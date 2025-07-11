@@ -409,6 +409,10 @@ PrefabInstance:
       propertyPath: footstepStopThreshold
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 5932811329201777030, guid: feccb33928fa16d4a8f711a88f638898, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 472a1d1c1f7d653459a5970ffefe76fc, type: 2}
     - target: {fileID: 7823804385824512175, guid: feccb33928fa16d4a8f711a88f638898, type: 3}
       propertyPath: timeBetweenSteps
       value: 0.5
@@ -504,6 +508,10 @@ PrefabInstance:
     - target: {fileID: 7462348719627921146, guid: 1079ade9fc341224faae6f5ce544e38c, type: 3}
       propertyPath: m_VertexColorAlwaysGammaSpace
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7462348719627921146, guid: 1079ade9fc341224faae6f5ce544e38c, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 27
       objectReference: {fileID: 0}
     - target: {fileID: 8971918889113223546, guid: 1079ade9fc341224faae6f5ce544e38c, type: 3}
       propertyPath: m_Pivot.x
