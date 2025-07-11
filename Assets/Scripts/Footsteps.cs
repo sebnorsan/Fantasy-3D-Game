@@ -3,29 +3,29 @@ using UnityEngine;
 
 public class Footsteps : MonoBehaviour
 {
-    public FootstepLibrary[] libraries;
+	public FootstepLibrary[] libraries;
 
-    [System.Serializable]
-    public class FootstepLibrary
-    {
-        public string libId = "";
-        public Material[] materialsRecognized;
+	[System.Serializable]
+	public class FootstepLibrary
+	{
+		public string libId = "";
+		public Material[] materialsRecognized;
 		public AudioClip[] footsteps;
 	}
 
-    private FootstepLibrary currLib;
+	private FootstepLibrary currLib;
 
 	private Coroutine coroutine;
 	public float timeBetweenSteps;
 	public void PlayFootsteps()
-    {
+	{
 		if (coroutine != null)
 			return;
 
 		InvokeRepeating(nameof(CheckForMaterial), 0f, .2f);
 
 		coroutine = StartCoroutine(Numerator());
-    }
+	}
 	public void StopFootsteps()
 	{
 		CancelInvoke();
@@ -79,8 +79,8 @@ public class Footsteps : MonoBehaviour
 			PlayFootstep();
 		}
 	}
-    private void CheckForMaterial()
-    {
+	private void CheckForMaterial()
+	{
 		var player = FindFirstObjectByType<PlayerController>();
 
 		Collider[] groundColliders = Physics.OverlapSphere(player.groundCheck.position, player.checkRadius + .1f, LayerMask.GetMask("Ground", "MovingPlatform"));

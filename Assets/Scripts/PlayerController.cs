@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
 	[Header("Player Settings")]
 	[SerializeField] public Transform playerCamera;
 	[SerializeField, Range(1, 10)] float walkingSpeed = 3.0f;
-	[SerializeField, Range(0.1f, 5)] float crouchSpeed = 1.0f;
+	[SerializeField, Range(0.1f, 5)] public float crouchSpeed = 1.0f;
 	[SerializeField, Range(2, 20)] float runningSpeed = 4.0f;
 	[SerializeField, Range(0, 20)] float jumpSpeed = 6.0f;
 	[SerializeField, Range(0.5f, 10)] public float lookSpeed = 2.0f;
@@ -320,11 +320,15 @@ public class PlayerController : MonoBehaviour
 
 		if (Input.GetKey(crouchKey))
 		{
+			return;
+			
 			isCrouching = true;
 			walkingSpeed = Mathf.Lerp(walkingSpeed, crouchSpeed, 6 * Time.deltaTime);
 		}
 		else if (!crouchSphere)
 		{
+			return;
+
 			isCrouching = false;
 			walkingSpeed = Mathf.Lerp(walkingSpeed, initialWalkingSpeed, 4 * Time.deltaTime);
 
@@ -339,6 +343,8 @@ public class PlayerController : MonoBehaviour
 
 	void SetCrouchHeight(float newHeight)
 	{
+		return;
+
 		characterController.stepOffset = 0.1f;
 
 		transform.localScale = new Vector3(transform.localScale.x, newHeight, transform.localScale.z);
@@ -349,6 +355,8 @@ public class PlayerController : MonoBehaviour
 
 	void ResetSetCrouchHeight(float newHeight)
 	{
+		return;
+
 		characterController.stepOffset = 0.65f;
 
 		transform.localScale = new Vector3(transform.localScale.x, newHeight, transform.localScale.z);

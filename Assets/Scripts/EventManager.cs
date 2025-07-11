@@ -221,11 +221,11 @@ public class EventManager : MonoBehaviour
 	}
 	public void TeleportPlayer(Vector3 tpPos)
 	{
-		player.characterController.enabled = false;
-		player.transform.position = tpPos;
-		player.characterController.enabled = true;
+		//player.characterController.enabled = false;
+		//player.transform.position = tpPos;
+		//player.characterController.enabled = true;
 
-		player.moveDirection = Vector3.zero;
+		//player.moveDirection = Vector3.zero;
 	}
 	public Transform bonusRoomSpawn;
 	public void BonusRoomTeleport()
