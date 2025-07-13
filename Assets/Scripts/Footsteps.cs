@@ -115,11 +115,12 @@ public class Footsteps : MonoBehaviour
 
 				foreach (var mat in lib.materialsRecognized)
 				{
-					if (closestCollider.gameObject.GetComponent<MeshRenderer>().material.name.Contains(mat.name))
-					{
-						tempLib = lib;
-						break;
-					}
+					if (closestCollider.TryGetComponent(out MeshRenderer meshRend))
+						if (meshRend.material.name.Contains(mat.name))
+						{
+							tempLib = lib;
+							break;
+						}
 				}
 			}
 

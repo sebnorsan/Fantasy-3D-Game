@@ -3,72 +3,7 @@ guid: 4b2cff1696f034d498684c045d298ec5
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: All_textures
-    second: {fileID: 2100000, guid: 575c7a17a71847a4f8a2aada8f34fbd8, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: All_textures.001
-    second: {fileID: 2100000, guid: b7b8a55a800a602459471ec9976b013b, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Candle_Texture
-    second: {fileID: 2100000, guid: c449b3989f0f72c42b04222575eacdc4, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Crystal_Color
-    second: {fileID: 2100000, guid: da4c17a563b58164588e5a19ef2913dc, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Gray
-    second: {fileID: 2100000, guid: ef7ef3b0b2663314ebf5e530ccc11012, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Gray.001
-    second: {fileID: 2100000, guid: b122b393f31c66d4f85a90ae1d707199, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Material
-    second: {fileID: 2100000, guid: e9e6378f515159b41b484024452a9d38, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Material.001
-    second: {fileID: 2100000, guid: 95fbbbcc175de3c49afbfab0b192a12c, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Material.002
-    second: {fileID: 2100000, guid: c1ba1da3911c7e44590220009d3e1cc8, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Material.004
-    second: {fileID: 2100000, guid: e9dba075646c6cc4cb8127d0c46d108b, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Plank_Texture
-    second: {fileID: 2100000, guid: 7b67a56d705a5344f9bd4e55337c5b2d, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Stone
-    second: {fileID: 2100000, guid: f24b7b738d139cb4e9a0ccbfd1d89b94, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: x1
-    second: {fileID: 2100000, guid: c76d9a8f2fb87794f89c89d45d87c224, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0

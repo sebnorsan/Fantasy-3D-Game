@@ -21,10 +21,13 @@ public class Arrow : MonoBehaviour
 	// Correct for a mesh that needs a 90° pitch to face its Z+ forward
 	private readonly Quaternion modelCorrection = Quaternion.Euler(90f, 0f, 0f);
 
+	private Vector3 initPlayerPos;
 	private Vector3 velocity;
 	private Rigidbody rb;
 	private void Start()
 	{
+		initPlayerPos = FindFirstObjectByType<PlayerController>().transform.position;
+
 		CameraShaker.Instance.ShakeOnce(2f, 3f, .1f, .2f);
 
 		rb = GetComponent<Rigidbody>();
@@ -64,28 +67,23 @@ public class Arrow : MonoBehaviour
 			rb.MoveRotation(aimRot * modelCorrection);
 		}
 	}
-	bool hasStuck = false;
+	//bool hasStuck = false;
 	private void OnCollisionEnter(Collision collision)
 	{
-		if (hasStuck) return;
-		hasStuck = true;
+		//if (hasStuck) return;
+		//hasStuck = true;
 
 		if (collision.gameObject.TryGetComponent(out IDamagable component))
 		{
 			component.TakeDamage(arrowDamage);
-			component.DamageEffects(transform.position);
+			component.DamageEffects(initPlayerPos);
 		}
 
-		var tr = GetComponentInChildren<TrailRenderer>();
+		//var tr = GetComponentInChildren<TrailRenderer>();
 
-		float dist = Vector3.Distance(transform.position, FindFirstObjectByType<PlayerController>().transform.position);
-		float t = Mathf.Clamp01(dist / 350f);
+		//float dist = Vector3.Distance(transform.position, FindFirstObjectByType<PlayerController>().transform.position);
+		//float t = Mathf.Clamp01(dist / 350f);
 		
-		tr.time = Mathf.Lerp(tr.time * 0.05f, tr.time, t);
-
-		transform.SetParent(collision.transform, true);
-		rb.isKinematic = true;
-		GetComponent<Collider>().enabled = false;
-		Destroy(this);
+		//tr.time = Mathf.Lerp(tr.time * 0.05f, tr.time, t);
 	}
 }
