@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
 	[Header("Advanced")]
 	[SerializeField] float runningFOV = 65.0f;
 	[SerializeField] float fovTransitionSpeed = 4.0f;
-	[SerializeField] float crouchHeight = 1.0f;
+	//[SerializeField] float crouchHeight = 1.0f;
 	[SerializeField] float gravity = 20.0f;
 	[SerializeField] float timeToRunning = 2.0f;
 	[HideInInspector] public bool canMove = true;
@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviour
 	public float maxFallSpeed = -15f;
 
 	[Header("Input")]
-	[SerializeField] KeyCode crouchKey = KeyCode.LeftControl;
+	//[SerializeField] KeyCode crouchKey = KeyCode.LeftControl;
 	public bool runToggle = false;
 	public bool cameraLock = false;
 
@@ -313,57 +313,57 @@ public class PlayerController : MonoBehaviour
 		bool crouchSphere = Physics.CheckSphere(transform.position + new Vector3(0, .66f, 0), .3f, LayerMask.GetMask("Ground", "MovingPlatform"));
 
 		// Crouching
-		if (Input.GetKeyDown(crouchKey))
-			SetCrouchHeight(crouchHeight);
-		else if (Input.GetKeyUp(crouchKey) && !crouchSphere)
-			ResetSetCrouchHeight(initialCrouchHeight);
+		//if (Input.GetKeyDown(crouchKey))
+		//	SetCrouchHeight(crouchHeight);
+		//else if (Input.GetKeyUp(crouchKey) && !crouchSphere)
+		//	ResetSetCrouchHeight(initialCrouchHeight);
 
-		if (Input.GetKey(crouchKey))
-		{
-			return;
+		//if (Input.GetKey(crouchKey))
+		//{
+		//	return;
 			
-			isCrouching = true;
-			walkingSpeed = Mathf.Lerp(walkingSpeed, crouchSpeed, 6 * Time.deltaTime);
-		}
-		else if (!crouchSphere)
-		{
-			return;
+		//	isCrouching = true;
+		//	walkingSpeed = Mathf.Lerp(walkingSpeed, crouchSpeed, 6 * Time.deltaTime);
+		//}
+		//else if (!crouchSphere)
+		//{
+		//	return;
 
-			isCrouching = false;
-			walkingSpeed = Mathf.Lerp(walkingSpeed, initialWalkingSpeed, 4 * Time.deltaTime);
+		//	isCrouching = false;
+		//	walkingSpeed = Mathf.Lerp(walkingSpeed, initialWalkingSpeed, 4 * Time.deltaTime);
 
-			if (transform.localScale.y == crouchHeight)
-				ResetSetCrouchHeight(initialCrouchHeight);
-		}
+		//	if (transform.localScale.y == crouchHeight)
+		//		ResetSetCrouchHeight(initialCrouchHeight);
+		//}
 	}
 
 	void ResetRebound() => rebound = false;
 	void StopCoyote() => coyoteActive = false;
 
 
-	void SetCrouchHeight(float newHeight)
-	{
-		return;
+	//void SetCrouchHeight(float newHeight)
+	//{
+	//	return;
 
-		characterController.stepOffset = 0.1f;
+	//	characterController.stepOffset = 0.1f;
 
-		transform.localScale = new Vector3(transform.localScale.x, newHeight, transform.localScale.z);
-		characterController.enabled = false;
-		transform.position = new Vector3(transform.position.x, transform.position.y - ((initialCrouchHeight - newHeight) / 2), transform.position.z);
-		characterController.enabled = true;
-	}
+	//	transform.localScale = new Vector3(transform.localScale.x, newHeight, transform.localScale.z);
+	//	characterController.enabled = false;
+	//	transform.position = new Vector3(transform.position.x, transform.position.y - ((initialCrouchHeight - newHeight) / 2), transform.position.z);
+	//	characterController.enabled = true;
+	//}
 
-	void ResetSetCrouchHeight(float newHeight)
-	{
-		return;
+	//void ResetSetCrouchHeight(float newHeight)
+	//{
+	//	return;
 
-		characterController.stepOffset = 0.65f;
+	//	characterController.stepOffset = 0.65f;
 
-		transform.localScale = new Vector3(transform.localScale.x, newHeight, transform.localScale.z);
-		characterController.enabled = false;
-		transform.position = new Vector3(transform.position.x, transform.position.y + ((initialCrouchHeight - crouchHeight) / 2), transform.position.z);
-		characterController.enabled = true;
-	}
+	//	transform.localScale = new Vector3(transform.localScale.x, newHeight, transform.localScale.z);
+	//	characterController.enabled = false;
+	//	transform.position = new Vector3(transform.position.x, transform.position.y + ((initialCrouchHeight - crouchHeight) / 2), transform.position.z);
+	//	characterController.enabled = true;
+	//}
 
 	void OnDrawGizmos()
 	{

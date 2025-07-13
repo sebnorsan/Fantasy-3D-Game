@@ -230,8 +230,8 @@ public class EventManager : MonoBehaviour
 	public Transform bonusRoomSpawn;
 	public void BonusRoomTeleport()
 	{
-		TeleportPlayer(bonusRoomSpawn.position);
-		PlayThisSound("Voicelines", "BonusRoom");
+		//TeleportPlayer(bonusRoomSpawn.position);
+		//PlayThisSound("Voicelines", "BonusRoom");
 	}
 
 	#region UI-Events
