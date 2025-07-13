@@ -28,6 +28,7 @@ public class BowScript : MonoBehaviour
 	}
 	private void LoadBow()
 	{
+		anim.ResetTrigger("Shoot");
 		hs.UnassignMaxAmounts();
 		anim.SetBool("Load", true);
 	}
@@ -40,7 +41,7 @@ public class BowScript : MonoBehaviour
 	{
 		anim.SetTrigger("Shoot");
 		canShoot = false;
-		Invoke(nameof(ResetShot), .15f);
+		Invoke(nameof(ResetShot), .35f);
 	}
 	private void ResetShot() => canShoot = true;
 	public void InstantiateArrow()

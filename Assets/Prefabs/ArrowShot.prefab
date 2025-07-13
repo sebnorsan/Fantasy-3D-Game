@@ -5083,7 +5083,7 @@ MonoBehaviour:
   arrowDamage: 1
   arrowEffect: 0
   initialSpeed: 150
-  dropGravity: 9
+  dropGravity: 4
   lifeTime: 10
 --- !u!65 &184284523751061023
 BoxCollider:
@@ -5104,7 +5104,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.29, y: 2.5734782, z: 0.35}
+  m_Size: {x: 0.83, y: 3.17, z: 0.84}
   m_Center: {x: -0.0000018849969, y: 0.073062435, z: 0.0000000027939684}
 --- !u!1 &6750712160851407486
 GameObject:
@@ -5193,7 +5193,7 @@ TrailRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.20616952
+        value: 0.49132577
         inSlope: -0.017178832
         outSlope: -0.017178832
         tangentMode: 0
@@ -5203,11 +5203,11 @@ TrailRenderer:
       - serializedVersion: 3
         time: 1
         value: 0
-        inSlope: -0.5472974
-        outSlope: -0.5472974
+        inSlope: -1.4431149
+        outSlope: -1.4431149
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0.12695622
+        inWeight: 0.109482706
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
