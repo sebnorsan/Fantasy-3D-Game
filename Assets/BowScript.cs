@@ -43,7 +43,11 @@ public class BowScript : MonoBehaviour
 		Invoke(nameof(ResetShot), .15f);
 	}
 	private void ResetShot() => canShoot = true;
-	public void InstantiateArrow() => Instantiate(arrowFired, arrowTransform.position, Quaternion.identity);
+	public void InstantiateArrow()
+	{
+		//arrowFired.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+		Instantiate(arrowFired, arrowTransform.position, arrowFired.transform.rotation);
+	}
 	public void AssignMiddleString() => GetComponentInChildren<BowStringRend>().AssignMid();
 	public void UnAssignMiddleString() => GetComponentInChildren<BowStringRend>().UnAssignMid();
 }

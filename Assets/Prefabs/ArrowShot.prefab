@@ -26,13 +26,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1323043003993081425}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.70710707, y: -0, z: -0, w: 0.7071066}
-  m_LocalPosition: {x: 0, y: -7.4, z: 0}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 1.4250875, z: -0.0000104904175}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 920991001379462035}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!198 &1135843697448365108
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -4961,10 +4961,10 @@ GameObject:
   - component: {fileID: 920991001379462035}
   - component: {fileID: 8884069470092788789}
   - component: {fileID: 3486222336262703202}
-  - component: {fileID: 6335952314771608171}
   - component: {fileID: 2845986693196668612}
   - component: {fileID: 2464897326432360680}
-  m_Layer: 0
+  - component: {fileID: 184284523751061023}
+  m_Layer: 8
   m_Name: ArrowShot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4979,15 +4979,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5657210549004271310}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: -0, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.17575489, y: 0.12456863, z: 0.21969368}
+  m_LocalScale: {x: 0.7272, y: 1.0300183, z: 0.7272}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 203476811335279998}
   - {fileID: 3040993942566502436}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!33 &8884069470092788789
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -5041,27 +5041,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &6335952314771608171
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5657210549004271310}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.88, y: 6.808142, z: 1.13}
-  m_Center: {x: 0.0000056624413, y: -0.19328682, z: 0.000000014901161}
 --- !u!54 &2845986693196668612
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5101,9 +5080,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 377abf98a6611fa42a25704bb747be1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  arrowDamage: 1
+  arrowEffect: 0
   initialSpeed: 150
   dropGravity: 9
   lifeTime: 10
+--- !u!65 &184284523751061023
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5657210549004271310}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.29, y: 2.5734782, z: 0.35}
+  m_Center: {x: -0.0000018849969, y: 0.073062435, z: 0.0000000027939684}
 --- !u!1 &6750712160851407486
 GameObject:
   m_ObjectHideFlags: 0
@@ -5130,8 +5132,8 @@ Transform:
   m_GameObject: {fileID: 6750712160851407486}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.21, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: -1.19, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 920991001379462035}
@@ -5199,7 +5201,7 @@ TrailRenderer:
         inWeight: 0.33333334
         outWeight: 1
       - serializedVersion: 3
-        time: 0.998291
+        time: 1
         value: 0
         inSlope: -0.5472974
         outSlope: -0.5472974
