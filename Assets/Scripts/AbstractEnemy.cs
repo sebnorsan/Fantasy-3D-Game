@@ -8,6 +8,7 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 {
 	private NavMeshAgent agent;
 	private Transform crystalPos;
+	private Animator anim;
 
 	public int maxHealth = 100;
 	public int currentHealth = 0;
@@ -16,22 +17,26 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 	{
 		agent = GetComponent<NavMeshAgent>();
 
+		if (GetComponent<Animator>())
+			anim = GetComponent<Animator>();
+
 		originalSpeed = agent.speed;
 		originalAcceleration = agent.acceleration;
+
 		flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
 
 		hitParticles = Resources.Load<GameObject>("PFX/HitFX");
 		deathParticles = Resources.Load<GameObject>("PFX/DeathFX");
-
-		crystalPos = GameObject.FindGameObjectWithTag("Crystal").transform;
-		agent.SetDestination(crystalPos.position);
 
 		InitializeEnemy();
 	}
 
 	protected virtual void InitializeEnemy() 
 	{
-		
+		if (anim != null)
+			anim.SetBool("Walking", true);
+		crystalPos = GameObject.FindGameObjectWithTag("Crystal").transform;
+		agent.SetDestination(crystalPos.position);
 	}
 	Coroutine currKnockbackCoroutine, currFlashCoroutine;
 	public void DamageEffects(Vector3 hitPoint)
@@ -55,6 +60,9 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 	protected virtual IEnumerator OnKnockback(Vector3 hitPoint)
 	{
 		yield return new WaitForSeconds(0.001f);
+		if (anim != null)
+			anim.SetBool("Walking", false);
+
 		// Compute direction from hit point to this enemy
 		Vector3 dir = (transform.position - hitPoint).normalized;
 
@@ -96,47 +104,44 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 
 		agent.speed = originalSpeed;
 		agent.SetDestination(crystalPos.position); // Resume behavior
+		if (anim != null)
+			anim.SetBool("Walking", true);
 	}
 	private Material flashMaterial;
 	private float flashDuration = .1f;
 	protected virtual IEnumerator OnFlashMaterial()
 	{
-		// Load flash material if not already loaded
+		// 1) Load flash material if not already loaded
 		if (flashMaterial == null)
 			flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
 
-		// Store original materials per renderer
-		List<(MeshRenderer renderer, Material[] originalMaterials)> affectedRenderers = new();
+		// 2) Find ALL MeshRenderers in this object’s hierarchy
+		var allRenderers = GetComponentsInChildren<MeshRenderer>(includeInactive: true);
 
-		// Add root MeshRenderer
-		if (TryGetComponent(out MeshRenderer rootRenderer))
+		// 3) Store originals and apply flash
+		var affected = new List<(MeshRenderer renderer, Material[] originals)>(allRenderers.Length);
+		foreach (var rend in allRenderers)
 		{
-			affectedRenderers.Add((rootRenderer, rootRenderer.materials));
-			Material[] flashMats = new Material[rootRenderer.materials.Length];
-			for (int i = 0; i < flashMats.Length; i++) flashMats[i] = flashMaterial;
-			rootRenderer.materials = flashMats;
+			// store original materials
+			affected.Add((rend, rend.materials));
+
+			// create an array filled with flashMaterial
+			var flashMats = new Material[rend.materials.Length];
+			for (int i = 0; i < flashMats.Length; i++)
+				flashMats[i] = flashMaterial;
+
+			// apply
+			rend.materials = flashMats;
 		}
 
-		// Add child MeshRenderers
-		foreach (Transform child in transform)
-		{
-			if (child.TryGetComponent(out MeshRenderer childRenderer))
-			{
-				affectedRenderers.Add((childRenderer, childRenderer.materials));
-				Material[] flashMats = new Material[childRenderer.materials.Length];
-				for (int i = 0; i < flashMats.Length; i++) flashMats[i] = flashMaterial;
-				childRenderer.materials = flashMats;
-			}
-		}
-
+		// 4) Wait
 		yield return new WaitForSeconds(flashDuration);
 
-		// Revert to original materials
-		foreach (var (renderer, originalMaterials) in affectedRenderers)
-		{
-			renderer.materials = originalMaterials;
-		}
+		// 5) Revert all
+		foreach (var (renderer, originals) in affected)
+			renderer.materials = originals;
 	}
+
 	private GameObject hitParticles;
 	private GameObject deathParticles;
 	protected virtual void OnSpawnDamagePFX()
@@ -146,7 +151,8 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 	}
 	protected virtual void OnPlayDamageAnimation()
 	{
-
+		if (anim != null)
+			anim.SetTrigger("Damage");
 	}
 	public void TakeDamage(int amount)
 	{
