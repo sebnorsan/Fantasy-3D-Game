@@ -4016,8 +4016,8 @@ Transform:
   m_GameObject: {fileID: 1211007080}
   serializedVersion: 2
   m_LocalRotation: {x: -0.63169694, y: -0.31774062, z: -0.3177406, w: 0.6316968}
-  m_LocalPosition: {x: -95, y: -24.7, z: 145}
-  m_LocalScale: {x: 23.939043, y: 23.939043, z: 23.939043}
+  m_LocalPosition: {x: -95.49, y: -25.05, z: 149.46}
+  m_LocalScale: {x: 17.54, y: 19.5, z: 18.4}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 637798956}
@@ -4687,6 +4687,7 @@ GameObject:
   - component: {fileID: 1363509215}
   - component: {fileID: 1363509217}
   - component: {fileID: 1363509216}
+  - component: {fileID: 1363509218}
   m_Layer: 6
   m_Name: Terrain
   m_TagString: Untagged
@@ -4740,10 +4741,10 @@ Terrain:
   serializedVersion: 6
   m_TerrainData: {fileID: 15600000, guid: 8b8a60429bb2edc438ec8ffd29455a04, type: 2}
   m_TreeDistance: 5000
-  m_TreeBillboardDistance: 50
+  m_TreeBillboardDistance: 378
   m_TreeCrossFadeLength: 5
   m_TreeMaximumFullLODCount: 50
-  m_DetailObjectDistance: 80
+  m_DetailObjectDistance: 767
   m_DetailObjectDensity: 1
   m_HeightmapPixelError: 5
   m_SplatMapDistance: 1000
@@ -4769,6 +4770,20 @@ Terrain:
   m_EnableHeightmapRayTracing: 1
   m_EnableTreesAndDetailsRayTracing: 0
   m_TreeMotionVectorModeOverride: 3
+--- !u!182 &1363509218
+WindZone:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1363509214}
+  m_Enabled: 1
+  m_Mode: 1
+  m_Radius: 107.67
+  m_WindMain: 1
+  m_WindTurbulence: 1
+  m_WindPulseMagnitude: 0.5
+  m_WindPulseFrequency: 0.01
 --- !u!1 &1401573658
 GameObject:
   m_ObjectHideFlags: 0
@@ -5893,7 +5908,7 @@ Terrain:
   m_TreeBillboardDistance: 50
   m_TreeCrossFadeLength: 5
   m_TreeMaximumFullLODCount: 50
-  m_DetailObjectDistance: 80
+  m_DetailObjectDistance: 50
   m_DetailObjectDensity: 1
   m_HeightmapPixelError: 5
   m_SplatMapDistance: 1000
