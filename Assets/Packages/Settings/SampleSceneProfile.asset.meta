@@ -6,3 +6,10 @@ NativeFormatImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 233080
+  packageName: Waving Force Fields URP
+  packageVersion: 1.0
+  assetPath: Assets/Packages/Settings/SampleSceneProfile.asset
+  uploadId: 527016

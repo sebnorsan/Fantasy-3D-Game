@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7394e6837967f8f41ad4cd701daaf830
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 233080
+  packageName: Waving Force Fields URP
+  packageVersion: 1.0
+  assetPath: Assets/FinTheHuman/UniversalRenderPipelineGlobalSettings.asset
+  uploadId: 527016
