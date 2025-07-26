@@ -12,6 +12,8 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 
 	public int maxHealth = 100;
 	public int currentHealth = 0;
+
+	public float speed = 3.5f;
 	private void Awake() => currentHealth = maxHealth;
 	private void Start()
 	{
@@ -35,7 +37,14 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 	{
 		if (anim != null)
 			anim.SetBool("Walking", true);
-		crystalPos = GameObject.FindGameObjectWithTag("Crystal").transform;
+
+		agent.speed = speed;
+
+		InitializeDestination();
+	}
+	protected virtual void InitializeDestination()
+	{
+		crystalPos = FindFirstObjectByType<CrystalScript>().transform;
 		agent.SetDestination(crystalPos.position);
 	}
 	Coroutine currKnockbackCoroutine, currFlashCoroutine;
