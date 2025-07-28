@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c31cf11c006b390418f8227aceb3424c, type: 3}
-  m_Name: PlayTheGame
+  m_Script: {fileID: 11500000, guid: 5d1bc4ee9d2788344a19f022e0992a50, type: 3}
+  m_Name: 2
   m_EditorClassIdentifier: 
-  dialogueId: PlayTheGame
+  dialogueId: 
   npcVoiceLine:
     audioName: New Audio
     loop: 0
@@ -22,15 +22,14 @@ MonoBehaviour:
     maxDistance: 500
     subtitlesEnabled: 0
     subtitles: []
-  imageOverride: {fileID: 21300000, guid: a933e7814e1e9974480b3eed420f6c46, type: 3}
-  dialogue: Just play the fucking game.
-  affectedWords:
-  - wordAffected: fucking
-    wordEffectType: 1
-  continuedDialogueId: 
-  dialogueEvent_enabled: 1
+  imageOverride: {fileID: 0}
+  dialogue: can you go chop some wood with that bow of yours, i think you can. okay
+    thanks
+  affectedWords: []
+  continuedDialogue: {fileID: 0}
+  dialogueEvent_enabled: 0
   dialogueEvent_OnStart: 0
-  dialogueEvent: 2
+  dialogueEvent: 0
   dialogueEvent_timeEvent: 0
   dialogueEvent_interactionsEvent: 0
-  dialogueEvent_continuedDialogue: 
+  dialogueEvent_continuedDialogue: {fileID: 0}

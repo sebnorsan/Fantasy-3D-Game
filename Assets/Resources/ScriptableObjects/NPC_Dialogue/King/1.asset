@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c31cf11c006b390418f8227aceb3424c, type: 3}
-  m_Name: Introduction
+  m_Script: {fileID: 11500000, guid: 5d1bc4ee9d2788344a19f022e0992a50, type: 3}
+  m_Name: 1
   m_EditorClassIdentifier: 
-  dialogueId: Normal
+  dialogueId: 
   npcVoiceLine:
     audioName: New Audio
     loop: 0
@@ -23,12 +23,13 @@ MonoBehaviour:
     subtitlesEnabled: 0
     subtitles: []
   imageOverride: {fileID: 0}
-  dialogue: ...
+  dialogue: hey there my singular and only guard in the whole kingdom, of uhhhhhhh
+    idk
   affectedWords: []
-  continuedDialogueId: 
-  dialogueEvent_enabled: 1
+  continuedDialogue: {fileID: 11400000, guid: ddc0f85e41a608644b62a16fef0257e8, type: 2}
+  dialogueEvent_enabled: 0
   dialogueEvent_OnStart: 0
-  dialogueEvent: 1
+  dialogueEvent: 0
   dialogueEvent_timeEvent: 0
-  dialogueEvent_interactionsEvent: 10
-  dialogueEvent_continuedDialogue: PlayTheGame
+  dialogueEvent_interactionsEvent: 0
+  dialogueEvent_continuedDialogue: {fileID: 0}

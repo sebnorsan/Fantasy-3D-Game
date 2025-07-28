@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using static NPC_Interactable;
 
 [CreateAssetMenu(fileName = "Dialogue", menuName = "NPC/New Dialogue")]
 public class ScriptableObject_NPC_Dialogue : ScriptableObject
@@ -17,7 +16,7 @@ public class ScriptableObject_NPC_Dialogue : ScriptableObject
 
 	[Space(15)]
 
-	public string continuedDialogueId;
+	public ScriptableObject_NPC_Dialogue continuedDialogue;
 
 	[Space(15)]
 
@@ -34,7 +33,7 @@ public class ScriptableObject_NPC_Dialogue : ScriptableObject
 
 	[Space(15)]
 
-	public string dialogueEvent_continuedDialogue;
+	public ScriptableObject_NPC_Dialogue dialogueEvent_continuedDialogue;
 }
 [Serializable]
 public class WordEffect

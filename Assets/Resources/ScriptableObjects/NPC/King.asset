@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3552e028b93c0b4f9cc293293eaf0cc, type: 3}
-  m_Name: Guy
+  m_Script: {fileID: 11500000, guid: 18bea4de19913a348870c56090851372, type: 3}
+  m_Name: King
   m_EditorClassIdentifier: 
-  npcName: Guy
-  npcPic: {fileID: 21300000, guid: 9686e0728c6a8954fbdc4b7887f17d59, type: 3}
+  npcName: King
+  npcPic: {fileID: 0}

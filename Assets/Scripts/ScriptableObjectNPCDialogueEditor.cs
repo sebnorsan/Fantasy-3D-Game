@@ -11,7 +11,7 @@ public class ScriptableObjectNPCDialogueEditor : Editor
 	SerializedProperty imageOverrideProp;
 	SerializedProperty dialogueProp;
 	SerializedProperty affectedWordsProp;
-	SerializedProperty continuedDialogueIdProp;
+	SerializedProperty continuedDialogueProp;
 
 	SerializedProperty evtEnabledProp;
 	SerializedProperty evtOnStartProp;
@@ -22,13 +22,14 @@ public class ScriptableObjectNPCDialogueEditor : Editor
 
 	void OnEnable()
 	{
-		// link properties by name
-		dialogueIdProp = serializedObject.FindProperty("dialogueId");                            // :contentReference[oaicite:0]{index=0}
+		// link properties by name (must match SO field names)
+		dialogueIdProp = serializedObject.FindProperty("dialogueId");
 		npcVoiceLineProp = serializedObject.FindProperty("npcVoiceLine");
 		imageOverrideProp = serializedObject.FindProperty("imageOverride");
 		dialogueProp = serializedObject.FindProperty("dialogue");
 		affectedWordsProp = serializedObject.FindProperty("affectedWords");
-		continuedDialogueIdProp = serializedObject.FindProperty("continuedDialogueId");
+		// corrected: matches 'public ScriptableObject_NPC_Dialogue continuedDialogue;' in SO
+		continuedDialogueProp = serializedObject.FindProperty("continuedDialogue");
 
 		evtEnabledProp = serializedObject.FindProperty("dialogueEvent_enabled");
 		evtOnStartProp = serializedObject.FindProperty("dialogueEvent_OnStart");
@@ -40,44 +41,47 @@ public class ScriptableObjectNPCDialogueEditor : Editor
 
 	public override void OnInspectorGUI()
 	{
-		serializedObject.Update();                                                                         // :contentReference[oaicite:1]{index=1}
+		serializedObject.Update();
 
-		// draw the always-visible fields
-		EditorGUILayout.PropertyField(dialogueIdProp);
-		EditorGUILayout.PropertyField(npcVoiceLineProp);
-		EditorGUILayout.PropertyField(imageOverrideProp);
-		EditorGUILayout.PropertyField(dialogueProp);
-		EditorGUILayout.PropertyField(affectedWordsProp, true);
-		EditorGUILayout.PropertyField(continuedDialogueIdProp);
+		// draw the always-visible fields if found
+		if (dialogueIdProp != null) EditorGUILayout.PropertyField(dialogueIdProp);
+		if (npcVoiceLineProp != null) EditorGUILayout.PropertyField(npcVoiceLineProp);
+		if (imageOverrideProp != null) EditorGUILayout.PropertyField(imageOverrideProp);
+		if (dialogueProp != null) EditorGUILayout.PropertyField(dialogueProp);
+		if (affectedWordsProp != null) EditorGUILayout.PropertyField(affectedWordsProp, true);
+		if (continuedDialogueProp != null) EditorGUILayout.PropertyField(continuedDialogueProp, new GUIContent("Continued Dialogue"));
 
-		// draw the master toggle
-		EditorGUILayout.PropertyField(evtEnabledProp);
-		if (evtEnabledProp.boolValue)                                                                      // :contentReference[oaicite:2]{index=2}
+		// draw the master toggle for events
+		if (evtEnabledProp != null)
 		{
-			// once enabled, show OnStart and enum
-			EditorGUILayout.PropertyField(evtOnStartProp);
-			EditorGUILayout.PropertyField(evtTypeProp);
-
-			// only show matching sub-field for the selected enum
-			var mode = (DialogueEvent)evtTypeProp.enumValueIndex;
-			switch (mode)                                                                                  // :contentReference[oaicite:3]{index=3}
+			EditorGUILayout.PropertyField(evtEnabledProp);
+			if (evtEnabledProp.boolValue)
 			{
-				case DialogueEvent.AfterSomeTime:
-					EditorGUILayout.PropertyField(evtTimeProp, new GUIContent("Time Delay"));
-					EditorGUILayout.PropertyField(evtContinuedDialogueProp);
-					break;
+				if (evtOnStartProp != null) EditorGUILayout.PropertyField(evtOnStartProp);
+				if (evtTypeProp != null) EditorGUILayout.PropertyField(evtTypeProp);
 
-				case DialogueEvent.AfterSomeInteractions:
-					EditorGUILayout.PropertyField(evtInteractionsProp, new GUIContent("Max Interactions"));
-					EditorGUILayout.PropertyField(evtContinuedDialogueProp);
-					break;
-
-				case DialogueEvent.AfterTalkNullify:
-					// no extra fields
-					break;
+				// only show matching sub-field for the selected enum
+				if (evtTypeProp != null && evtContinuedDialogueProp != null)
+				{
+					var mode = (DialogueEvent)evtTypeProp.enumValueIndex;
+					switch (mode)
+					{
+						case DialogueEvent.AfterSomeTime:
+							if (evtTimeProp != null) EditorGUILayout.PropertyField(evtTimeProp, new GUIContent("Time Delay"));
+							EditorGUILayout.PropertyField(evtContinuedDialogueProp, new GUIContent("Post-Event Dialogue"));
+							break;
+						case DialogueEvent.AfterSomeInteractions:
+							if (evtInteractionsProp != null) EditorGUILayout.PropertyField(evtInteractionsProp, new GUIContent("Max Interactions"));
+							EditorGUILayout.PropertyField(evtContinuedDialogueProp, new GUIContent("Post-Event Dialogue"));
+							break;
+						case DialogueEvent.AfterTalkNullify:
+							// no extra fields
+							break;
+					}
+				}
 			}
 		}
 
-		serializedObject.ApplyModifiedProperties();                                                        // :contentReference[oaicite:4]{index=4}
+		serializedObject.ApplyModifiedProperties();
 	}
 }

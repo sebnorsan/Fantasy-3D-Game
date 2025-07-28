@@ -1,14 +1,14 @@
 using UnityEngine;
+using System.Linq;
 using System.Collections;
+using System.Net.NetworkInformation;
 
 public class NPC_Interactable : MonoBehaviour, IInteractable
 {
 	public ScriptableObject_NPC npcBase;
 
 	public ScriptableObject_NPC_Dialogue nextDialogue;
-
-	public ScriptableObject_NPC_Dialogue[] availableCharacterDialogues;
-	public bool canInteract { get; set; }
+	public bool canInteract { get; set; } = true;
 
 	private int maxInteractions;
 	private int currentInteractions;
@@ -18,6 +18,18 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 
 	private bool dialogueEventActive = false;
 
+	/// <summary>
+	/// Hey lille luder, ændrer den her path for at finde dine resources tingenoter
+	/// hvor dine små klamme bøsse dialoger er :DDD
+	/// var lig ved at skriv n-ordet
+	/// </summary>
+
+	private ScriptableObject_NPC_Dialogue[] allDialogues;
+	private string dialoguePath = "ScriptableObjects/NPC_Dialogue";
+	private void Awake()
+	{
+		allDialogues = Resources.LoadAll<ScriptableObject_NPC_Dialogue>(dialoguePath);
+	}
 	private void Start()
 	{
 		if (nextDialogue.dialogueEvent_enabled && nextDialogue.dialogueEvent_OnStart && !dialogueEventActive)
@@ -27,24 +39,14 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 	{
 		StartTalk();
 	}
-	public ScriptableObject_NPC_Dialogue GetDialogue(string id)
+	public void ChangeDialogue(ScriptableObject_NPC_Dialogue d)
 	{
-		foreach (var dialogue in availableCharacterDialogues)
-			if (dialogue.dialogueId == id)
-				return dialogue;
-
-		return null;
-	}
-	public void ChangeDialogue(string id)
-	{
-		foreach (var dialogue in availableCharacterDialogues)
-			if (dialogue.dialogueId == id)
-				nextDialogue = dialogue;
+		nextDialogue = d;
 
 		if (nextDialogue.dialogueEvent_enabled && !nextDialogue.dialogueEvent_OnStart && !dialogueEventActive)
 			ApplyDialogueEvent(nextDialogue.dialogueEvent);
 	}
-	private string savedDialogueEventId;
+	private ScriptableObject_NPC_Dialogue savedDialogueEvent;
 	private void ApplyDialogueEvent(DialogueEvent tempEvent)
 	{
 		switch (tempEvent)
@@ -64,7 +66,7 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 				break;
 		}
 
-		savedDialogueEventId = nextDialogue.dialogueEvent_continuedDialogue;
+		savedDialogueEvent = nextDialogue.dialogueEvent_continuedDialogue;
 		dialogueEventActive = true;
 	}
 
@@ -101,8 +103,8 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 			EventManager.instance.PlayThisSound(nextDialogue.npcVoiceLine);
 			currentlyPlayingAudio = nextDialogue.npcVoiceLine.audioToPlay;
 		}
-		if (GetDialogue(nextDialogue.continuedDialogueId) != null)
-			ChangeDialogue(nextDialogue.continuedDialogueId);
+		if (nextDialogue.continuedDialogue != null)
+			ChangeDialogue(nextDialogue.continuedDialogue);
 		else
 			exitOnFinish = true;
 	}	
@@ -132,7 +134,7 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 			{
 				if (isTimerDone)
 				{
-					ChangeDialogue(savedDialogueEventId);
+					ChangeDialogue(savedDialogueEvent);
 					dialogueEventActive = false;
 				}
 			}
@@ -142,7 +144,7 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 
 				if (maxInteractions <= currentInteractions)
 				{
-					ChangeDialogue(savedDialogueEventId);
+					ChangeDialogue(savedDialogueEvent);
 					dialogueEventActive = false;
 				}
 			}
