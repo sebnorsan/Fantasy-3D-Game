@@ -9,7 +9,7 @@ public class ChangeFaceText : MonoBehaviour
     }
     public void ChangeFaceToCurrentWave()
     {
-        int tempWave = 0;
+        int tempWave = EnemySpawnerManager.instance._currentWave+1;
         ChangeFace($"Wave {tempWave}");
     }
 }

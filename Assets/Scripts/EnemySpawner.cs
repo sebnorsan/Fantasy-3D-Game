@@ -51,15 +51,12 @@ public class EnemySpawner : MonoBehaviour
 
 	private void TrySpawnEnemy()
 	{
-		// pick a random point in sphere (uniform distribution)
 		Vector3 randomOffset = Random.insideUnitSphere * spawnRadius;
 		Vector3 candidatePoint = transform.position + randomOffset;
 
-		// optional: reject if overlapping some obstacle
 		if (Physics.CheckSphere(candidatePoint, 0.5f, obstacleMask))
 			return;
 
-		// find nearest point on NavMesh
 		NavMeshHit hit;
 		if (NavMesh.SamplePosition(candidatePoint, out hit, maxNavSampleDistance, NavMesh.AllAreas))
 		{
@@ -67,7 +64,6 @@ public class EnemySpawner : MonoBehaviour
 		}
 	}
 
-	// draw a red wireframe sphere in the Editor
 	void OnDrawGizmosSelected()
 	{
 		Gizmos.color = Color.red;
