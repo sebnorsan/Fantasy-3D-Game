@@ -7,4 +7,8 @@ public class EventAudioPlayer : MonoBehaviour
     {
         EventManager.instance.PlayThisSound(audios[i]);
     }
+    public void StopAudio(int i)
+    {
+        EventManager.instance.StopThisSound(audios[i].audioToPlay);
+    }
 }

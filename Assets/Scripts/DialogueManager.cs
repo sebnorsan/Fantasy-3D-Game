@@ -17,7 +17,6 @@ public class DialogueManager : MonoBehaviour
 		_lookup.Remove(id);
 	}
 
-	// *** NEW ***
 	public static void SetActive(string id, bool active)
 	{
 		if (_lookup.TryGetValue(id, out var go))

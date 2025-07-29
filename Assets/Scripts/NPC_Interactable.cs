@@ -21,45 +21,38 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 
 	public event Action OnTalkEnded;
 
-	/// <summary>
-	/// Hey lille luder, ændrer den her path for at finde dine resources tingenoter
-	/// hvor dine små klamme bøsse dialoger er :DDD
-	/// var lig ved at skriv n-ordet
-	/// </summary>
-
-	private ScriptableObject_NPC_Dialogue[] allDialogues;
-	private string dialoguePath = "ScriptableObjects/NPC_Dialogue";
-	private void Awake()
-	{
-		allDialogues = Resources.LoadAll<ScriptableObject_NPC_Dialogue>(dialoguePath);
-	}
 	private void Start()
 	{
-		if (nextDialogue.dialogueEvent_enabled && nextDialogue.dialogueEvent_OnStart && !dialogueEventActive)
-			ApplyDialogueEvent(nextDialogue.dialogueEvent);
+		if (nextDialogue.dialogueEvent_OnStart)
+			ApplyDialogueEvent(nextDialogue);
 	}
 	public void Interact()
 	{
+		if (!canInteract)
+			return;
+
 		StartTalk();
 	}
 	public void ChangeDialogue(ScriptableObject_NPC_Dialogue d)
 	{
 		nextDialogue = d;
-
-		if (nextDialogue.dialogueEvent_enabled && !nextDialogue.dialogueEvent_OnStart && !dialogueEventActive)
-			ApplyDialogueEvent(nextDialogue.dialogueEvent);
 	}
 	private ScriptableObject_NPC_Dialogue savedDialogueEvent;
-	private void ApplyDialogueEvent(DialogueEvent tempEvent)
+	private void ApplyDialogueEvent(ScriptableObject_NPC_Dialogue dlg)
 	{
+		if (dialogueEventActive || !dlg.dialogueEvent_enabled)
+			return;
+
+		var tempEvent = dlg.dialogueEvent;
+
 		switch (tempEvent)
 		{
 			case DialogueEvent.AfterSomeTime:
-				maxTime = nextDialogue.dialogueEvent_timeEvent;
+				maxTime = dlg.dialogueEvent_timeEvent;
 				StartTimer();
 				break;
 			case DialogueEvent.AfterSomeInteractions:
-				maxInteractions = nextDialogue.dialogueEvent_interactionsEvent;
+				maxInteractions = dlg.dialogueEvent_interactionsEvent;
 				currentInteractions = 0;
 				break;
 			case DialogueEvent.AfterTalkNullify:
@@ -69,15 +62,24 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 				break;
 		}
 
-		savedDialogueEvent = nextDialogue.dialogueEvent_continuedDialogue;
+		savedDialogueEvent = dlg.dialogueEvent_continuedDialogue;
 		dialogueEventActive = true;
 	}
 
 	private AudioClip currentlyPlayingAudio = null;
 	private bool exitOnFinish;
+	private ScriptableObject_NPC_Dialogue prevDialogue;
 
 	public void ContinueTalk()
 	{
+		if (prevDialogue != null)
+		{
+			DoDialogueActions(prevDialogue);
+			if (!prevDialogue.dialogueEvent_OnStart)
+				ApplyDialogueEvent(prevDialogue);	
+		}
+		
+
 		if (currentlyPlayingAudio != null)
 		{
 			EventManager.instance.StopThisSound(currentlyPlayingAudio);
@@ -89,6 +91,8 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 			StopTalk();
 			return;
 		}
+
+		prevDialogue = nextDialogue;
 
 		NPC_Canvas.singleton.SetDialogue(npcBase.npcName, nextDialogue.dialogue, nextDialogue.affectedWords);
 
@@ -110,23 +114,15 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 			ChangeDialogue(nextDialogue.continuedDialogue);
 		else
 			exitOnFinish = true;
-
-		DoDialogueActions(nextDialogue);
 	}	
 	
 	private void StartTalk()
 	{
-		if (!canInteract)
-			return;
-
 		InteractionHandler.singleton.EnterInteraction_NPC(this);
 
+		prevDialogue = null;
 		exitOnFinish = false;
 		CheckDialogueEvents();
-
-		if (nextDialogue.dialogueEvent_enabled && !nextDialogue.dialogueEvent_OnStart && !dialogueEventActive)
-			ApplyDialogueEvent(nextDialogue.dialogueEvent);
-
 		ContinueTalk();
 
 		NPC_Canvas.singleton.ActivateCanvas();

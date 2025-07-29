@@ -127,12 +127,12 @@ public class EnemySpawnerManager : MonoBehaviour
 
 	void OnDrawGizmosSelected()
 	{
-		Gizmos.color = Color.red;
+		Gizmos.color = new Color(255,0,0,80);
 		if (spawnPoints != null)
 		{
 			foreach (var sp in spawnPoints)
 				if (sp != null)
-					Gizmos.DrawWireSphere(sp.position, spawnRadius);
+					Gizmos.DrawSphere(sp.position, spawnRadius);
 		}
 	}
 }

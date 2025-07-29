@@ -2,41 +2,34 @@ using UnityEngine;
 
 public class NPC_Interactable_Remote : MonoBehaviour, IInteractable
 {
-	public static NPC_Interactable_Remote instance;
-    [SerializeField] private NPC_Interactable npcOwner;
+    public NPC_Interactable npcOwner;
 	private Animator anim;
-
 	public bool canInteract { get; set; } = true;
-
-	private void Awake()
-	{
-		if (instance != null)
-			Destroy(gameObject);
-		else
-			instance = this;
-	}
 	private void Start()
 	{
 		anim = GetComponent<Animator>();
 	}
-	private void OnEnable()
-	{
-		npcOwner.OnTalkEnded += TalkEnded;
-	}
 	public void Interact()
 	{
+		if (!canInteract)
+			return;
+
 		StartCoroutine(PickUp());
 	}
 	System.Collections.IEnumerator PickUp()
 	{
 		canInteract = false;
 
+		npcOwner.OnTalkEnded += TalkEnded;
+
 		anim.SetTrigger("Answer");
-		yield return new WaitForSeconds(GetAnimationLength() + .4f);
+		yield return new WaitForSeconds(GetAnimationLength());
 		npcOwner.Interact();
 	}
 	private void TalkEnded()
 	{
+		npcOwner.OnTalkEnded -= TalkEnded;
+
 		anim.SetTrigger("HangUp");
 		Invoke(nameof(ResetInteract), GetAnimationLength() + .4f);
 	}

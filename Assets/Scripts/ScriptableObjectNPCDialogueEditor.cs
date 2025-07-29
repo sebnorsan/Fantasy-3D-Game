@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 
@@ -85,3 +86,4 @@ public class ScriptableObjectNPCDialogueEditor : Editor
 		serializedObject.ApplyModifiedProperties();
 	}
 }
+#endif

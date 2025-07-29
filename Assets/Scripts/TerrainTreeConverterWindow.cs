@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 
@@ -100,3 +101,4 @@ public class TerrainTreeConverterWindow : EditorWindow
 		Debug.Log($"Converted {count} terrain trees to prefabs under '{treeParent.name}'.");
 	}
 }
+#endif
