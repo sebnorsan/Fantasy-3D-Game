@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Linq;
 using System.Collections;
 using System.Net.NetworkInformation;
+using System;
 
 public class NPC_Interactable : MonoBehaviour, IInteractable
 {
@@ -17,6 +18,8 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 	private float currentTime;
 
 	private bool dialogueEventActive = false;
+
+	public event Action OnTalkEnded;
 
 	/// <summary>
 	/// Hey lille luder, ændrer den her path for at finde dine resources tingenoter
@@ -154,6 +157,8 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 	{
 		InteractionHandler.singleton.ExitInteraction_NPC();
 		NPC_Canvas.singleton.DeactivateCanvas();
+
+		OnTalkEnded?.Invoke();
 	}
 
 	private void StartTimer()

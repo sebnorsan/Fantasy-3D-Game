@@ -6,6 +6,10 @@ public class NPC_Interactable_Remote : MonoBehaviour, IInteractable
 
 	public bool canInteract { get ; set ; }
 
+	private void OnEnable()
+	{
+		npcOwner.OnTalkEnded += TalkEnded;	
+	}
 	private void Start()
 	{
 		canInteract = npcOwner.canInteract;
@@ -13,5 +17,9 @@ public class NPC_Interactable_Remote : MonoBehaviour, IInteractable
 	public void Interact()
 	{
 		npcOwner.Interact();
+	}
+	private void TalkEnded()
+	{
+
 	}
 }
