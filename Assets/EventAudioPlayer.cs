@@ -2,15 +2,9 @@ using UnityEngine;
 
 public class EventAudioPlayer : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private AudioToPlay[] audios;
+    public void PlayAudio(int i)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        EventManager.instance.PlayThisSound(audios[i]);
     }
 }
