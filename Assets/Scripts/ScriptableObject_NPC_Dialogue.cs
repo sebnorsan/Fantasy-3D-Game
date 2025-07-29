@@ -34,6 +34,10 @@ public class ScriptableObject_NPC_Dialogue : ScriptableObject
 	[Space(15)]
 
 	public ScriptableObject_NPC_Dialogue dialogueEvent_continuedDialogue;
+
+	[Space(10)]
+
+	public DialogueAction[] actions;
 }
 [Serializable]
 public class WordEffect
@@ -52,4 +56,18 @@ public enum TextType
 	Normal,
 	Aggressive,
 	Whisper
+}
+[Serializable]
+public class DialogueAction
+{
+	public enum ActionType
+	{
+		EnableObject,
+		DisableObject,
+	}
+
+	public ActionType actionType;
+
+	[Tooltip("Must match a DialogueTarget.targetID in the scene")]
+	public string targetID;
 }

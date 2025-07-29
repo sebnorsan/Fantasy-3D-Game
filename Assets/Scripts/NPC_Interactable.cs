@@ -110,6 +110,8 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 			ChangeDialogue(nextDialogue.continuedDialogue);
 		else
 			exitOnFinish = true;
+
+		DoDialogueActions(nextDialogue);
 	}	
 	
 	private void StartTalk()
@@ -175,5 +177,20 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 			yield return null;
 		}
 		isTimerDone = true;
+	}
+	private void DoDialogueActions(ScriptableObject_NPC_Dialogue dlg)
+	{
+		foreach (var a in dlg.actions)
+		{
+			switch (a.actionType)
+			{
+				case DialogueAction.ActionType.EnableObject:
+					DialogueManager.SetActive(a.targetID, true);
+					break;
+				case DialogueAction.ActionType.DisableObject:
+					DialogueManager.SetActive(a.targetID, false);
+					break;
+			}
+		}
 	}
 }

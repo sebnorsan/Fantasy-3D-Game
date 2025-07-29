@@ -33,3 +33,6 @@ MonoBehaviour:
   dialogueEvent_timeEvent: 0
   dialogueEvent_interactionsEvent: 0
   dialogueEvent_continuedDialogue: {fileID: 0}
+  actions:
+  - actionType: 0
+    targetID: kc_0

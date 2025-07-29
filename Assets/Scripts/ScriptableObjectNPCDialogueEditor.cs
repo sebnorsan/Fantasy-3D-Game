@@ -5,7 +5,6 @@ using UnityEditor;
 [CustomEditor(typeof(ScriptableObject_NPC_Dialogue))]
 public class ScriptableObjectNPCDialogueEditor : Editor
 {
-	// 2) SerializedProperties for every field
 	SerializedProperty dialogueIdProp;
 	SerializedProperty npcVoiceLineProp;
 	SerializedProperty imageOverrideProp;
@@ -20,15 +19,15 @@ public class ScriptableObjectNPCDialogueEditor : Editor
 	SerializedProperty evtInteractionsProp;
 	SerializedProperty evtContinuedDialogueProp;
 
+	SerializedProperty actionsProp;
+
 	void OnEnable()
 	{
-		// link properties by name (must match SO field names)
 		dialogueIdProp = serializedObject.FindProperty("dialogueId");
 		npcVoiceLineProp = serializedObject.FindProperty("npcVoiceLine");
 		imageOverrideProp = serializedObject.FindProperty("imageOverride");
 		dialogueProp = serializedObject.FindProperty("dialogue");
 		affectedWordsProp = serializedObject.FindProperty("affectedWords");
-		// corrected: matches 'public ScriptableObject_NPC_Dialogue continuedDialogue;' in SO
 		continuedDialogueProp = serializedObject.FindProperty("continuedDialogue");
 
 		evtEnabledProp = serializedObject.FindProperty("dialogueEvent_enabled");
@@ -37,13 +36,14 @@ public class ScriptableObjectNPCDialogueEditor : Editor
 		evtTimeProp = serializedObject.FindProperty("dialogueEvent_timeEvent");
 		evtInteractionsProp = serializedObject.FindProperty("dialogueEvent_interactionsEvent");
 		evtContinuedDialogueProp = serializedObject.FindProperty("dialogueEvent_continuedDialogue");
+
+		actionsProp = serializedObject.FindProperty("actions");
 	}
 
 	public override void OnInspectorGUI()
 	{
 		serializedObject.Update();
 
-		// draw the always-visible fields if found
 		if (dialogueIdProp != null) EditorGUILayout.PropertyField(dialogueIdProp);
 		if (npcVoiceLineProp != null) EditorGUILayout.PropertyField(npcVoiceLineProp);
 		if (imageOverrideProp != null) EditorGUILayout.PropertyField(imageOverrideProp);
@@ -51,7 +51,6 @@ public class ScriptableObjectNPCDialogueEditor : Editor
 		if (affectedWordsProp != null) EditorGUILayout.PropertyField(affectedWordsProp, true);
 		if (continuedDialogueProp != null) EditorGUILayout.PropertyField(continuedDialogueProp, new GUIContent("Continued Dialogue"));
 
-		// draw the master toggle for events
 		if (evtEnabledProp != null)
 		{
 			EditorGUILayout.PropertyField(evtEnabledProp);
@@ -60,7 +59,6 @@ public class ScriptableObjectNPCDialogueEditor : Editor
 				if (evtOnStartProp != null) EditorGUILayout.PropertyField(evtOnStartProp);
 				if (evtTypeProp != null) EditorGUILayout.PropertyField(evtTypeProp);
 
-				// only show matching sub-field for the selected enum
 				if (evtTypeProp != null && evtContinuedDialogueProp != null)
 				{
 					var mode = (DialogueEvent)evtTypeProp.enumValueIndex;
@@ -75,12 +73,14 @@ public class ScriptableObjectNPCDialogueEditor : Editor
 							EditorGUILayout.PropertyField(evtContinuedDialogueProp, new GUIContent("Post-Event Dialogue"));
 							break;
 						case DialogueEvent.AfterTalkNullify:
-							// no extra fields
 							break;
 					}
 				}
 			}
 		}
+
+		EditorGUILayout.Space(10);
+		if (actionsProp != null) EditorGUILayout.PropertyField(actionsProp, true);
 
 		serializedObject.ApplyModifiedProperties();
 	}
