@@ -24,8 +24,8 @@ public class Skill : MonoBehaviour
 			if (skill == null)
 				continue;
 
+			skill.lockedUI.SetActive(!isBought);
 			skill.OnValidate();
-			skill.lockedUI.SetActive(true);
 			
 			lineRend.points.Add(new Vector2(transform.localPosition.x, transform.localPosition.y));
 			lineRend.points.Add(new Vector2(skill.transform.localPosition.x, skill.transform.localPosition.y));
