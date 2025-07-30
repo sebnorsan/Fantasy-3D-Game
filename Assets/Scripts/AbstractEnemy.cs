@@ -19,8 +19,6 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 	public float attackDelay = 3;
 
 	public int xpDrop = 1;
-	public int currencyDrop = 10;
-
 	public float speed = 3.5f;
 	private void Awake() => currentHealth = maxHealth;
 	private void Start()
@@ -210,12 +208,11 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 	public void Die()
 	{
 		var pfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
-		pfx.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = $"+{currencyDrop}$";
+		pfx.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = $"+{xpDrop}xp";
 		Destroy(pfx, 5);
 		Destroy(gameObject);
 
 		GameManager.instance.AddXp(xpDrop);
-		GameManager.instance.AddCurrency(currencyDrop);
 
 		StopAllCoroutines();
 	}

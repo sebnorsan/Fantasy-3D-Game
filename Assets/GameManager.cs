@@ -5,14 +5,15 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-	[SerializeField] private int currentXp, currentCurrency = 0;
-    private int displayedCurrency;
+	[SerializeField] private int currentXp = 0;
+	//[SerializeField] private int currentCurrency = 0;
+    //private int displayedCurrency;
 	[SerializeField] private int xpToLevelUp = 10;
     [SerializeField] private Slider xpSlider;
     [SerializeField] private float xpLerpDuration = 2f;
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI levelPointsText;
-    [SerializeField] private TextMeshProUGUI cashText;
+    //[SerializeField] private TextMeshProUGUI cashText;
 	[SerializeField] private int currLevel, levelPointsAvailable;
 
 	private void Awake()
@@ -22,11 +23,11 @@ public class GameManager : MonoBehaviour
         else
             instance = this;
 
-		displayedCurrency = currentCurrency;
-		cashText.text = $"{currentCurrency}$";
+		//displayedCurrency = currentCurrency;
+		//cashText.text = $"{currentCurrency}$";
 
 		UpdateXpGraphics();
-        UpdateCashGraphics();
+        //UpdateCashGraphics();
 	}
 
 	public void AddXp(int xp)
@@ -94,61 +95,61 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Next part here is for the skilltree
     /// </summary>
-    public void AddCurrency(int curr)
-    {
-        currentCurrency += curr;
-        UpdateCashGraphics();
-    }
-    Coroutine cashRoutine;
+ //   public void AddCurrency(int curr)
+ //   {
+ //       currentCurrency += curr;
+ //       UpdateCashGraphics();
+ //   }
+ //   Coroutine cashRoutine;
     
-    private void UpdateCashGraphics()
-    {
-		if (cashRoutine != null)
-			StopCoroutine(cashRoutine);
-		cashRoutine = StartCoroutine(CountCurrency(.3f));
-	}
-	private System.Collections.IEnumerator CountCurrency(float duration)
-	{
-        int from = displayedCurrency;
-        int to = currentCurrency;
+ //   private void UpdateCashGraphics()
+ //   {
+	//	if (cashRoutine != null)
+	//		StopCoroutine(cashRoutine);
+	//	cashRoutine = StartCoroutine(CountCurrency(.3f));
+	//}
+	//private System.Collections.IEnumerator CountCurrency(float duration)
+	//{
+ //       int from = displayedCurrency;
+ //       int to = currentCurrency;
 
-		int delta = to - from;
-		if (delta == 0)
-		{
-			yield break;
-		}
+	//	int delta = to - from;
+	//	if (delta == 0)
+	//	{
+	//		yield break;
+	//	}
 
-		int step = delta > 0 ? 1 : -1;
-		int steps = Mathf.Abs(delta);
-		float interval = duration / steps;
-		int current = from;
+	//	int step = delta > 0 ? 1 : -1;
+	//	int steps = Mathf.Abs(delta);
+	//	float interval = duration / steps;
+	//	int current = from;
 
-		for (int i = 0; i < steps; i++)
-		{
-			current += step;
-			cashText.text = $"{current}$";
-			yield return new WaitForSeconds(interval);
-		}
+	//	for (int i = 0; i < steps; i++)
+	//	{
+	//		current += step;
+	//		cashText.text = $"{current}$";
+	//		yield return new WaitForSeconds(interval);
+	//	}
 
-		// ensure exact final value
-		cashText.text = $"{to}$";
-		displayedCurrency = to;
-		cashRoutine = null;
-	}
-	private bool TryBuySkill(int price)
-    {
-        if (currentCurrency >= price)
-        {
-			currentCurrency -= price;
-			return true;
-		}
-		return false;
-    }
-    public void PurchaseSkill(int price)
-    {
-        if (TryBuySkill(price))
-        {
+	//	// ensure exact final value
+	//	cashText.text = $"{to}$";
+	//	displayedCurrency = to;
+	//	cashRoutine = null;
+	//}
+	//private bool TryBuySkill(int price)
+ //   {
+ //       if (currentCurrency >= price)
+ //       {
+	//		currentCurrency -= price;
+	//		return true;
+	//	}
+	//	return false;
+ //   }
+ //   public void PurchaseSkill(int price)
+ //   {
+ //       if (TryBuySkill(price))
+ //       {
 
-        }
-    }
+ //       }
+ //   }
 }

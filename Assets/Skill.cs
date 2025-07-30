@@ -1,17 +1,17 @@
 using Radishmouse;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.InputSystem.iOS;
 
 public class Skill : MonoBehaviour
 {
 	[SerializeField] private int price = 100;
 	[SerializeField] TMPro.TextMeshProUGUI priceText;
-	[SerializeField] private GameObject boughtUI;
-	private bool isBought;
+	public GameObject boughtUI, lockedUI;
+	[Space(30)]
+	[SerializeField] private bool isBought;
 
 	[SerializeField] private Skill[] connectedSkills;
-	private void OnValidate()
+	public void OnValidate()
 	{
 		var lineRend = GetComponentInChildren<UILineRenderer>();
 
@@ -22,11 +22,18 @@ public class Skill : MonoBehaviour
 		foreach (var skill in connectedSkills)
 		{
 			if (skill == null)
-				continue;	
+				continue;
+
+			skill.OnValidate();
+			skill.lockedUI.SetActive(true);
+			
 			lineRend.points.Add(new Vector2(transform.localPosition.x, transform.localPosition.y));
 			lineRend.points.Add(new Vector2(skill.transform.localPosition.x, skill.transform.localPosition.y));
 			lineRend.points.Add(new Vector2(transform.localPosition.x, transform.localPosition.y));
 		}
+
+		boughtUI.SetActive(isBought);
+		UpdateText();
 	}
 	private void Start()
 	{
@@ -35,7 +42,11 @@ public class Skill : MonoBehaviour
 	private void UpdateText()
 	{
 		priceText.text = isBought ? string.Empty : $"{price}$";
+
+		if (lockedUI.activeSelf)
+			priceText.text = string.Empty;
 	}
+	
 	public void BuySkill()
 	{
 		isBought = true;
