@@ -22,8 +22,9 @@ public class Skill : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
 		if (lineRend == null) return;
 		lineRend.points.Clear();
-		lineRend.transform.localPosition = -(new Vector3(0, transform.localPosition.y + (transform.localPosition.y * .5f)));
-		
+
+		lineRend.transform.position = transform.parent.position;
+
 		foreach (var skill in connectedSkills)
 		{
 			if (skill == null)
@@ -31,7 +32,7 @@ public class Skill : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
 			skill.lockedUI.SetActive(!isBought);
 			skill.OnValidate();
-			
+
 			lineRend.points.Add(new Vector2(transform.localPosition.x, transform.localPosition.y));
 			lineRend.points.Add(new Vector2(skill.transform.localPosition.x, skill.transform.localPosition.y));
 			lineRend.points.Add(new Vector2(transform.localPosition.x, transform.localPosition.y));
@@ -52,7 +53,7 @@ public class Skill : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 		if (lockedUI.activeSelf)
 			priceText.text = string.Empty;
 	}
-	
+
 	public void BuySkill()
 	{
 		isBought = true;
