@@ -14,8 +14,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI levelPointsText;
     //[SerializeField] private TextMeshProUGUI cashText;
-	[SerializeField] private int currLevel, levelPointsAvailable;
-
+	[SerializeField] private int currLevel, skillPointsAvailable;
+	[SerializeField] private GameObject skillTree;
+	
 	private void Awake()
 	{
         if (instance != null)
@@ -27,9 +28,29 @@ public class GameManager : MonoBehaviour
 		//cashText.text = $"{currentCurrency}$";
 
 		UpdateXpGraphics();
-        //UpdateCashGraphics();
-	}
+		//UpdateCashGraphics();
 
+		skillTree.SetActive(false);
+	}
+	private void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.I))
+		{
+			if (!FindFirstObjectByType<PlayerController>().canMove && !skillTree.activeSelf)
+				return;
+
+			skillTree.SetActive(!skillTree.activeSelf);
+			FindFirstObjectByType<PlayerController>().canMove = !FindFirstObjectByType<PlayerController>().canMove;
+			FindFirstObjectByType<HandsSmooth>().enabled = !FindFirstObjectByType<HandsSmooth>().enabled;
+			FindFirstObjectByType<BowScript>().enabled = !FindFirstObjectByType<BowScript>().enabled;
+
+			Cursor.visible = !Cursor.visible;
+			if (Cursor.lockState == CursorLockMode.Locked)
+				Cursor.lockState = CursorLockMode.Confined;
+			else
+				Cursor.lockState = CursorLockMode.Locked;
+		}
+	}
 	public void AddXp(int xp)
     {
 		currentXp += xp;
@@ -40,8 +61,8 @@ public class GameManager : MonoBehaviour
     private void UpdateXpGraphics()
     {
         levelText.text = $"Lv. {currLevel}";
-        if (levelPointsAvailable > 0)
-            levelPointsText.text = $"Level points: {levelPointsAvailable}";
+        if (skillPointsAvailable > 0)
+            levelPointsText.text = $"Skill points: {skillPointsAvailable}";
         else
             levelPointsText.text = string.Empty;
         if (xpRoutine != null)
@@ -77,20 +98,20 @@ public class GameManager : MonoBehaviour
         xpToLevelUp *= 2;
 
         currLevel++;
-        GainLevelPoint(1);
+        GainSkillPoint(1);
     }
-    public bool TrySpendLevelPoint()
+    public bool TrySpendSkillPoint()
     {
-        if (levelPointsAvailable >= 1)
+        if (skillPointsAvailable >= 1)
         {
-            levelPointsAvailable--;
+            skillPointsAvailable--;
             return true;
         }
         return false;
     }
-    public void GainLevelPoint(int points)
+    public void GainSkillPoint(int points)
     {
-        levelPointsAvailable += points;
+        skillPointsAvailable += points;
     }
     /// <summary>
     /// Next part here is for the skilltree

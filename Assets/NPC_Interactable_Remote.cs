@@ -23,7 +23,7 @@ public class NPC_Interactable_Remote : MonoBehaviour, IInteractable
 		npcOwner.OnTalkEnded += TalkEnded;
 
 		anim.SetTrigger("Answer");
-		yield return new WaitForSeconds(GetAnimationLength());
+		yield return new WaitForSeconds(GetAnimationLength() -1f);
 		npcOwner.Interact();
 	}
 	private void TalkEnded()

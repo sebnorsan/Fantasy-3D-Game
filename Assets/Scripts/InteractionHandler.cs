@@ -64,6 +64,8 @@ public class InteractionHandler : MonoBehaviour
 
 		isTalking = true;
 		playerController.canMove = false;
+		playerController.GetComponentInChildren<HandsSmooth>().enabled = false;
+		FindFirstObjectByType<BowScript>().enabled = false;
 	}
 	public void ExitInteraction_NPC()
 	{
@@ -71,5 +73,7 @@ public class InteractionHandler : MonoBehaviour
 
 		isTalking = false;
 		playerController.canMove = true;
+		playerController.GetComponentInChildren<HandsSmooth>().enabled = true;
+		FindFirstObjectByType<BowScript>().enabled = true;
 	}
 }

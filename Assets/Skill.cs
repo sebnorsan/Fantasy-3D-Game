@@ -1,16 +1,21 @@
 using Radishmouse;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Skill : MonoBehaviour
+public class Skill : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+	public string skillName;
+	[TextArea]
+	public string skillDescription;
 	[SerializeField] private int price = 100;
+	[Space(10)]
+	[SerializeField] private Skill[] connectedSkills;
+	[Space(50)]
 	[SerializeField] TMPro.TextMeshProUGUI priceText;
 	public GameObject boughtUI, lockedUI;
 	[Space(30)]
 	[SerializeField] private bool isBought;
-
-	[SerializeField] private Skill[] connectedSkills;
 	public void OnValidate()
 	{
 		var lineRend = GetComponentInChildren<UILineRenderer>();
@@ -32,6 +37,7 @@ public class Skill : MonoBehaviour
 			lineRend.points.Add(new Vector2(transform.localPosition.x, transform.localPosition.y));
 		}
 
+		GetComponent<Button>().interactable = !lockedUI.activeSelf;
 		boughtUI.SetActive(isBought);
 		UpdateText();
 	}
@@ -51,5 +57,15 @@ public class Skill : MonoBehaviour
 	{
 		isBought = true;
 		boughtUI.SetActive(true);
+	}
+
+	public void OnPointerEnter(PointerEventData eventData)
+	{
+		SkillHoverTooltip.instance.ShowTooltip(skillName, skillDescription);
+	}
+
+	public void OnPointerExit(PointerEventData eventData)
+	{
+		SkillHoverTooltip.instance.HideTooltip();
 	}
 }
