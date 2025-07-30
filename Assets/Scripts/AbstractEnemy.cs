@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngineInternal;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public abstract class AbstractEnemy : MonoBehaviour, IDamagable
@@ -11,7 +13,13 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 	private Animator anim;
 
 	public int maxHealth = 100;
-	public int currentHealth = 0;
+	private int currentHealth = 0;
+
+	public int damage = 1;
+	public float attackDelay = 3;
+
+	public int xpDrop = 1;
+	public int currencyDrop = 10;
 
 	public float speed = 3.5f;
 	private void Awake() => currentHealth = maxHealth;
@@ -32,7 +40,23 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 
 		InitializeEnemy();
 	}
-
+	private Coroutine attackCoroutine;
+	public void StartAttack()
+	{
+		attackCoroutine = StartCoroutine(AttackNumerator());
+	}
+	public void StopAttack()
+	{
+		if (attackCoroutine != null)
+			StopCoroutine(attackCoroutine);
+	}
+	protected virtual IEnumerator AttackNumerator()
+	{
+		anim.SetBool("Walking", false);
+		yield return new WaitForSeconds(attackDelay);
+		anim.SetTrigger("Attack");
+		attackCoroutine = StartCoroutine(AttackNumerator());
+	}
 	protected virtual void InitializeEnemy() 
 	{
 		if (anim != null)
@@ -42,11 +66,19 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 
 		InitializeDestination();
 	}
+	private Vector3 targetDestination;
 	protected virtual void InitializeDestination()
 	{
 		crystalPos = FindFirstObjectByType<CrystalScript>().transform;
-		agent.SetDestination(crystalPos.position);
+
+		float radius = 2.5f;
+		Vector2 randomCircle = Random.insideUnitCircle.normalized * radius;
+		Vector3 offset = new Vector3(randomCircle.x, 0, randomCircle.y);
+
+		targetDestination = crystalPos.position + offset;
+		agent.SetDestination(targetDestination);
 	}
+
 	Coroutine currKnockbackCoroutine, currFlashCoroutine;
 	public void DamageEffects(Vector3 hitPoint)
 	{
@@ -112,7 +144,7 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 		}
 
 		agent.speed = originalSpeed;
-		agent.SetDestination(crystalPos.position); // Resume behavior
+		agent.SetDestination(targetDestination); // Resume behavior
 		if (anim != null)
 			anim.SetBool("Walking", true);
 	}
@@ -178,10 +210,19 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 	public void Die()
 	{
 		var pfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
+		pfx.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = $"+{currencyDrop}$";
 		Destroy(pfx, 5);
 		Destroy(gameObject);
 
+		GameManager.instance.AddXp(xpDrop);
+		GameManager.instance.AddCurrency(currencyDrop);
+
 		StopAllCoroutines();
+	}
+	public void AttackCrystal()
+	{
+		var crystalScript = FindFirstObjectByType<CrystalScript>();
+		crystalScript.TakeDamage(damage);
 	}
 }
 
