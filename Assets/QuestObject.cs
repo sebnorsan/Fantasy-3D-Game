@@ -1,0 +1,45 @@
+using UnityEngine;
+
+public class QuestObject : MonoBehaviour
+{
+	[TextArea]
+	[SerializeField] private string questDesc;
+    public enum QuestType
+    {
+        MainQuest,
+        SideQuest
+    }
+    [SerializeField] private QuestType questType;
+	private void OnEnable()
+	{
+		Invoke(nameof(SetQuest), .1f);
+	}
+	private void OnDisable()
+	{
+		CancelInvoke();
+	}
+	public void FinishQuest()
+    {
+		switch (questType)
+		{
+			case QuestType.MainQuest:
+				QuestManager.instance.FinishMainQuest();
+				break;
+			case QuestType.SideQuest:
+				QuestManager.instance.FinishSideQuest();
+				break;
+		}
+	}
+	public void SetQuest()
+	{
+		switch (questType)
+		{
+			case QuestType.MainQuest:
+				QuestManager.instance.SetMainQuest(questDesc);
+				break;
+			case QuestType.SideQuest:
+				QuestManager.instance.SetSideQuest(questDesc);
+				break;
+		}
+	}
+}

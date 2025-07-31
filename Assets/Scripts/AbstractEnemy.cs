@@ -1,9 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngineInternal;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public abstract class AbstractEnemy : MonoBehaviour, IDamagable
