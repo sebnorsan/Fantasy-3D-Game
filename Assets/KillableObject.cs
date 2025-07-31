@@ -2,12 +2,15 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 using Unity.VisualScripting;
+using UnityEditor.Timeline;
 
 public class KillableObject : MonoBehaviour, IDamagable
 {
-	[SerializeField] private int currentHealth, maxHealth;
-	[SerializeField] private GameObject hitParticles;
-	[SerializeField] private GameObject deathParticles;
+	public int currentHealth, maxHealth;
+	public GameObject hitParticles;
+	public GameObject deathParticles;
+
+	public bool parentHitFx = false;
 	private void Awake()
 	{
 		currentHealth = maxHealth;
@@ -54,10 +57,12 @@ public class KillableObject : MonoBehaviour, IDamagable
 	void OnSpawnDamagePFX()
 	{
 		var pfx = Instantiate(hitParticles, transform.position, Quaternion.identity);
-		var oldScale = pfx.transform.lossyScale;
-		pfx.transform.SetParent(transform, true);
-		pfx.transform.localScale = oldScale;
-
+		if (parentHitFx)
+		{
+			var oldScale = pfx.transform.lossyScale;
+			pfx.transform.SetParent(transform, true);
+			pfx.transform.localScale = oldScale;
+		}
 		Destroy(pfx, 5);
 	}
 	public void Heal(int amount)
@@ -78,7 +83,7 @@ public class KillableObject : MonoBehaviour, IDamagable
 		if (TryGetComponent(out QuestObject quester))
 			quester.FinishQuest();
 
-		var pfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
+		var pfx = Instantiate(deathParticles, transform.position, deathParticles.transform.rotation);
 		Destroy(pfx, 5);
 		Destroy(gameObject);
 	}

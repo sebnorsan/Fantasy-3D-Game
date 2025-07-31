@@ -20,6 +20,13 @@ public class QuestObject : MonoBehaviour
 	}
 	public void FinishQuest()
     {
+		var questCounter = GetComponentInParent<QuestObjectCounter>();
+		if (questCounter != null)
+		{
+
+			return;
+		}
+
 		switch (questType)
 		{
 			case QuestType.MainQuest:

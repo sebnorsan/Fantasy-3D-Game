@@ -7,16 +7,14 @@ public class Arrow : MonoBehaviour
 {
 	[Header("Damage & Effects")]
 	public int arrowDamage = 1;
-	public ArrowEffect arrowEffect;	
-	public enum ArrowEffect
-	{
-		Normal
-	}
+	public ArrowEffect[] arrowEffect;	
 
 	[Header("Flight Settings")]
 	public float initialSpeed = 30f;   // How fast the arrow is shot
 	public float dropGravity = 1f;     // How strong the downward pull is
 	public float lifeTime = 10f;       // Destroy after this many seconds
+
+	public bool cutTrees = false;
 
 	// Correct for a mesh that needs a 90° pitch to face its Z+ forward
 	private readonly Quaternion modelCorrection = Quaternion.Euler(90f, 0f, 0f);
@@ -26,6 +24,14 @@ public class Arrow : MonoBehaviour
 	private Rigidbody rb;
 	private void Start()
 	{
+		var bowComponent = FindFirstObjectByType<BowScript>();
+		arrowDamage = bowComponent.arrowDamage;
+		arrowEffect = bowComponent.arrowEffect;
+		initialSpeed = bowComponent.arrowSpeed;
+		cutTrees = bowComponent.arrowCutsTrees;
+
+
+
 		initPlayerPos = FindFirstObjectByType<PlayerController>().transform.position;
 
 		CameraShaker.Instance.ShakeOnce(2f, 3f, .1f, .2f);
@@ -73,17 +79,31 @@ public class Arrow : MonoBehaviour
 		//if (hasStuck) return;
 		//hasStuck = true;
 
+		if (collision.gameObject.tag == "Tree")
+		{
+			if (!cutTrees) return;
+
+			var newComp = collision.gameObject.AddComponent<KillableObject>();
+			newComp.maxHealth = 5;
+			newComp.hitParticles = Resources.Load<GameObject>("PFX/HitFX (big)");
+			newComp.deathParticles = Resources.Load<GameObject>("PFX/Explosion Tree");
+			newComp.currentHealth = newComp.maxHealth;
+			newComp.parentHitFx = false;
+		}
 		if (collision.gameObject.TryGetComponent(out IDamagable component))
 		{
 			component.TakeDamage(arrowDamage);
 			component.DamageEffects(initPlayerPos);
 		}
-
 		//var tr = GetComponentInChildren<TrailRenderer>();
 
 		//float dist = Vector3.Distance(transform.position, FindFirstObjectByType<PlayerController>().transform.position);
 		//float t = Mathf.Clamp01(dist / 350f);
-		
+
 		//tr.time = Mathf.Lerp(tr.time * 0.05f, tr.time, t);
 	}
+}
+public enum ArrowEffect
+{
+	Normal
 }

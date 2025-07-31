@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Crystal
+  - Tree
   layers:
   - Default
   - TransparentFX

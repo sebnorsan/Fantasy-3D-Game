@@ -4,6 +4,16 @@ using UnityEngine;
 
 public class BowScript : MonoBehaviour
 {
+
+	public int arrowDamage = 1;
+	public float arrowSpeed = 30f;
+	public ArrowEffect[] arrowEffect;
+	public float arrowDrawSpeed = 1f;
+
+	public bool arrowCutsTrees = false;
+
+	[Space(75)]
+
 	private Animator anim;
 	private HandsSmooth hs;
 	private bool canShoot = true;
