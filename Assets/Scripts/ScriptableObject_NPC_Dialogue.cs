@@ -64,6 +64,7 @@ public class DialogueAction
 	{
 		EnableObject,
 		DisableObject,
+		FinishQuest
 	}
 
 	public ActionType actionType;

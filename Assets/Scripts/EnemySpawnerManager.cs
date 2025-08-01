@@ -66,6 +66,9 @@ public class EnemySpawnerManager : MonoBehaviour
 		}
 		var wave = waves[waveIndex];
 
+		minSpawnInterval = wave.minimiumSpawnInterval;
+		maxSpawnInterval = wave.maximumSpawnInterval;
+
 		_remainingThisWave = wave.countsPerTier.ToArray();
 		Debug.Log($"Wave {waveIndex + 1} started: total enemies = {_remainingThisWave.Sum()}");
 	}

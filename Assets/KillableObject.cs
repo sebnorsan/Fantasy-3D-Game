@@ -90,4 +90,9 @@ public class KillableObject : MonoBehaviour, IDamagable
 		Destroy(pfx, 5);
 		Destroy(gameObject);
 	}
+    private void OnDestroy()
+    {
+		if (gameObject.tag == "Tree")
+			FindFirstObjectByType<QuestObjectCounterTrees>().RemoveCount();
+    }
 }

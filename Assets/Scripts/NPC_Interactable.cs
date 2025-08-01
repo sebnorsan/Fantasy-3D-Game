@@ -184,8 +184,11 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 					DialogueManager.SetActive(a.targetID, true);
 					break;
 				case DialogueAction.ActionType.DisableObject:
-					DialogueManager.SetActive(a.targetID, false);
+                    DialogueManager.SetActive(a.targetID, false);
 					break;
+				case DialogueAction.ActionType.FinishQuest:
+					GetComponent<QuestObject>().FinishQuest();
+                    break;
 			}
 		}
 	}

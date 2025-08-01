@@ -83,12 +83,15 @@ public class Arrow : MonoBehaviour
 		{
 			if (!cutTrees) return;
 
-			var newComp = collision.gameObject.AddComponent<KillableObject>();
-			newComp.maxHealth = 5;
-			newComp.hitParticles = Resources.Load<GameObject>("PFX/HitFX (big)");
-			newComp.deathParticles = Resources.Load<GameObject>("PFX/Explosion Tree");
-			newComp.currentHealth = newComp.maxHealth;
-			newComp.parentHitFx = false;
+			if (!collision.gameObject.TryGetComponent(out KillableObject killable))
+            {
+				var newComp = collision.gameObject.AddComponent<KillableObject>();
+				newComp.maxHealth = 5;
+				newComp.hitParticles = Resources.Load<GameObject>("PFX/HitFX (big)");
+				newComp.deathParticles = Resources.Load<GameObject>("PFX/Explosion Tree");
+				newComp.currentHealth = newComp.maxHealth;
+				newComp.parentHitFx = false;
+			}
 		}
 		if (collision.gameObject.TryGetComponent(out IDamagable component))
 		{
