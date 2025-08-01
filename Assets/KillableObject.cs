@@ -10,6 +10,8 @@ public class KillableObject : MonoBehaviour, IDamagable
 	public GameObject hitParticles;
 	public GameObject deathParticles;
 
+	public int xpGain = 1;
+
 	public bool parentHitFx = false;
 	private void Awake()
 	{
@@ -83,6 +85,7 @@ public class KillableObject : MonoBehaviour, IDamagable
 		if (TryGetComponent(out QuestObject quester))
 			quester.FinishQuest();
 
+		GameManager.instance.AddXp(xpGain);
 		var pfx = Instantiate(deathParticles, transform.position, deathParticles.transform.rotation);
 		Destroy(pfx, 5);
 		Destroy(gameObject);

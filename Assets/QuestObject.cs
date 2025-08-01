@@ -21,9 +21,9 @@ public class QuestObject : MonoBehaviour
 	public void FinishQuest()
     {
 		var questCounter = GetComponentInParent<QuestObjectCounter>();
-		if (questCounter != null)
+		if (questCounter != null && questCounter.isActive)
 		{
-
+			questCounter.RemoveCount();
 			return;
 		}
 
@@ -39,6 +39,10 @@ public class QuestObject : MonoBehaviour
 	}
 	public void SetQuest()
 	{
+		var questCounter = GetComponentInParent<QuestObjectCounter>();
+		if (questCounter != null && questCounter.isActive)
+			return;
+
 		switch (questType)
 		{
 			case QuestType.MainQuest:

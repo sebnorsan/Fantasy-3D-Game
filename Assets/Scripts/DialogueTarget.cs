@@ -1,6 +1,5 @@
 using UnityEngine;
 
-[DisallowMultipleComponent]
 public class DialogueTarget : MonoBehaviour
 {
 	[Tooltip("Unique key this object responds to.")]

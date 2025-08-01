@@ -23,7 +23,8 @@ public class NPC_Interactable_Remote : MonoBehaviour, IInteractable
 		npcOwner.OnTalkEnded += TalkEnded;
 
 		anim.SetTrigger("Answer");
-		yield return new WaitForSeconds(GetAnimationLength() -1f);
+		yield return new WaitForEndOfFrame();
+		yield return new WaitForSeconds(GetTransitioningAnimationLength());
 		npcOwner.Interact();
 	}
 	private void TalkEnded()
@@ -31,9 +32,10 @@ public class NPC_Interactable_Remote : MonoBehaviour, IInteractable
 		npcOwner.OnTalkEnded -= TalkEnded;
 
 		anim.SetTrigger("HangUp");
-		Invoke(nameof(ResetInteract), GetAnimationLength() + .4f);
+		Invoke(nameof(ResetInteract), GetCurrentAnimationLength() + .4f);
 	}
-	private float GetAnimationLength() => anim.GetCurrentAnimatorStateInfo(0).length;
+	private float GetCurrentAnimationLength() => anim.GetCurrentAnimatorStateInfo(0).length;
+	private float GetTransitioningAnimationLength() => anim.GetNextAnimatorStateInfo(0).length;
 	private void ResetInteract() => canInteract = true;
 	public void CallUp()
 	{

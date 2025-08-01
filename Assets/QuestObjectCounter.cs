@@ -2,15 +2,23 @@ using UnityEngine;
 
 public class QuestObjectCounter : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+	public int countToReach;
+	[TextArea]
+	public string questDescription;
+	public bool isActive = true;
+	private void Awake()
+	{
+		if (countToReach <= 0)
+			countToReach = GetComponentsInChildren<QuestObject>().Length;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+		isActive = false;
+		GetComponentInChildren<QuestObject>().SetQuest();	
+		isActive = true;
+	}
+	public void RemoveCount()
+	{
+		countToReach--;
+		if (countToReach <= 1)
+			isActive = false;
+	}
 }
