@@ -5082,10 +5082,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arrowDamage: 1
-  arrowEffect: 0
+  arrowEffect: 
+  lightningChain: 3
   initialSpeed: 150
   dropGravity: 4
   lifeTime: 10
+  cutTrees: 0
+  explosion: {fileID: 8410903520702676324, guid: b8b89b080679b7943a28f60da7e4656a, type: 3}
 --- !u!65 &184284523751061023
 BoxCollider:
   m_ObjectHideFlags: 0

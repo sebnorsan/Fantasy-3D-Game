@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Tier4
   m_EditorClassIdentifier: 
   enemyPrefabs:
-  - {fileID: 3070977239302808498, guid: 5892b1589058ad74789f1b3d6156373d, type: 3}
+  - {fileID: 3070977239302808498, guid: 1a02c8d3427380645b95f0b67bbd03b5, type: 3}

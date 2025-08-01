@@ -37,6 +37,7 @@ public class Skill : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
 			skill.lockedUI.SetActive(!isBought);
 			skill.OnValidate();
+			skill.DecideInteractable();
 
 			lineRend.points.Add(new Vector2(transform.localPosition.x, transform.localPosition.y));
 			lineRend.points.Add(new Vector2(skill.transform.localPosition.x, skill.transform.localPosition.y));
@@ -45,7 +46,6 @@ public class Skill : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
 		connectedSkills = connectedSkills.Where(s => s != null).ToArray();
 
-		GetComponent<Button>().interactable = !lockedUI.activeSelf;
 		boughtUI.SetActive(isBought);
 		UpdateText();
 	}
@@ -65,6 +65,16 @@ public class Skill : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	{
 		isBought = true;
 		boughtUI.SetActive(true);
+
+		OnValidate();
+	}
+
+	public void DecideInteractable()
+    {
+		if (isBought || lockedUI.activeSelf)
+			GetComponent<Button>().interactable = false;
+		else
+			GetComponent<Button>().interactable = true;
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)

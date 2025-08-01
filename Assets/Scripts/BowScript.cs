@@ -1,14 +1,17 @@
-using EvolveGames;
+﻿using EvolveGames;
 using System.Net.NetworkInformation;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class BowScript : MonoBehaviour
 {
 
 	public int arrowDamage = 1;
 	public float arrowSpeed = 30f;
-	public ArrowEffect[] arrowEffect;
+	public List<ArrowEffect> arrowEffect = new List<ArrowEffect>();
 	public float arrowDrawSpeed = 1f;
+	public float arrowSize = 1f;
+	public int lightningChain = 3;
 
 	public bool arrowCutsTrees = false;
 
@@ -35,6 +38,17 @@ public class BowScript : MonoBehaviour
 
 		if (Input.GetMouseButtonUp(0))
 			ShootBow();
+
+		// 🔥 Adjust speed if we’re in "bow_loadIn"
+		AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
+		if (stateInfo.IsName("bow_loadIn"))
+		{
+			anim.speed = arrowDrawSpeed; // e.g. 1f = normal, 2f = double speed
+		}
+		else
+		{
+			anim.speed = 1f; // reset to normal for everything else
+		}
 	}
 	private void LoadBow()
 	{

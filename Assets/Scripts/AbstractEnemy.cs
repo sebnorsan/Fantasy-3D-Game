@@ -18,6 +18,9 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 
 	public int xpDrop = 1;
 	public float speed = 3.5f;
+
+	[SerializeField] private GameObject fireEffect, iceEffect;
+
 	private void Awake() => currentHealth = maxHealth;
 	private void Start()
 	{
@@ -218,6 +221,39 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 	{
 		var crystalScript = FindFirstObjectByType<CrystalScript>();
 		crystalScript.TakeDamage(damage);
+
+		if (crystalScript.thorns)
+			TakeDamage(1);
+		if (crystalScript.deadly)
+			Die();
+	}
+
+	public void IceEffect()
+    {
+		iceEffect.SetActive(true);
+		CancelInvoke(nameof(ResetIceEffect));
+		Invoke(nameof(ResetIceEffect), 6f);
+		agent.speed /= 2;
+    }
+	private void ResetIceEffect()
+    {
+		agent.speed = originalSpeed;
+    }
+	public void FireEffect()
+    {
+		fireEffect.SetActive(true);
+		InvokeRepeating(nameof(FireDamage), .5f, 10);
+		CancelInvoke(nameof(ResetFireEffect));
+		Invoke(nameof(ResetFireEffect), .5f * 10);
+    }
+	private void FireDamage()
+    {
+		TakeDamage(1);
+	}
+	private void ResetFireEffect()
+    {
+		fireEffect.SetActive(false);
+
 	}
 }
 

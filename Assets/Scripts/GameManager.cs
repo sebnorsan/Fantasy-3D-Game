@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     //[SerializeField] private TextMeshProUGUI cashText;
 	[SerializeField] private int currLevel, skillPointsAvailable;
 	[SerializeField] private GameObject skillTree;
-	
+	[HideInInspector] public int xpMultiplier = 1;
 	private void Awake()
 	{
         if (instance != null)
@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour
 	}
 	public void AddXp(int xp)
     {
-		currentXp += xp;
+		currentXp += xp * xpMultiplier;
 
 		TryLevelUp();
         UpdateXpGraphics();

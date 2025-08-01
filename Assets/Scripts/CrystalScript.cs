@@ -1,15 +1,19 @@
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class CrystalScript : MonoBehaviour
 {
 	[SerializeField] private GameObject crystalShield;
 	[SerializeField] private float radius;
-	[SerializeField] private int maxHealth = 1000;
+	public int maxHealth = 1000;
 	[SerializeField] private MeshRenderer[] renderersToFlash;
-	private int currentHealth;
+	public int currentHealth;
 	private List<(MeshRenderer renderer, Material[] originals)> affected =
 		new List<(MeshRenderer renderer, Material[] originals)>();
+
+	public bool thorns, deadly;
+
 	private void Start()
 	{
 		crystalShield.SetActive(true);
@@ -76,4 +80,11 @@ public class CrystalScript : MonoBehaviour
 		if (other.TryGetComponent(out AbstractEnemy enemy))
 			enemy.StopAttack();
 	}
+	public void Regeneration()
+    {
+		Invoke(nameof(Regeneration), .5f);
+		currentHealth++;
+		if (maxHealth < currentHealth)
+			currentHealth = maxHealth;
+    }
 }
