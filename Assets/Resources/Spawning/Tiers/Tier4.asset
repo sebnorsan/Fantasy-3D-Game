@@ -9,7 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64b627dc6639fc844ac7a3a2b365e457, type: 3}
-  m_Name: Wave1
+  m_Script: {fileID: 11500000, guid: b24115a412e174d4bbfb647abd683fa8, type: 3}
+  m_Name: Tier4
   m_EditorClassIdentifier: 
-  countsPerTier: 32000000
+  enemyPrefabs:
+  - {fileID: 3070977239302808498, guid: 5892b1589058ad74789f1b3d6156373d, type: 3}
