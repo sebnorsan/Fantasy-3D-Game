@@ -296,10 +296,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ea4c96b145df984bb0267d8e6f7778a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 25
-  damage: 50
+  maxHealth: 100
+  damage: 100
   attackDelay: 6
-  xpDrop: 100
+  xpDrop: 500
   speed: 6
   fireEffect: {fileID: 8898272364281211374}
   iceEffect: {fileID: 7709917493392581493}

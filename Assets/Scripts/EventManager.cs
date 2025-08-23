@@ -100,6 +100,7 @@ public class EventManager : MonoBehaviour
 	{
 		var tempAudio = a;
 
+
 		GameObject template = Instantiate(audioSourceTemplate, transform.position, Quaternion.identity);
 
 		AudioSource templateSource = template.GetComponent<AudioSource>();
@@ -118,6 +119,9 @@ public class EventManager : MonoBehaviour
 		if (tempAudio.subtitlesEnabled)
 			foreach (var sub in tempAudio.subtitles)
 				StartCoroutine(CreateSubtitle(sub.timeStarted, sub.timeDestroyed, sub.subtitleText));
+
+		if (tempAudio.randomizePitch)
+			RandomizePitchOnSound(a.audioToPlay, .8f, 1f);
 	}
 
 	public void StopThisSound(string libId, string audioId)
@@ -281,6 +285,7 @@ public class EventManager : MonoBehaviour
 public class AudioToPlay
 {
 	public string audioName = "New Audio";
+	public bool randomizePitch;
 
 	[Space(30)]
 

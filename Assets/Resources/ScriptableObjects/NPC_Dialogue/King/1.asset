@@ -23,10 +23,10 @@ MonoBehaviour:
     subtitlesEnabled: 0
     subtitles: []
   imageOverride: {fileID: 0}
-  dialogue: hey there my singular and only guard in the whole kingdom, of uhhhhhhh
-    idk
+  dialogue: hey there my singular and only guard in the whole kingdom, glad you could
+    make it on such short notice
   affectedWords: []
-  continuedDialogue: {fileID: 11400000, guid: ddc0f85e41a608644b62a16fef0257e8, type: 2}
+  continuedDialogue: {fileID: 11400000, guid: 02be7bbff9577634fb8a6b4b3cde9200, type: 2}
   dialogueEvent_enabled: 0
   dialogueEvent_OnStart: 0
   dialogueEvent: 0

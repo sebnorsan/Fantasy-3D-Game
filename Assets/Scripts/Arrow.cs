@@ -1,187 +1,183 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
+using UnityEngine.AI;
 using EZCameraShake;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Arrow : MonoBehaviour
 {
-    [Header("Damage & Effects")]
-    public int arrowDamage = 1;
-    public ArrowEffect[] arrowEffect;
-    public int lightningChain = 3;
+	[Header("Damage & Effects")]
+	public int arrowDamage = 1;
+	public ArrowEffect[] arrowEffect;
+	public int lightningChain = 3;
 
-    [Header("Flight Settings")]
-    public float initialSpeed = 30f;   // How fast the arrow is shot
-    public float dropGravity = 1f;     // How strong the downward pull is
-    public float lifeTime = 10f;       // Destroy after this many seconds
+	[Header("Flight Settings")]
+	public float initialSpeed = 30f;
+	public float dropGravity = 1f;
+	public float lifeTime = 10f;
+	public bool cutTrees = false;
 
-    public bool cutTrees = false;
+	private readonly Quaternion modelCorrection = Quaternion.Euler(90f, 0f, 0f);
+	private Vector3 initPlayerPos;
+	private Vector3 velocity;
+	private Rigidbody rb;
 
-    // Correct for a mesh that needs a 90° pitch to face its Z+ forward
-    private readonly Quaternion modelCorrection = Quaternion.Euler(90f, 0f, 0f);
+	// lightning specific
+	private Transform lightningTarget;
 
-    private Vector3 initPlayerPos;
-    private Vector3 velocity;
-    private Rigidbody rb;
+	public GameObject explosion;
 
-    // lightning specific
-    private Transform lightningTarget;
+	private void Start()
+	{
+		var bowComponent = FindObjectOfType<BowScript>();
+		arrowDamage = bowComponent.arrowDamage;
+		arrowEffect = bowComponent.arrowEffect.ToArray();
+		initialSpeed = bowComponent.arrowSpeed;
+		cutTrees = bowComponent.arrowCutsTrees;
+		lightningChain = bowComponent.lightningChain;
 
-    public GameObject explosion;
+		transform.localScale *= bowComponent.arrowSize;
 
-    private void Start()
-    {
-        var bowComponent = FindFirstObjectByType<BowScript>();
-        arrowDamage = bowComponent.arrowDamage;
-        arrowEffect = bowComponent.arrowEffect.ToArray();
-        initialSpeed = bowComponent.arrowSpeed;
-        cutTrees = bowComponent.arrowCutsTrees;
-        lightningChain = bowComponent.lightningChain;
+		initPlayerPos = FindObjectOfType<PlayerController>().transform.position;
 
-        transform.localScale = transform.localScale *= bowComponent.arrowSize;
+		CameraShaker.Instance.ShakeOnce(2f, 3f, .1f, .2f);
 
-        initPlayerPos = FindFirstObjectByType<PlayerController>().transform.position;
+		rb = GetComponent<Rigidbody>();
+		rb.useGravity = false;
 
-        CameraShaker.Instance.ShakeOnce(2f, 3f, .1f, .2f);
+		Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+		Vector3 shootDir = ray.direction.normalized;
+		velocity = shootDir * initialSpeed;
+		transform.rotation = Quaternion.LookRotation(shootDir) * modelCorrection;
 
-        rb = GetComponent<Rigidbody>();
-        rb.useGravity = false; // We’ll apply our own “gravity”
+		Destroy(gameObject, lifeTime);
+		Invoke(nameof(EnableTrailAfterDelay), 0.03f);
+	}
 
-        // 1) Compute aim direction from screen center
-        Camera cam = Camera.main;
-        Ray ray = cam.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
-        Vector3 shootDir = ray.direction.normalized;
+	private void EnableTrailAfterDelay() => GetComponentInChildren<TrailRenderer>().enabled = true;
 
-        // 2) Set initial velocity
-        velocity = shootDir * initialSpeed;
+	private void FixedUpdate()
+	{
+		if (lightningTarget != null)
+		{
+			Vector3 dir = (lightningTarget.position - rb.position).normalized;
+			velocity = dir * initialSpeed;
+			Vector3 newPos = rb.position + velocity * Time.fixedDeltaTime;
+			rb.MovePosition(newPos);
+			rb.MoveRotation(Quaternion.LookRotation(dir) * modelCorrection);
+		}
+		else
+		{
+			Vector3 newPos = rb.position + velocity * Time.fixedDeltaTime;
+			rb.MovePosition(newPos);
+			velocity += Vector3.down * dropGravity * Time.fixedDeltaTime;
+			if (velocity.sqrMagnitude > 0.001f)
+			{
+				rb.MoveRotation(Quaternion.LookRotation(velocity.normalized) * modelCorrection);
+			}
+		}
+	}
 
-        // 3) Orient arrow (with model correction)
-        transform.rotation = Quaternion.LookRotation(shootDir) * modelCorrection;
+	private void OnCollisionEnter(Collision collision)
+	{
+		if (collision.gameObject.CompareTag("Tree"))
+		{
+			if (!cutTrees) return;
+			if (!collision.gameObject.TryGetComponent(out KillableObject killable))
+			{
+				var newComp = collision.gameObject.AddComponent<KillableObject>();
+				newComp.maxHealth = 5;
+				newComp.hitParticles = Resources.Load<GameObject>("PFX/HitFX (big)");
+				newComp.deathParticles = Resources.Load<GameObject>("PFX/Explosion Tree");
+				newComp.currentHealth = newComp.maxHealth;
+				newComp.parentHitFx = false;
+			}
+		}
 
-        // 4) Auto‑destroy to clean up
-        Destroy(gameObject, lifeTime);
+		if (collision.gameObject.TryGetComponent(out BigguyDamagable compt))
+		{
+			compt.TakeDamage(transform, arrowDamage);
+			Destroy(gameObject);
+		}
 
-        Invoke(nameof(EnableTrailAfterDelay), 0.03f);
-    }
+		if (collision.gameObject.TryGetComponent<IDamagable>(out var component))
+		{
+			if (collision.gameObject.TryGetComponent<AbstractEnemy>(out var enem))
+			{
+				foreach (var effect in arrowEffect)
+				{
+					switch (effect)
+					{
+						case ArrowEffect.Fire:
+							enem.FireEffect();
+							break;
+						case ArrowEffect.Ice:
+							enem.IceEffect();
+							break;
+						case ArrowEffect.Lightning:
+							HandleLightningChain(collision.transform);
+							break;
+						case ArrowEffect.Bomb:
+							var expl = Instantiate(explosion, transform.position, explosion.transform.rotation);
+							Destroy(expl, 5f);
+							break;
+					}
+				}
+			}
+			component.DamageEffects(initPlayerPos);
+			component.TakeDamage(arrowDamage);
+		}
+	}
 
-    private void EnableTrailAfterDelay() => GetComponentInChildren<TrailRenderer>().enabled = true;
+	private void HandleLightningChain(Transform hitEnemy)
+	{
+		if (lightningChain > 0)
+		{
+			Transform nextTarget = FindNextEnemy(hitEnemy);
+			if (nextTarget != null)
+			{
+				lightningTarget = nextTarget;
+				lightningChain--;
+			}
+			else
+			{
+				Destroy(gameObject, 0.05f);
+			}
+		}
+		else
+		{
+			lightningTarget = null;
+			Destroy(gameObject, 0.05f);
+		}
+	}
 
-    void FixedUpdate()
-    {
-        if (lightningTarget != null)
-        {
-            // Fly directly at lightning target
-            Vector3 dir = (lightningTarget.position - rb.position).normalized;
-            velocity = dir * initialSpeed; // reset velocity, ignore drop
-            Vector3 newPos = rb.position + velocity * Time.fixedDeltaTime;
-            rb.MovePosition(newPos);
+	private Transform FindNextEnemy(Transform exclude)
+	{
+		float searchRadius = 1000f;
+		Collider[] hits = Physics.OverlapSphere(transform.position, searchRadius);
+		Transform closest = null;
+		float minDistSqr = float.MaxValue;
 
-            rb.MoveRotation(Quaternion.LookRotation(dir) * modelCorrection);
-        }
-        else
-        {
-            // Normal arrow physics
-            Vector3 newPos = rb.position + velocity * Time.fixedDeltaTime;
-            rb.MovePosition(newPos);
-            velocity += Vector3.down * dropGravity * Time.fixedDeltaTime;
+		foreach (var hit in hits)
+		{
+			var tr = hit.transform;
+			if (tr == exclude) continue;
+			if (tr.TryGetComponent<IDamagable>(out _))
+			{
+				float distSqr = (tr.position - transform.position).sqrMagnitude;
+				if (distSqr < minDistSqr)
+				{
+					minDistSqr = distSqr;
+					closest = tr;
+				}
+			}
+		}
 
-            if (velocity.sqrMagnitude > 0.001f)
-            {
-                Quaternion aimRot = Quaternion.LookRotation(velocity.normalized);
-                rb.MoveRotation(aimRot * modelCorrection);
-            }
-        }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.tag == "Tree")
-        {
-            if (!cutTrees) return;
-
-            if (!collision.gameObject.TryGetComponent(out KillableObject killable))
-            {
-                var newComp = collision.gameObject.AddComponent<KillableObject>();
-                newComp.maxHealth = 5;
-                newComp.hitParticles = Resources.Load<GameObject>("PFX/HitFX (big)");
-                newComp.deathParticles = Resources.Load<GameObject>("PFX/Explosion Tree");
-                newComp.currentHealth = newComp.maxHealth;
-                newComp.parentHitFx = false;
-            }
-        }
-
-        if (collision.gameObject.TryGetComponent(out IDamagable component))
-        {
-            var enem = collision.gameObject.GetComponent<AbstractEnemy>();
-
-            foreach (var effect in arrowEffect)
-            {
-                switch (effect)
-                {
-                    case ArrowEffect.Fire:
-                        enem.FireEffect();
-                        break;
-                    case ArrowEffect.Ice:
-                        enem.IceEffect();
-                        break;
-                    case ArrowEffect.Lightning:
-                        HandleLightningChain(collision.transform);
-                        break;
-                    case ArrowEffect.Bomb:
-                        var expl = Instantiate(explosion, transform.position, explosion.transform.rotation);
-                        Destroy(expl, 5f);
-                        break;
-                }
-            }
-
-            component.TakeDamage(arrowDamage);
-            component.DamageEffects(initPlayerPos);
-        }
-    }
-
-    private void HandleLightningChain(Transform hitEnemy)
-    {
-        if (lightningChain > 0)
-        {
-            Transform nextTarget = FindNextEnemy(hitEnemy);
-            if (nextTarget != null)
-            {
-                lightningTarget = nextTarget;
-                lightningChain--;
-            }
-            else
-            {
-                Destroy(gameObject, 0.05f); // no valid next target
-            }
-        }
-        else
-        {
-            lightningTarget = null;
-            Destroy(gameObject, 0.05f);
-        }
-    }
-
-    private Transform FindNextEnemy(Transform exclude)
-    {
-        float searchRadius = 20f; // adjust to taste
-        Collider[] hits = Physics.OverlapSphere(transform.position, searchRadius);
-
-        foreach (var hit in hits)
-        {
-            if (hit.transform == exclude) continue; // don’t chain to same enemy
-            if (hit.TryGetComponent(out IDamagable dmg))
-            {
-                return hit.transform;
-            }
-        }
-        return null;
-    }
+		return closest;
+	}
 }
 
 public enum ArrowEffect
 {
-    Normal,
-    Ice,
-    Lightning,
-    Bomb,
-    Fire
+	Normal, Ice, Lightning, Bomb, Fire
 }

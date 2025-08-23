@@ -6,7 +6,7 @@ public class QuestObjectCounter : MonoBehaviour
 	[TextArea]
 	public string questDescription;
 	public bool isActive = true;
-	private void Awake()
+	private void OnEnable()
 	{
 		if (countToReach <= 0)
 			countToReach = GetComponentsInChildren<QuestObject>().Length;

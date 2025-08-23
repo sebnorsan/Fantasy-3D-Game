@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     //[SerializeField] private TextMeshProUGUI cashText;
 	[SerializeField] private int currLevel, skillPointsAvailable;
 	[SerializeField] private GameObject skillTree;
-	[HideInInspector] public int xpMultiplier = 1;
+	public int xpMultiplier = 1;
 	private void Awake()
 	{
         if (instance != null)
@@ -43,7 +43,6 @@ public class GameManager : MonoBehaviour
 			FindFirstObjectByType<PlayerController>().canMove = !FindFirstObjectByType<PlayerController>().canMove;
 			FindFirstObjectByType<HandsSmooth>().enabled = !FindFirstObjectByType<HandsSmooth>().enabled;
 			FindFirstObjectByType<BowScript>().enabled = !FindFirstObjectByType<BowScript>().enabled;
-
 			Cursor.visible = !Cursor.visible;
 			if (Cursor.lockState == CursorLockMode.Locked)
 				Cursor.lockState = CursorLockMode.Confined;
@@ -105,7 +104,8 @@ public class GameManager : MonoBehaviour
         if (skillPointsAvailable >= 1)
         {
             skillPointsAvailable--;
-            return true;
+			UpdateXpGraphics();
+			return true;
         }
         return false;
     }

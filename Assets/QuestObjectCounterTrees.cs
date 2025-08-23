@@ -1,3 +1,4 @@
+using EasyTextEffects.Editor.MyBoxCopy.Extensions;
 using UnityEngine;
 
 public class QuestObjectCounterTrees : MonoBehaviour
@@ -12,6 +13,11 @@ public class QuestObjectCounterTrees : MonoBehaviour
 		SideQuest
 	}
 	[SerializeField] private QuestType questType;
+
+	public int xpGain = 100;
+
+	public string actionToEnable = "";
+
 	private void OnEnable()
 	{
 		Invoke(nameof(SetQuest), .1f);
@@ -45,7 +51,12 @@ public class QuestObjectCounterTrees : MonoBehaviour
 	{
 		FindFirstObjectByType<BowScript>().arrowCutsTrees = false;
 
-        foreach (var item in GameObject.FindGameObjectsWithTag("Tree"))
+		GameManager.instance.AddXp(xpGain);
+
+		if (!actionToEnable.IsNullOrEmpty())
+			DialogueManager.SetActive(actionToEnable, true);
+
+		foreach (var item in GameObject.FindGameObjectsWithTag("Tree"))
         {
 			var ko = item.GetComponent<KillableObject>();
 			if (ko != null)

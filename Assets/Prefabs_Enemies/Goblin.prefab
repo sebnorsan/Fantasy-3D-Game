@@ -5130,7 +5130,7 @@ MonoBehaviour:
   maxHealth: 2
   damage: 1
   attackDelay: 3
-  xpDrop: 1
+  xpDrop: 5
   speed: 10
   fireEffect: {fileID: 9179433807452027166}
   iceEffect: {fileID: 2539255377322597236}
@@ -5276,7 +5276,7 @@ Transform:
   m_Children:
   - {fileID: 4557481086537271911}
   m_Father: {fileID: 8864574165799043315}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -89.98, y: 0, z: 0}
 --- !u!33 &489238614916460213
 MeshFilter:
   m_ObjectHideFlags: 0

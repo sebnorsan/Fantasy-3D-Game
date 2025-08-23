@@ -1,3 +1,4 @@
+using EasyTextEffects.Editor.MyBoxCopy.Extensions;
 using UnityEngine;
 
 public class QuestObject : MonoBehaviour
@@ -9,10 +10,18 @@ public class QuestObject : MonoBehaviour
         MainQuest,
         SideQuest
     }
-    [SerializeField] private QuestType questType;
+    public QuestType questType;
+	[SerializeField] private bool reenableKingQuest;
+	[SerializeField] private bool setKingSideQuest;
+	[SerializeField] ScriptableObject_NPC_Dialogue dia;
+
+	public int xpGain = 100;
+
+	public string actionToEnable = "";
+
 	private void OnEnable()
 	{
-		Invoke(nameof(SetQuest), .1f);
+		Invoke(nameof(SetQuest), .3f);
 	}
 	private void OnDisable()
 	{
@@ -27,6 +36,11 @@ public class QuestObject : MonoBehaviour
 			return;
 		}
 
+		GameManager.instance.AddXp(xpGain);
+
+		if (!actionToEnable.IsNullOrEmpty())
+			DialogueManager.SetActive(actionToEnable, true);
+
 		switch (questType)
 		{
 			case QuestType.MainQuest:
@@ -36,6 +50,11 @@ public class QuestObject : MonoBehaviour
 				QuestManager.instance.FinishSideQuest();
 				break;
 		}
+
+		if (setKingSideQuest)
+			FindFirstObjectByType<NPC_Interactable>().gameObject.GetComponent<QuestObject>().questType = QuestType.SideQuest;
+		if (reenableKingQuest)
+			FindFirstObjectByType<NPC_Interactable>().KingDialogue(dia);
 	}
 	public void SetQuest()
 	{

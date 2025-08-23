@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64b627dc6639fc844ac7a3a2b365e457, type: 3}
   m_Name: Wave2
   m_EditorClassIdentifier: 
+  minimiumSpawnInterval: 0.1
+  maximumSpawnInterval: 2
   countsPerTier: 4600000014000000

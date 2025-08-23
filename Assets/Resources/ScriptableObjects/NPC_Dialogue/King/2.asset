@@ -23,8 +23,8 @@ MonoBehaviour:
     subtitlesEnabled: 0
     subtitles: []
   imageOverride: {fileID: 0}
-  dialogue: can you go chop some wood with that bow of yours, i think you can. okay
-    thanks
+  dialogue: a band of goblins goober have set up camp in the forest, mind murdering
+    them in cold blood? ok thanks
   affectedWords: []
   continuedDialogue: {fileID: 0}
   dialogueEvent_enabled: 0
@@ -35,4 +35,4 @@ MonoBehaviour:
   dialogueEvent_continuedDialogue: {fileID: 0}
   actions:
   - actionType: 0
-    targetID: kc_0
+    targetID: quest_campfire

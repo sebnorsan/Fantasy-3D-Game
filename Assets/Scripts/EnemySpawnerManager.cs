@@ -31,13 +31,13 @@ public class EnemySpawnerManager : MonoBehaviour
 	public LayerMask obstacleMask;
 	public float maxNavSampleDistance = 1f;
 
-	[HideInInspector] public int _currentWave = 0;
+	public int _currentWave = 0;
 	private int[] _remainingThisWave;
 	private Coroutine _spawnRoutine;
 
 	private void Awake()
 	{
-		_currentWave = 0;
+		timerText.text = string.Empty;
 
 		if (instance != null)
 			Destroy(gameObject);
@@ -45,20 +45,21 @@ public class EnemySpawnerManager : MonoBehaviour
 			instance = this;
 	}
 
-	void OnEnable()
-	{
-		StartWave(_currentWave);
-		_spawnRoutine = StartCoroutine(SpawnLoop());
-	}
+	//void OnEnable()
+	//{
+	//	_spawnRoutine = StartCoroutine(SpawnLoop());
+	//}
 
-	void OnDisable()
-	{
-		if (_spawnRoutine != null)
-			StopCoroutine(_spawnRoutine);
-	}
+	//void OnDisable()
+	//{
+	//	if (_spawnRoutine != null)
+	//		StopCoroutine(_spawnRoutine);
+	//}
 
-	void StartWave(int waveIndex)
+	public void StartWave(int waveIndex)
 	{
+		FindFirstObjectByType<MusicManager>().BattleResume();
+
 		if (waveIndex < 0 || waveIndex >= waves.Length)
 		{
 			Debug.Log("No more waves to run.");
@@ -71,23 +72,50 @@ public class EnemySpawnerManager : MonoBehaviour
 
 		_remainingThisWave = wave.countsPerTier.ToArray();
 		Debug.Log($"Wave {waveIndex + 1} started: total enemies = {_remainingThisWave.Sum()}");
+		_spawnRoutine = StartCoroutine(SpawnLoop());
+	}
+	[SerializeField] private TMPro.TextMeshProUGUI timerText;
+	[SerializeField] private string[] actionAfterWave;
+	private void WaveFinish()
+	{
+		FindFirstObjectByType<MusicManager>().BattlePause();
+
+		DialogueManager.SetActive(actionAfterWave[_currentWave], true);
+
+		if (_spawnRoutine != null)
+			StopCoroutine(_spawnRoutine);
+			Debug.Log($"Wave {_currentWave + 1} complete.");
+		// Start countdown to next wave
+		StartCoroutine(TimerCountdown(60)); // 2 minutes = 120 seconds
 	}
 
-	IEnumerator SpawnLoop()
+	private IEnumerator TimerCountdown(int totalSeconds)
+	{
+		int remaining = totalSeconds;
+		while (remaining >= 0)
+		{
+			int minutes = remaining / 60;
+			int seconds = remaining % 60;
+			timerText.text = $"{minutes}:{seconds:00}";
+			yield return new WaitForSeconds(1f);
+			remaining--;
+		}
+
+		timerText.text = string.Empty;
+		// Countdown finished, start next wave
+		FindFirstObjectByType<WaveController>().StartWaveAnimation();
+	}
+
+	private IEnumerator SpawnLoop()
 	{
 		while (true)
 		{
 			yield return new WaitForSeconds(Random.Range(minSpawnInterval, maxSpawnInterval));
-
-			// If no counts left, end this wave
 			if (_remainingThisWave == null || _remainingThisWave.Sum() == 0)
 			{
-				Debug.Log($"Wave {_currentWave + 1} complete.");
-				if (_spawnRoutine != null)
-					StopCoroutine(_spawnRoutine);
+				WaveFinish();
 				yield break;
 			}
-
 			TrySpawnOne();
 		}
 	}
@@ -137,5 +165,11 @@ public class EnemySpawnerManager : MonoBehaviour
 				if (sp != null)
 					Gizmos.DrawSphere(sp.position, spawnRadius);
 		}
+	}
+	public bool ReachedFinalWave()
+	{
+		if (_currentWave >= waves.Length-1)
+			return true;
+		return false;
 	}
 }

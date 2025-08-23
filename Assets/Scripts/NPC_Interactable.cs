@@ -192,4 +192,14 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 			}
 		}
 	}
+	public void KingDialogue(ScriptableObject_NPC_Dialogue d)
+	{
+		StartCoroutine(KingQuestReUpdate(d));
+	}
+	private IEnumerator KingQuestReUpdate(ScriptableObject_NPC_Dialogue d)
+	{
+		yield return new WaitForSeconds(4f);
+		GetComponent<QuestObject>().SetQuest();
+		ChangeDialogue(d);
+	}
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CrystalScript : MonoBehaviour
 {
@@ -14,6 +15,17 @@ public class CrystalScript : MonoBehaviour
 
 	public bool thorns, deadly;
 
+	[Header("UI")]
+	[Tooltip("Slider showing health")]
+	public Slider healthSlider;
+	[Tooltip("Speed at which the slider value lerps")]
+	[SerializeField] private float sliderLerpSpeed = 5f;
+
+	private Material flashMaterial;
+	private float flashDuration = .1f;
+
+	public ParticleSystem explosionpfx;
+
 	private void Start()
 	{
 		crystalShield.SetActive(true);
@@ -21,12 +33,29 @@ public class CrystalScript : MonoBehaviour
 		foreach (var rend in renderersToFlash)
 			affected.Add((rend, rend.materials));
 		currentHealth = maxHealth;
+
+		if (healthSlider != null)
+		{
+			healthSlider.maxValue = maxHealth;
+			healthSlider.value = maxHealth;
+		}
 	}
+
+	private void Update()
+	{
+		if (healthSlider != null)
+		{
+			float target = currentHealth;
+			healthSlider.value = Mathf.Lerp(healthSlider.value, target, Time.deltaTime * sliderLerpSpeed);
+		}
+	}
+
 	private void OnDrawGizmos()
 	{
 		Gizmos.color = Color.green;
 		Gizmos.DrawWireSphere(transform.position, radius);
 	}
+
 	public void TakeDamage(int dmg)
 	{
 		currentHealth -= dmg;
@@ -34,57 +63,57 @@ public class CrystalScript : MonoBehaviour
 		if (currentHealth <= 0)
 			Die();
 	}
+
 	private void Die()
 	{
 		Debug.Log("Crystal has been destroyed!!");
-		Destroy(this);
+		explosionpfx.Play();
+		explosionpfx.gameObject.GetComponent<AudioSource>().Play();
+		FindFirstObjectByType<WaveController>().GetComponent<Animator>().SetTrigger("Lose");
+		Destroy(gameObject);
 	}
-	private Material flashMaterial;
-	private float flashDuration = .1f;
-	Material[] _originals;
-	System.Collections.IEnumerator DamageEffects()
+
+	private IEnumerator DamageEffects()
 	{
 		GetComponentInChildren<ParticleSystem>().Play();
+		GetComponentInChildren<AudioSource>().Play();
+		EventManager.instance.RandomizePitchOnSound(GetComponentInChildren<AudioSource>().clip, .6f, .9f);
 		GetComponent<Animator>().SetTrigger("TakeDamage");
 
-		// 1) Load flash material if not already loaded
 		if (flashMaterial == null)
 			flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
 
-		// 3) Store originals and apply flash
 		foreach (var rend in renderersToFlash)
 		{
-			// create an array filled with flashMaterial
 			var flashMats = new Material[rend.materials.Length];
 			for (int i = 0; i < flashMats.Length; i++)
 				flashMats[i] = flashMaterial;
-
-			// apply
 			rend.materials = flashMats;
 		}
 
-		// 4) Wait
 		yield return new WaitForSeconds(flashDuration);
 
-		// 5) Revert all
 		foreach (var (renderer, originals) in affected)
 			renderer.materials = originals;
 	}
+
 	private void OnTriggerEnter(Collider other)
 	{
 		if (other.TryGetComponent(out AbstractEnemy enemy))
 			enemy.StartAttack();
 	}
+
 	private void OnTriggerExit(Collider other)
 	{
 		if (other.TryGetComponent(out AbstractEnemy enemy))
 			enemy.StopAttack();
 	}
+
 	public void Regeneration()
-    {
+	{
 		Invoke(nameof(Regeneration), .5f);
 		currentHealth++;
-		if (maxHealth < currentHealth)
+		if (currentHealth > maxHealth)
 			currentHealth = maxHealth;
-    }
+	}
 }

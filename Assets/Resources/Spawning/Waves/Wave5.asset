@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Wave5
   m_EditorClassIdentifier: 
   minimiumSpawnInterval: 0.1
-  maximumSpawnInterval: 1
+  maximumSpawnInterval: 0.2
   countsPerTier: e8030000e8030000e8030000e8030000

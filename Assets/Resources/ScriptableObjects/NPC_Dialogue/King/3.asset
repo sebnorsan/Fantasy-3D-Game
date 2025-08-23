@@ -23,16 +23,15 @@ MonoBehaviour:
     subtitlesEnabled: 0
     subtitles: []
   imageOverride: {fileID: 0}
-  dialogue: uhhh yeah so change of plans, theres like a big mf coming real close
-    watch out
+  dialogue: welcome back my guard, good job killing those goblin goober gob gobs
   affectedWords: []
-  continuedDialogue: {fileID: 0}
+  continuedDialogue: {fileID: 11400000, guid: 06e70049c2bf90041a8fee1d569dbe49, type: 2}
   dialogueEvent_enabled: 0
   dialogueEvent_OnStart: 0
-  dialogueEvent: 2
+  dialogueEvent: 0
   dialogueEvent_timeEvent: 0
   dialogueEvent_interactionsEvent: 0
   dialogueEvent_continuedDialogue: {fileID: 0}
   actions:
-  - actionType: 0
-    targetID: bigguy
+  - actionType: 2
+    targetID: 

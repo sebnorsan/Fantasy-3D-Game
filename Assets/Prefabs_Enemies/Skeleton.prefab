@@ -325,11 +325,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ea4c96b145df984bb0267d8e6f7778a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
+  maxHealth: 25
   damage: 2
   attackDelay: 1
-  xpDrop: 35
-  speed: 30
+  xpDrop: 150
+  speed: 25
   fireEffect: {fileID: 4686013760087645928}
   iceEffect: {fileID: 3637153038430837716}
   knockbackForce: 20

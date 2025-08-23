@@ -20,6 +20,8 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 	public float speed = 3.5f;
 
 	[SerializeField] private GameObject fireEffect, iceEffect;
+	private List<(MeshRenderer renderer, Material[] originals)> affected =
+		new List<(MeshRenderer renderer, Material[] originals)>();
 
 	private void Awake() => currentHealth = maxHealth;
 	private void Start()
@@ -29,7 +31,7 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 		if (GetComponent<Animator>())
 			anim = GetComponent<Animator>();
 
-		originalSpeed = agent.speed;
+		originalSpeed = speed;
 		originalAcceleration = agent.acceleration;
 
 		flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
@@ -223,7 +225,7 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 		crystalScript.TakeDamage(damage);
 
 		if (crystalScript.thorns)
-			TakeDamage(1);
+			TakeDamage(5);
 		if (crystalScript.deadly)
 			Die();
 	}
