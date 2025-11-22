@@ -12,7 +12,10 @@ public class InteractionHandler : MonoBehaviour
 
 	private void Start()
 	{
-		playerController = GetComponentInParent<PlayerController>();
+		playerController = GetComponentInParent<PlayerController>(includeInactive: true);
+
+		if (!playerController.IsOwner) return;
+
 		interactionKeyAnimator = EventManager.instance.interactionAnimator;
 		cam = playerController.cam;
 	}
