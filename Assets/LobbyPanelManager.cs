@@ -137,7 +137,7 @@ public class LobbyPanelManager : MonoBehaviour
 
 		// Host-only: load your game scene via NGO
 		// Replace "GameScene" with your actual scene name.
-		NetworkManager.Singleton.SceneManager.LoadScene("GameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+		NetworkManager.Singleton.SceneManager.LoadScene("SampleScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
 	}
 
 	private async Task<Sprite> GetAvatarSpriteAsync(SteamId id)

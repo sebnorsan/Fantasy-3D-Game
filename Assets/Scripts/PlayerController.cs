@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Net.Http.Headers;
+using Unity.Netcode;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
 	// Player Settings
 	[Header("Player Settings")]
