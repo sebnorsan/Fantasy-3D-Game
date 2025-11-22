@@ -21,7 +21,7 @@ public class QuestObject : MonoBehaviour
 
 	private void OnEnable()
 	{
-		Invoke(nameof(SetQuest), .3f);
+		Invoke(nameof(SetQuest), 1f);
 	}
 	private void OnDisable()
 	{
