@@ -2,6 +2,7 @@
 using System.Net.NetworkInformation;
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Netcode;
 
 public class BowScript : MonoBehaviour
 {
@@ -75,15 +76,45 @@ public class BowScript : MonoBehaviour
 		Invoke(nameof(ResetShot), .35f);
 	}
 	private void ResetShot() => canShoot = true;
+	
+	//singleplayer only
+	//public void InstantiateArrow()
+	//{
+	//	//arrowFired.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+	//	var go = Instantiate(arrowFired, arrowTransform.position, arrowFired.transform.rotation);
+
+	//	go.TryGetComponent(out Arrow arrowComponent);
+
+	//	arrowComponent.Initialize(this, GetComponentInParent<PlayerController>());
+	//}
 	public void InstantiateArrow()
 	{
-		//arrowFired.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-		var go = Instantiate(arrowFired, arrowTransform.position, arrowFired.transform.rotation);
+		if (!playerController.IsOwner) return;
 
-		go.TryGetComponent(out Arrow arrowComponent);
-
-		arrowComponent.Initialize(this, GetComponentInParent<PlayerController>());
+		// call server to spawn arrow
+		SpawnArrowServerRpc(arrowTransform.position, arrowTransform.rotation);
 	}
+
+	[ServerRpc]
+	private void SpawnArrowServerRpc(Vector3 pos, Quaternion rot, ServerRpcParams rpcParams = default)
+	{
+		var arrowObj = Instantiate(arrowFired, pos, rot);
+
+		var netObj = arrowObj.GetComponent<NetworkObject>();
+		netObj.Spawn(true);
+
+		// Initialize on server so everyone gets same data
+		if (arrowObj.TryGetComponent(out Arrow arrowComponent))
+		{
+			arrowComponent.Initialize(this, GetComponentInParent<PlayerController>());
+			// better: pass OwnerClientId in Initialize so arrow knows who fired
+		}
+
+		// Give it velocity on server
+		if (arrowObj.TryGetComponent(out Rigidbody rb))
+			rb.linearVelocity = arrowTransform.forward * arrowSpeed;
+	}
+
 	public void AssignMiddleString() => GetComponentInChildren<BowStringRend>().AssignMid();
 	public void UnAssignMiddleString() => GetComponentInChildren<BowStringRend>().UnAssignMid();
 }

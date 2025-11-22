@@ -1,10 +1,10 @@
 ﻿using System.Collections;
+using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.AI;
-using EZCameraShake;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Arrow : MonoBehaviour
+public class Arrow : NetworkBehaviour
 {
 	[Header("Damage & Effects")]
 	public int arrowDamage = 1;
@@ -25,38 +25,92 @@ public class Arrow : MonoBehaviour
 	// lightning specific
 	private Transform lightningTarget;
 
+	[Header("VFX")]
 	public GameObject explosion;
 
-	public void Initialize(BowScript bowComponent, PlayerController playerController)
+	// ---- Server-side init ----
+	// Call this ONLY on server, BEFORE Spawn()
+	public void ServerInitialize(
+		int damage,
+		ArrowEffect[] effects,
+		float speed,
+		bool cutsTrees,
+		int lightningChains,
+		float size,
+		Vector3 shootDir,
+		Vector3 shooterPos,
+		ulong shooterClientId
+	)
 	{
-		arrowDamage = bowComponent.arrowDamage;
-		arrowEffect = bowComponent.arrowEffect.ToArray();
-		initialSpeed = bowComponent.arrowSpeed;
-		cutTrees = bowComponent.arrowCutsTrees;
-		lightningChain = bowComponent.lightningChain;
+		if (!IsServer) return;
 
-		transform.localScale *= bowComponent.arrowSize;
+		arrowDamage = damage;
+		arrowEffect = effects != null ? effects.ToArray() : new ArrowEffect[0];
+		initialSpeed = speed;
+		cutTrees = cutsTrees;
+		lightningChain = lightningChains;
 
-		initPlayerPos = playerController.transform.position;
+		transform.localScale *= size;
 
-		CameraShaker.Instance.ShakeOnce(2f, 3f, .1f, .2f);
+		initPlayerPos = shooterPos;
 
-		rb = GetComponent<Rigidbody>();
 		rb.useGravity = false;
 
-		Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
-		Vector3 shootDir = ray.direction.normalized;
+		shootDir = shootDir.normalized;
 		velocity = shootDir * initialSpeed;
 		transform.rotation = Quaternion.LookRotation(shootDir) * modelCorrection;
 
-		Destroy(gameObject, lifeTime);
-		Invoke(nameof(EnableTrailAfterDelay), 0.03f);
+		// lifetime on server -> despawn for everyone
+		StartCoroutine(LifeTimer());
+
+		// Shooter-only camera shake
+		ShakeShooterClientRpc(shooterClientId);
+
+		EnableTrailAfterDelayClientRpc(0.03f);
 	}
 
-	private void EnableTrailAfterDelay() => GetComponentInChildren<TrailRenderer>().enabled = true;
+	private void Awake()
+	{
+		rb = GetComponent<Rigidbody>();
+	}
+
+	private IEnumerator LifeTimer()
+	{
+		yield return new WaitForSeconds(lifeTime);
+		if (IsSpawned)
+			NetworkObject.Despawn();
+	}
+
+	[ClientRpc]
+	private void EnableTrailAfterDelayClientRpc(float delay)
+	{
+		StartCoroutine(EnableTrail(delay));
+	}
+
+	private IEnumerator EnableTrail(float delay)
+	{
+		yield return new WaitForSeconds(delay);
+		var tr = GetComponentInChildren<TrailRenderer>();
+		if (tr != null) tr.enabled = true;
+	}
+
+	[ClientRpc]
+	private void ShakeShooterClientRpc(ulong shooterClientId)
+	{
+		// only shake on the shooter’s machine
+		if (NetworkManager.Singleton == null) return;
+		if (NetworkManager.Singleton.LocalClientId != shooterClientId) return;
+
+		// avoid singleton problems by finding a shaker on local camera
+		var shaker = FindFirstObjectByType<EZCameraShake.CameraShaker>();
+		if (shaker != null)
+			shaker.ShakeOnce(2f, 3f, .1f, .2f);
+	}
 
 	private void FixedUpdate()
 	{
+		if (!IsServer) return;
+
 		if (lightningTarget != null)
 		{
 			Vector3 dir = (lightningTarget.position - rb.position).normalized;
@@ -69,16 +123,18 @@ public class Arrow : MonoBehaviour
 		{
 			Vector3 newPos = rb.position + velocity * Time.fixedDeltaTime;
 			rb.MovePosition(newPos);
+
 			velocity += Vector3.down * dropGravity * Time.fixedDeltaTime;
+
 			if (velocity.sqrMagnitude > 0.001f)
-			{
 				rb.MoveRotation(Quaternion.LookRotation(velocity.normalized) * modelCorrection);
-			}
 		}
 	}
 
 	private void OnCollisionEnter(Collision collision)
 	{
+		if (!IsServer) return;
+
 		if (collision.gameObject.CompareTag("Tree"))
 		{
 			if (!cutTrees) return;
@@ -96,7 +152,8 @@ public class Arrow : MonoBehaviour
 		if (collision.gameObject.TryGetComponent(out BigguyDamagable compt))
 		{
 			compt.TakeDamage(transform, arrowDamage);
-			Destroy(gameObject);
+			NetworkObject.Despawn();
+			return;
 		}
 
 		if (collision.gameObject.TryGetComponent<IDamagable>(out var component))
@@ -117,15 +174,23 @@ public class Arrow : MonoBehaviour
 							HandleLightningChain(collision.transform);
 							break;
 						case ArrowEffect.Bomb:
-							var expl = Instantiate(explosion, transform.position, explosion.transform.rotation);
-							Destroy(expl, 5f);
+							PlayExplosionClientRpc(transform.position, transform.rotation);
 							break;
 					}
 				}
 			}
+
 			component.DamageEffects(initPlayerPos);
 			component.TakeDamage(arrowDamage);
 		}
+	}
+
+	[ClientRpc]
+	private void PlayExplosionClientRpc(Vector3 pos, Quaternion rot)
+	{
+		if (explosion == null) return;
+		var expl = Instantiate(explosion, pos, rot);
+		Destroy(expl, 5f);
 	}
 
 	private void HandleLightningChain(Transform hitEnemy)
@@ -140,13 +205,13 @@ public class Arrow : MonoBehaviour
 			}
 			else
 			{
-				Destroy(gameObject, 0.05f);
+				NetworkObject.Despawn();
 			}
 		}
 		else
 		{
 			lightningTarget = null;
-			Destroy(gameObject, 0.05f);
+			NetworkObject.Despawn();
 		}
 	}
 
