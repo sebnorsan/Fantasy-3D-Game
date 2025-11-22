@@ -99,20 +99,27 @@ public class BowScript : MonoBehaviour
 	private void SpawnArrowServerRpc(Vector3 pos, Quaternion rot, ServerRpcParams rpcParams = default)
 	{
 		var arrowObj = Instantiate(arrowFired, pos, rot);
+		var arrow = arrowObj.GetComponent<Arrow>();
 
-		var netObj = arrowObj.GetComponent<NetworkObject>();
-		netObj.Spawn(true);
+		var shooterPos = playerController.transform.position;
 
-		// Initialize on server so everyone gets same data
-		if (arrowObj.TryGetComponent(out Arrow arrowComponent))
-		{
-			arrowComponent.Initialize(this, GetComponentInParent<PlayerController>());
-			// better: pass OwnerClientId in Initialize so arrow knows who fired
-		}
+		Ray ray = playerController.cam.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+		var shootDir = ray.direction.normalized;
 
-		// Give it velocity on server
-		if (arrowObj.TryGetComponent(out Rigidbody rb))
-			rb.linearVelocity = arrowTransform.forward * arrowSpeed;
+		arrow.ServerInitialize(
+			arrowDamage,
+			arrowEffect.ToArray(),
+			arrowSpeed,
+			arrowCutsTrees,
+			lightningChain,
+			arrowSize,
+			shootDir,
+			shooterPos,
+			rpcParams.Receive.SenderClientId
+		);
+
+		arrowObj.GetComponent<NetworkObject>().Spawn();
+
 	}
 
 	public void AssignMiddleString() => GetComponentInChildren<BowStringRend>().AssignMid();
