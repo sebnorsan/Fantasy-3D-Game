@@ -101,7 +101,9 @@ public class GameNetworkManager : MonoBehaviour
 		NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
 
 		transport.targetSteamId = hostId;
-		NetworkManager.Singleton.StartClient();
+
+		bool ok = NetworkManager.Singleton.StartClient();
+		Debug.Log($"StartClient to {hostId} returned {ok}");
 	}
 
 	public async Task<Lobby[]> RefreshLobbiesAsync()
@@ -178,7 +180,7 @@ public class GameNetworkManager : MonoBehaviour
 	private void OnLobbyEntered(Lobby lobby)
 	{
 		if (NetworkManager.Singleton.IsHost) return;
-		StartClient(lobby.Id);
+		StartClient(lobby.Owner.Id);
 
 		currLobby = lobby;
 
