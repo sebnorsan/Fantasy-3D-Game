@@ -61,16 +61,23 @@ public class GameSceneSpawnManager : NetworkBehaviour
 
 	private void OnClientDisconnected(ulong clientId)
 	{
-		// Optional: remove that player's spawn point so new late joiners can reuse space
-		// If you want that behavior, uncomment below:
-
-		var playerObj = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
-		if (playerObj != null)
-			usedSpawnPoints.Remove(playerObj.transform.position);
+		if (NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var cc))
+		{
+			var playerObj = cc.PlayerObject;
+			if (playerObj != null)
+				usedSpawnPoints.Remove(playerObj.transform.position);
+		}
 	}
+
+
+	private HashSet<ulong> spawned = new();
 
 	private void SpawnPlayerForClient(ulong clientId)
 	{
+		if (spawned.Contains(clientId)) return;
+		// also keep your PlayerObject null check
+		spawned.Add(clientId);
+
 		Vector3 spawnPos = FindValidSpawnPoint();
 		Quaternion spawnRot = Quaternion.identity;
 
