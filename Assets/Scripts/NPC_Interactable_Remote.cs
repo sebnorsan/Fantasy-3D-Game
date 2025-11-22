@@ -2,15 +2,20 @@ using UnityEngine;
 
 public class NPC_Interactable_Remote : MonoBehaviour, IInteractable
 {
-    public NPC_Interactable npcOwner;
+    [HideInInspector] public NPC_Interactable npcOwner;
 	private Animator anim;
 	public bool canInteract { get; set; } = true;
+	private PlayerController playerController;
 	private void Start()
 	{
 		anim = GetComponent<Animator>();
+		playerController = GetComponentInParent<PlayerController>();
+		npcOwner = FindFirstObjectByType<NPC_Interactable>();
 	}
 	public void Interact()
 	{
+		if (!playerController.IsOwner) return;
+
 		if (!canInteract)
 			return;
 

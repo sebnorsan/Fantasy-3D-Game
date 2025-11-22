@@ -22,13 +22,20 @@ public class BowScript : MonoBehaviour
 	private bool canShoot = true;
 	[SerializeField] private GameObject arrowFired;
 	[SerializeField] private Transform arrowTransform;
+	private PlayerController playerController;
 	private void Start()
 	{
+		playerController = GetComponentInParent<PlayerController>();
+
+		if (!playerController.IsOwner) return;
+
 		hs = GetComponentInParent<HandsSmooth>();
 		anim = GetComponent<Animator>();
 	}
 	private void Update()
 	{
+		if (!playerController.IsOwner) return;
+
 		if (!canShoot) return;
 
 		if (Input.GetMouseButton(0))
