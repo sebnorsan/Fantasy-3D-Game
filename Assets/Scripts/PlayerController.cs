@@ -93,7 +93,7 @@ public class PlayerController : NetworkBehaviour
 		{
 			// Disable all cameras + listeners
 			foreach (var c in GetComponentsInChildren<Camera>(true))
-				c.gameObject.SetActive(false); // kills tag/MainCamera too
+				c.enabled = false; // kills tag/MainCamera too
 
 			foreach (var a in GetComponentsInChildren<AudioListener>(true))
 				a.enabled = false;

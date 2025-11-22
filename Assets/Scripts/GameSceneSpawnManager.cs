@@ -75,7 +75,7 @@ public class GameSceneSpawnManager : NetworkBehaviour
 		Quaternion spawnRot = Quaternion.identity;
 
 		var player = Instantiate(playerPrefab, spawnPos, spawnRot);
-		player.SpawnAsPlayerObject(clientId, true);
+		player.SpawnAsPlayerObject(clientId, destroyWithScene: false);
 
 		usedSpawnPoints.Add(spawnPos);
 	}
