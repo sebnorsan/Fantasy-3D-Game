@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 2125885049808022428}
   - component: {fileID: 5680381780153879692}
   - component: {fileID: 791981249248097800}
+  - component: {fileID: 7398333624629841483}
   m_Layer: 0
   m_Name: Phone
   m_TagString: Untagged
@@ -171,6 +172,49 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcOwner: {fileID: 0}
+--- !u!114 &7398333624629841483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1019375252038045371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 460059413
+    DestinationState: 659351850
+    TransitionDuration: 0.1
+    TriggerNameHash: -579776749
+    TransitionIndex: 1
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 910444865
+    DestinationState: 659351850
+    TransitionDuration: 0
+    TriggerNameHash: -579776749
+    TransitionIndex: 0
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 1059120903
+    DestinationState: 460059413
+    TransitionDuration: 0
+    TriggerNameHash: 1824292864
+    TransitionIndex: 0
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 1244993637
+    DestinationState: -1735757700
+    TransitionDuration: 0.2
+    TriggerNameHash: -147590425
+    TransitionIndex: 0
+  m_Animator: {fileID: 2113065143638126602}
 --- !u!1 &1617594771116785923
 GameObject:
   m_ObjectHideFlags: 0
@@ -216,6 +260,7 @@ GameObject:
   - component: {fileID: 1227791032311695380}
   - component: {fileID: 6413132569534683115}
   - component: {fileID: 6784330846622331597}
+  - component: {fileID: 5853348521236689017}
   m_Layer: 0
   m_Name: Bow
   m_TagString: Untagged
@@ -345,6 +390,28 @@ MonoBehaviour:
     maxDistance: 500
     subtitlesEnabled: 0
     subtitles: []
+--- !u!114 &5853348521236689017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778696884442115976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 1007621405
+    DestinationState: -1405782425
+    TransitionDuration: 0.05
+    TriggerNameHash: -1316629574
+    TransitionIndex: 0
+  m_Animator: {fileID: 5685961037242288458}
 --- !u!1 &1825410108401040611
 GameObject:
   m_ObjectHideFlags: 0
@@ -1210,7 +1277,6 @@ GameObject:
   - component: {fileID: 8668623681890277092}
   - component: {fileID: 8365578267376534845}
   - component: {fileID: 465981164401472135}
-  - component: {fileID: 2081726937431346352}
   m_Layer: 3
   m_Name: PlayerController
   m_TagString: GameController
@@ -1420,28 +1486,6 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &2081726937431346352
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7758727492805073096}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  TransitionStateInfoList:
-  - IsCrossFadeExit: 0
-    Layer: 0
-    OriginatingState: 1007621405
-    DestinationState: -1405782425
-    TransitionDuration: 0.05
-    TriggerNameHash: -1316629574
-    TransitionIndex: 0
-  m_Animator: {fileID: 5685961037242288458}
 --- !u!1 &7973304527205840717
 GameObject:
   m_ObjectHideFlags: 0
