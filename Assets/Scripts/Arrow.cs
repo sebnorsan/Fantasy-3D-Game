@@ -27,9 +27,8 @@ public class Arrow : MonoBehaviour
 
 	public GameObject explosion;
 
-	private void Start()
+	public void Initialize(BowScript bowComponent, PlayerController playerController)
 	{
-		var bowComponent = FindObjectOfType<BowScript>();
 		arrowDamage = bowComponent.arrowDamage;
 		arrowEffect = bowComponent.arrowEffect.ToArray();
 		initialSpeed = bowComponent.arrowSpeed;
@@ -38,7 +37,7 @@ public class Arrow : MonoBehaviour
 
 		transform.localScale *= bowComponent.arrowSize;
 
-		initPlayerPos = FindObjectOfType<PlayerController>().transform.position;
+		initPlayerPos = playerController.transform.position;
 
 		CameraShaker.Instance.ShakeOnce(2f, 3f, .1f, .2f);
 

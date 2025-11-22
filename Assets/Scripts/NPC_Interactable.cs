@@ -3,8 +3,9 @@ using System.Linq;
 using System.Collections;
 using System.Net.NetworkInformation;
 using System;
+using Unity.Netcode;
 
-public class NPC_Interactable : MonoBehaviour, IInteractable
+public class NPC_Interactable : NetworkBehaviour, IInteractable
 {
 	public ScriptableObject_NPC npcBase;
 
@@ -21,6 +22,8 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 
 	public event Action OnTalkEnded;
 
+	public bool isTalkingToPlayer = false;
+
 	private void Start()
 	{
 		if (nextDialogue.dialogueEvent_OnStart)
@@ -28,7 +31,7 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 	}
 	public void Interact()
 	{
-		if (!canInteract)
+		if (!canInteract || isTalkingToPlayer)
 			return;
 
 		StartTalk();
@@ -118,6 +121,8 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 	
 	private void StartTalk()
 	{
+		SetNPCToTalkingServerRpc(true);
+
 		InteractionHandler.singleton.EnterInteraction_NPC(this);
 
 		prevDialogue = null;
@@ -153,6 +158,8 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 	}
 	private void StopTalk()
 	{
+		SetNPCToTalkingServerRpc(false);
+
 		InteractionHandler.singleton.ExitInteraction_NPC();
 		NPC_Canvas.singleton.DeactivateCanvas();
 
@@ -201,5 +208,16 @@ public class NPC_Interactable : MonoBehaviour, IInteractable
 		yield return new WaitForSeconds(4f);
 		GetComponent<QuestObject>().SetQuest();
 		ChangeDialogue(d);
+	}
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+	private void SetNPCToTalkingServerRpc(bool isTalking)
+	{
+		isTalkingToPlayer = isTalking;
+		SetNPCToTalkingClientRpc(isTalking);
+	}
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void SetNPCToTalkingClientRpc(bool isTalking)
+	{
+		isTalkingToPlayer = isTalking;
 	}
 }

@@ -71,7 +71,11 @@ public class BowScript : MonoBehaviour
 	public void InstantiateArrow()
 	{
 		//arrowFired.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-		Instantiate(arrowFired, arrowTransform.position, arrowFired.transform.rotation);
+		var go = Instantiate(arrowFired, arrowTransform.position, arrowFired.transform.rotation);
+
+		go.TryGetComponent(out Arrow arrowComponent);
+
+		arrowComponent.Initialize(this, GetComponentInParent<PlayerController>());
 	}
 	public void AssignMiddleString() => GetComponentInChildren<BowStringRend>().AssignMid();
 	public void UnAssignMiddleString() => GetComponentInChildren<BowStringRend>().UnAssignMid();

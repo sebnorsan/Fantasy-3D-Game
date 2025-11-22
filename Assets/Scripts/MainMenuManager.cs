@@ -1,0 +1,208 @@
+using Steamworks;
+using Steamworks.Data;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+using System.Threading.Tasks;
+
+public class MainMenuManager : MonoBehaviour
+{
+	[Header("Panels")]
+	[SerializeField] private GameObject mainPanel;
+	[SerializeField] private GameObject hostPanel;
+	[SerializeField] private GameObject browserPanel;
+	[SerializeField] private GameObject passwordPanel;
+
+	[Header("Main Buttons")]
+	[SerializeField] private Button hostButton;
+	[SerializeField] private Button joinButton;
+
+	[Header("Host UI")]
+	[SerializeField] private TMP_InputField lobbyNameInput;
+	[SerializeField] private TMP_InputField lobbyPasswordInput;
+	[SerializeField] private TMP_InputField maxPlayersInput; // simple numeric input
+	[SerializeField] private Toggle friendsOnlyToggle;
+	[SerializeField] private Button startHostButton;
+	[SerializeField] private Button hostBackButton;
+
+	[Header("Browser UI")]
+	[SerializeField] private Button refreshButton;
+	[SerializeField] private Button browserBackButton;
+	[SerializeField] private Transform lobbyListContent;
+	[SerializeField] private LobbyRowView lobbyRowPrefab;
+	[SerializeField] private TMP_Text browserStatusText;
+
+	[Header("Password UI")]
+	[SerializeField] private TMP_InputField joinPasswordInput;
+	[SerializeField] private Button passwordJoinButton;
+	[SerializeField] private Button passwordCancelButton;
+	[SerializeField] private TMP_Text passwordTitleText;
+
+	private Lobby pendingJoinLobby;
+	private bool isRefreshing;
+	private bool isJoining;
+
+	private void Awake()
+	{
+		hostButton.onClick.AddListener(OpenHostPanel);
+		joinButton.onClick.AddListener(OpenBrowserPanel);
+
+		startHostButton.onClick.AddListener(OnStartHostClicked);
+		hostBackButton.onClick.AddListener(BackToMain);
+
+		refreshButton.onClick.AddListener(() => _ = RefreshLobbies());
+		browserBackButton.onClick.AddListener(BackToMain);
+
+		passwordJoinButton.onClick.AddListener(() => _ = ConfirmPasswordJoin());
+		passwordCancelButton.onClick.AddListener(ClosePasswordPanel);
+
+		BackToMain();
+	}
+
+	public void BackToMain()
+	{
+		mainPanel.SetActive(true);
+		hostPanel.SetActive(false);
+		browserPanel.SetActive(false);
+		passwordPanel.SetActive(false);
+	}
+
+	public void OpenHostPanel()
+	{
+		mainPanel.SetActive(false);
+		hostPanel.SetActive(true);
+		browserPanel.SetActive(false);
+		passwordPanel.SetActive(false);
+	}
+
+	public void OpenBrowserPanel()
+	{
+		mainPanel.SetActive(false);
+		hostPanel.SetActive(false);
+		browserPanel.SetActive(true);
+		passwordPanel.SetActive(false);
+
+		_ = RefreshLobbies();
+	}
+	public void OpenLobbyPanel()
+	{
+		mainPanel.SetActive(false);
+		hostPanel.SetActive(false);
+		browserPanel.SetActive(false);
+		passwordPanel.SetActive(false);
+	}
+
+	private void OnStartHostClicked()
+	{
+		var name = lobbyNameInput.text;
+		var pw = lobbyPasswordInput.text;
+
+		int maxPlayers = 10;
+		if (!int.TryParse(maxPlayersInput.text, out maxPlayers))
+			maxPlayers = 10;
+
+		bool friendsOnly = friendsOnlyToggle != null && friendsOnlyToggle.isOn;
+
+		GameNetworkManager.instance.StartHost(name, pw, maxPlayers, friendsOnly);
+	}
+
+	private async Task RefreshLobbies()
+	{
+		if (isRefreshing) return;
+		isRefreshing = true;
+
+		browserStatusText.text = "Refreshing...";
+		ClearLobbyRows();
+
+		var lobbies = await GameNetworkManager.instance.RefreshLobbiesAsync();
+
+		if (lobbies.Length == 0)
+		{
+			browserStatusText.text = "No lobbies found.";
+			isRefreshing = false;
+			return;
+		}
+
+		browserStatusText.text = "";
+
+		foreach (var lobby in lobbies)
+		{
+			var row = Instantiate(lobbyRowPrefab, lobbyListContent);
+
+			var name = lobby.GetData("name");
+			if (string.IsNullOrEmpty(name)) name = "Lobby";
+
+			bool passworded = !string.IsNullOrEmpty(lobby.GetData("pwHash"));
+
+			row.Bind(
+				lobby,
+				name,
+				lobby.MemberCount,
+				lobby.MaxMembers,
+				passworded,
+				OnJoinLobbyPressed
+			);
+		}
+
+		isRefreshing = false;
+	}
+
+	private void ClearLobbyRows()
+	{
+		for (int i = lobbyListContent.childCount - 1; i >= 0; i--)
+			Destroy(lobbyListContent.GetChild(i).gameObject);
+	}
+
+	private void OnJoinLobbyPressed(Lobby lobby, bool passworded)
+	{
+		if (isJoining) return;
+
+		if (passworded)
+		{
+			pendingJoinLobby = lobby;
+			passwordTitleText.text = $"Join {lobby.GetData("name")}";
+			joinPasswordInput.text = "";
+			passwordPanel.SetActive(true);
+		}
+		else
+		{
+			_ = JoinLobbyDirect(lobby, "");
+		}
+	}
+
+	private async Task ConfirmPasswordJoin()
+	{
+		if (isJoining) return;
+		ClosePasswordPanel();
+
+		await JoinLobbyDirect(pendingJoinLobby, joinPasswordInput.text);
+	}
+
+	private async Task JoinLobbyDirect(Lobby lobby, string passwordAttempt)
+	{
+		isJoining = true;
+		browserStatusText.text = "Joining...";
+
+		bool ok = await GameNetworkManager.instance.TryJoinLobbyAsync(lobby, passwordAttempt);
+
+		if (!ok)
+		{
+			browserStatusText.text = "Wrong password or failed to join.";
+			isJoining = false;
+			Invoke(nameof(ResetStatusText), 3f);
+			return;
+		}
+
+		browserStatusText.text = "Joined! Connecting...";
+		// OnLobbyEntered callback will start the NGO client.
+		isJoining = false;
+	}
+	private void ResetStatusText()
+	{
+		browserStatusText.text = "";
+	}
+	private void ClosePasswordPanel()
+	{
+		passwordPanel.SetActive(false);
+	}
+}
