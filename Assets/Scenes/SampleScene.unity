@@ -378972,9 +378972,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a4f2b8218c241e459886d749edf6019, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playIntro: 0
-  tower: {fileID: 0}
-  lights: {fileID: 0}
+  interactionAnimator: {fileID: 1168617432}
   audioSourceTemplate: {fileID: 4507143242590177643, guid: aeba320fe8e7ddf4ca7e9910cc65f504, type: 3}
   subtitleTemplate: {fileID: 901854775799315975, guid: 1da9e54e41de2d649b8aefaf468aa12d, type: 3}
   audioLibraries:

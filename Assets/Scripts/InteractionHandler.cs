@@ -20,7 +20,8 @@ public class InteractionHandler : MonoBehaviour
 
 	private void Start()
 	{
-		playerController = FindFirstObjectByType<PlayerController>();
+		playerController = GetComponentInParent<PlayerController>();
+		interactionKeyAnimator = EventManager.instance.interactionAnimator;
 	}
 
 	Ray ray;

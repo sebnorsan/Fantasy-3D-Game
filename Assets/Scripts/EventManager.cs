@@ -6,44 +6,13 @@ using UnityEngine.UI;
 public class EventManager : MonoBehaviour
 {
 	public static EventManager instance;
+	public Animator interactionAnimator;
 	public void Awake()
 	{
 		if (instance != null)
 			Destroy(this);
 		else
 			instance = this;
-	}
-
-	public bool playIntro = true;
-
-	[SerializeField] private GameObject tower;
-	[SerializeField] private GameObject lights;
-
-	PlayerController player;
-	private void Start()
-	{
-		player = FindAnyObjectByType<PlayerController>();
-		if (playIntro)
-			StartCoroutine(StartEvent());
-	}
-	public IEnumerator StartEvent()
-	{
-		SummonScreen(Color.black, 1f, false);
-
-		player.canMove = false;
-
-		tower.SetActive(false);
-		lights.SetActive(false);
-
-		yield return new WaitForSeconds(1.5f);
-
-		PlayThisSound("Voicelines", "Tutorial");
-		yield return new WaitForSeconds(GetThisSound("Voicelines", "Tutorial").audioToPlay.length - 1.2f);
-			
-		tower.SetActive(true);
-		lights.SetActive(true);
-
-		player.canMove = true;
 	}
 
 	#region PlaySound-Subtitles
