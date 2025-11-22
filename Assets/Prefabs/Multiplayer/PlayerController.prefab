@@ -1217,7 +1217,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5219615711813225076
 Transform:
   m_ObjectHideFlags: 0
@@ -1520,6 +1520,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3273564066785457438}
   - component: {fileID: 7212588598366797314}
+  - component: {fileID: 5330099070029441228}
   m_Layer: 0
   m_Name: CameraShaker
   m_TagString: Untagged
@@ -1550,7 +1551,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8463654121262741178}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2ab8353b5ebd32545867da143199a814, type: 3}
   m_Name: 
@@ -1559,6 +1560,19 @@ MonoBehaviour:
   DefaultRotInfluence: {x: 1, y: 1, z: 1}
   RestPositionOffset: {x: 0, y: 0, z: 0}
   RestRotationOffset: {x: 0, y: 0, z: 0}
+--- !u!114 &5330099070029441228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8463654121262741178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a72d8f7b49e2f5441afc64e4bad3e232, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scriptToEnable: {fileID: 7212588598366797314}
 --- !u!1 &8827951681074446768
 GameObject:
   m_ObjectHideFlags: 0
