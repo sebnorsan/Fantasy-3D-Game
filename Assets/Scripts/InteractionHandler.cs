@@ -6,8 +6,7 @@ public class InteractionHandler : MonoBehaviour
 
 	private PlayerController playerController;
 
-	public Animator interactionKeyAnimator;
-
+	private Animator interactionKeyAnimator;
 	Camera cam;
 
 	private void Start()
@@ -16,6 +15,11 @@ public class InteractionHandler : MonoBehaviour
 
 		if (!playerController.IsOwner) return;
 
+		Invoke(nameof(StartChecks), 1f);
+	}
+
+	private void StartChecks()
+	{
 		interactionKeyAnimator = EventManager.instance.interactionAnimator;
 		cam = playerController.cam;
 	}
@@ -23,7 +27,7 @@ public class InteractionHandler : MonoBehaviour
 	Ray ray;
 	void Update()
 	{
-		if (playerController == null || !playerController.IsOwner) return;
+		if (playerController == null || !playerController.IsOwner || cam == null || interactionKeyAnimator == null) return;
 
 		ray = cam.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
 
