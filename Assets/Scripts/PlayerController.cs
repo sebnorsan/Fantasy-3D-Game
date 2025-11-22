@@ -83,6 +83,13 @@ public class PlayerController : NetworkBehaviour
 		runningValue = runningSpeed;
 		initialWalkingSpeed = walkingSpeed;
 	}
+	public override void OnNetworkSpawn()
+	{
+		base.OnNetworkSpawn();
+
+		if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "LobbyScene")
+			Destroy(gameObject);
+	}
 
 	private bool isFlying = false;
 
