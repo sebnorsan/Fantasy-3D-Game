@@ -24,10 +24,16 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 
 	public bool isTalkingToPlayer = false;
 
+	private InteractionHandler interactionHandler;
+
 	private void Start()
 	{
 		if (nextDialogue.dialogueEvent_OnStart)
 			ApplyDialogueEvent(nextDialogue);
+	}
+	public void SetInteractionHandler(InteractionHandler iHandler)
+	{
+		interactionHandler = iHandler;
 	}
 	public void Interact()
 	{
@@ -123,7 +129,7 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 	{
 		SetNPCToTalkingServerRpc(true);
 
-		InteractionHandler.singleton.EnterInteraction_NPC(this);
+		interactionHandler.EnterInteraction_NPC(this);
 
 		prevDialogue = null;
 		exitOnFinish = false;
@@ -160,7 +166,7 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 	{
 		SetNPCToTalkingServerRpc(false);
 
-		InteractionHandler.singleton.ExitInteraction_NPC();
+		interactionHandler.ExitInteraction_NPC();
 		NPC_Canvas.singleton.DeactivateCanvas();
 
 		OnTalkEnded?.Invoke();

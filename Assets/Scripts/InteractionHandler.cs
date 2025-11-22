@@ -6,28 +6,23 @@ public class InteractionHandler : MonoBehaviour
 
 	private PlayerController playerController;
 
-	public static InteractionHandler singleton;
-
 	public Animator interactionKeyAnimator;
 
-	private void Awake()
-	{
-		if (singleton != null)
-			Destroy(gameObject);
-		else
-			singleton = this;
-	}
+	Camera cam;
 
 	private void Start()
 	{
 		playerController = GetComponentInParent<PlayerController>();
 		interactionKeyAnimator = EventManager.instance.interactionAnimator;
+		cam = playerController.cam;
 	}
 
 	Ray ray;
 	void Update()
 	{
-		ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+		if (playerController == null || !playerController.IsOwner) return;
+
+		ray = cam.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
 
 		if (Input.GetKeyDown(KeyCode.E))
 		{
@@ -39,7 +34,12 @@ public class InteractionHandler : MonoBehaviour
 
 			if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
 				if (hit.transform.TryGetComponent<IInteractable>(out var interactable))
+				{
+					if (interactable is NPC_Interactable npcInteractable)
+						npcInteractable.SetInteractionHandler(this);
+
 					interactable.Interact();
+				}
 		}
 
 		CheckForVisual();

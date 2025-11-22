@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using EvolveGames;
+using EZCameraShake;
+using System.Collections;
 using System.Net.Http.Headers;
 using Unity.Netcode;
 using UnityEngine;
@@ -48,7 +50,7 @@ public class PlayerController : NetworkBehaviour
 	float rotationX = 0f;
 	float initialCrouchHeight;
 	float initialFOV;
-	Camera cam;
+	[HideInInspector] public Camera cam;
 
 	bool isCrouching = false;
 	[HideInInspector] public bool isGrounded;
@@ -72,6 +74,8 @@ public class PlayerController : NetworkBehaviour
 	//private bool sliding = false;
 	void Start()
 	{
+		if (!IsOwner) return;
+
 		characterController = GetComponent<CharacterController>();
 		cam = GetComponentInChildren<Camera>();
 		Cursor.lockState = CursorLockMode.Locked;
@@ -85,11 +89,34 @@ public class PlayerController : NetworkBehaviour
 	}
 	public override void OnNetworkSpawn()
 	{
-		base.OnNetworkSpawn();
+		if (!IsOwner)
+		{
+			// Disable all cameras + listeners
+			foreach (var c in GetComponentsInChildren<Camera>(true))
+				c.gameObject.SetActive(false); // kills tag/MainCamera too
 
-		if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "LobbyScene")
-			Destroy(gameObject);
+			foreach (var a in GetComponentsInChildren<AudioListener>(true))
+				a.enabled = false;
+
+			// Disable local-only scripts if they exist
+			DisableIfExists<MovementEffects>();
+			DisableIfExists<HandsSmooth>();
+			DisableIfExists<HeadBob>();
+			DisableIfExists<InteractionHandler>();
+			DisableIfExists<BowScript>();
+			DisableIfExists<HandsHolder>();
+			DisableIfExists<EventAudioPlayer>();
+			DisableIfExists<CameraShaker>();
+		}
 	}
+
+	private void DisableIfExists<T>() where T : Behaviour
+	{
+		var comps = GetComponentsInChildren<T>(true);
+		foreach (var comp in comps)
+			comp.enabled = false;
+	}
+
 
 	private bool isFlying = false;
 
@@ -132,6 +159,8 @@ public class PlayerController : NetworkBehaviour
 
 	void Update()
 	{
+		if (!IsOwner) return;
+
 		if (dev)
 		{
 			if (Input.GetKeyDown(KeyCode.C)) SaveState();

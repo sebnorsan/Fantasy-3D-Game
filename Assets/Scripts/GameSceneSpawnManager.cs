@@ -138,7 +138,7 @@ public class GameSceneSpawnManager : NetworkBehaviour
 
 		if (Physics.Raycast(ray, out RaycastHit hit, 50f, ~0, QueryTriggerInteraction.Ignore))
 		{
-			return hit.point;
+			return hit.point + new Vector3(0, 2, 0);
 		}
 
 		return point; // if no ground hit, keep original
