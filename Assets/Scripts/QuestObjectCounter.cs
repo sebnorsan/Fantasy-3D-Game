@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 public class QuestObjectCounter : MonoBehaviour
@@ -24,6 +25,12 @@ public class QuestObjectCounter : MonoBehaviour
 		isActive = false;
 		GetComponentInChildren<QuestObject>().SetQuest();
 		isActive = true;
+
+		var networkObjects = GetComponentsInChildren<NetworkObject>();
+		foreach (var nwo in networkObjects)
+		{
+			nwo.Spawn();
+		}
 	}
 	public void RemoveCount()
 	{

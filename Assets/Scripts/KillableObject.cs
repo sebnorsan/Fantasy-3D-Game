@@ -1,18 +1,26 @@
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class KillableObject : MonoBehaviour, IDamagable
+public class KillableObject : NetworkBehaviour, IDamagable
 {
 	[Header("Health Settings")]
-	public int currentHealth;
-	public int maxHealth;
+	[SerializeField] private int maxHealth = 5;
+
+	private NetworkVariable<int> currentHealth = new(
+		0,
+		NetworkVariableReadPermission.Everyone,
+		NetworkVariableWritePermission.Server
+	);
+
+	public int CurrentHealth => currentHealth.Value;
+	public int MaxHealth => maxHealth;
+
 
 	[Header("UI")]
-	[Tooltip("Optional slider to display health")]
 	[SerializeField] private Slider healthSlider;
-	[Tooltip("How fast the slider value follows health changes")]
 	[SerializeField] private float sliderLerpSpeed = 5f;
 
 	[Header("Effects")]
@@ -29,31 +37,76 @@ public class KillableObject : MonoBehaviour, IDamagable
 	public bool parentHitFx = false;
 	public bool bigguy = false;
 
-	private void Awake()
+	public override void OnNetworkSpawn()
 	{
-		currentHealth = maxHealth;
+		if (NetworkManager.Singleton.IsServer)
+			currentHealth.Value = maxHealth;
 
-		if (healthSlider != null)
-		{
-			healthSlider.maxValue = maxHealth;
-			healthSlider.value = currentHealth;
-		}
+		currentHealth.OnValueChanged += OnHealthChanged;
+
+		// init UI for late joiners too
+		SetupSlider(currentHealth.Value);
+	}
+	private void SetupSlider(int value)
+	{
+		if (healthSlider == null) return;
+		healthSlider.maxValue = maxHealth;
+		healthSlider.value = value;
+	}
+
+	private void OnHealthChanged(int oldValue, int newValue)
+	{
+		SetupSlider(newValue);
 	}
 
 	private void Update()
 	{
 		if (healthSlider != null)
 		{
-			float target = currentHealth;
-			healthSlider.value = Mathf.Lerp(healthSlider.value, target, Time.deltaTime * sliderLerpSpeed);
+			float target = currentHealth.Value;
+			healthSlider.value = Mathf.Lerp(
+				healthSlider.value,
+				target,
+				Time.deltaTime * sliderLerpSpeed
+			);
 		}
 	}
 
-	public void DamageEffects(Vector3 hitPoint)
+	// called by arrows/enemies. MUST execute on server.
+	public void TakeDamage(int amount, Vector3 hitPoint)
+	{
+		if (!NetworkManager.Singleton.IsServer) return;
+
+		int newHp = Mathf.Max(0, currentHealth.Value - amount);
+		currentHealth.Value = newHp;
+
+		DamageEffectsClientRpc(hitPoint);
+
+		if (newHp == 0)
+			DieServer();
+	}
+
+	public void Heal(int amount)
+	{
+		if (!NetworkManager.Singleton.IsServer) return;
+
+		int newHp = Mathf.Clamp(currentHealth.Value + amount, 0, maxHealth);
+		currentHealth.Value = newHp;
+	}
+
+	//public void DamageEffects(Vector3 hitPoint)
+	//{
+	//	if (!NetworkManager.Singleton.IsServer) return;
+	//	DamageEffectsClientRpc(hitPoint);
+	//}
+
+	[ClientRpc]
+	private void DamageEffectsClientRpc(Vector3 hitPoint)
 	{
 		StartCoroutine(OnFlashMaterial());
-		OnSpawnDamagePFX();
+		OnSpawnDamagePFX(); // you can use hitPoint here if you want
 	}
+
 
 	private IEnumerator OnFlashMaterial()
 	{
@@ -92,20 +145,7 @@ public class KillableObject : MonoBehaviour, IDamagable
 		Destroy(pfx, 5);
 	}
 
-	public void Heal(int amount)
-	{
-		if (currentHealth == maxHealth) return;
-		currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
-	}
-
-	public void TakeDamage(int amount)
-	{
-		currentHealth = Mathf.Max(0, currentHealth - amount);
-		if (currentHealth == 0)
-			Die();
-	}
-
-	private void Die()
+	private void DieServer()
 	{
 		if (bigguy) return;
 
@@ -114,19 +154,30 @@ public class KillableObject : MonoBehaviour, IDamagable
 
 		GameManager.instance.AddXp(xpGain);
 
+		DieEffectsClientRpc();
+
+		// If this object is networked, despawn it.
+		if (TryGetComponent(out NetworkObject netObj) && netObj.IsSpawned)
+			netObj.Despawn(true);
+		else
+			Destroy(gameObject);
+	}
+
+	[ClientRpc]
+	private void DieEffectsClientRpc()
+	{
 		if (deathParticles != null)
 		{
 			var pfx = Instantiate(deathParticles, transform.position, deathParticles.transform.rotation);
 			Destroy(pfx, 5);
 		}
-
-		Destroy(gameObject);
 	}
 
-	private void OnDestroy()
+	public override void OnNetworkDespawn()
 	{
-		if (gameObject.CompareTag("Tree"))
+		currentHealth.OnValueChanged -= OnHealthChanged;
+
+		if (IsServer && gameObject.CompareTag("Tree"))
 			FindFirstObjectByType<QuestObjectCounterTrees>().RemoveCount();
 	}
 }
-

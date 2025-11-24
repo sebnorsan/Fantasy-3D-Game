@@ -4962,9 +4962,9 @@ GameObject:
   - component: {fileID: 8884069470092788789}
   - component: {fileID: 3486222336262703202}
   - component: {fileID: 2845986693196668612}
-  - component: {fileID: 2464897326432360680}
   - component: {fileID: 184284523751061023}
   - component: {fileID: -8203494515354369122}
+  - component: {fileID: 2464897326432360680}
   - component: {fileID: -172997892965470999}
   m_Layer: 8
   m_Name: ArrowShot
@@ -5070,26 +5070,6 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
---- !u!114 &2464897326432360680
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5657210549004271310}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 377abf98a6611fa42a25704bb747be1e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  arrowDamage: 1
-  arrowEffect: 
-  lightningChain: 3
-  initialSpeed: 150
-  dropGravity: 4
-  lifeTime: 10
-  cutTrees: 0
-  explosion: {fileID: 8410903520702676324, guid: b8b89b080679b7943a28f60da7e4656a, type: 3}
 --- !u!65 &184284523751061023
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5136,6 +5116,27 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!114 &2464897326432360680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5657210549004271310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 377abf98a6611fa42a25704bb747be1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  arrowDamage: 1
+  arrowEffect: 
+  lightningChain: 3
+  initialSpeed: 150
+  dropGravity: 4
+  lifeTime: 10
+  cutTrees: 0
+  explosion: {fileID: 8410903520702676324, guid: b8b89b080679b7943a28f60da7e4656a, type: 3}
 --- !u!114 &-172997892965470999
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5151,7 +5152,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 0
   AutoOwnerAuthorityTickOffset: 1
-  PositionInterpolationType: 0
+  PositionInterpolationType: 2
   RotationInterpolationType: 0
   ScaleInterpolationType: 0
   PositionLerpSmoothing: 1

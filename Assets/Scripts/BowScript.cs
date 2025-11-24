@@ -1,125 +1,107 @@
-﻿using EvolveGames;
-using System.Net.NetworkInformation;
-using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
+using UnityEngine;
 
 public class BowScript : MonoBehaviour
 {
-
 	public int arrowDamage = 1;
 	public float arrowSpeed = 30f;
 	public List<ArrowEffect> arrowEffect = new List<ArrowEffect>();
 	public float arrowDrawSpeed = 1f;
 	public float arrowSize = 1f;
 	public int lightningChain = 3;
-
 	public bool arrowCutsTrees = false;
 
 	[Space(75)]
-
 	private Animator anim;
 	private HandsSmooth hs;
 	private bool canShoot = true;
-	[SerializeField] private GameObject arrowFired;
+
+	[SerializeField] private GameObject arrowFired;   // MUST be the NetworkObject arrow prefab
 	[SerializeField] private Transform arrowTransform;
+
 	private PlayerController playerController;
+	private BowNetCode bowNetcode;
+
 	private void Start()
 	{
 		playerController = GetComponentInParent<PlayerController>();
+		if (!playerController) return;
 
 		if (!playerController.IsOwner) return;
 
 		hs = GetComponentInParent<HandsSmooth>();
 		anim = GetComponent<Animator>();
+
+		bowNetcode = playerController.GetComponent<BowNetCode>();
+		if (!bowNetcode)
+			Debug.LogError("BowNetcode missing on player root!");
 	}
+
 	private void Update()
 	{
-		if (!playerController.IsOwner) return;
-
+		if (!playerController || !playerController.IsOwner) return;
 		if (!canShoot) return;
 
-		if (Input.GetMouseButton(0))
-			LoadBow();
-		else
-			UnLoadBow();
+		if (Input.GetMouseButton(0)) LoadBow();
+		else UnLoadBow();
 
-		if (Input.GetMouseButtonUp(0))
-			ShootBow();
+		if (Input.GetMouseButtonUp(0)) ShootBow();
 
-		// 🔥 Adjust speed if we’re in "bow_loadIn"
 		AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
-		if (stateInfo.IsName("bow_loadIn"))
-		{
-			anim.speed = arrowDrawSpeed; // e.g. 1f = normal, 2f = double speed
-		}
-		else
-		{
-			anim.speed = 1f; // reset to normal for everything else
-		}
+		anim.speed = stateInfo.IsName("bow_loadIn") ? arrowDrawSpeed : 1f;
 	}
+
 	private void LoadBow()
 	{
 		anim.ResetTrigger("Shoot");
 		hs.UnassignMaxAmounts();
 		anim.SetBool("Load", true);
 	}
+
 	private void UnLoadBow()
 	{
 		hs.ReassignMaxAmounts();
 		anim.SetBool("Load", false);
 	}
+
 	private void ShootBow()
 	{
 		anim.SetTrigger("Shoot");
 		canShoot = false;
 		Invoke(nameof(ResetShot), .35f);
 	}
+
 	private void ResetShot() => canShoot = true;
-	
-	//singleplayer only
-	//public void InstantiateArrow()
-	//{
-	//	//arrowFired.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-	//	var go = Instantiate(arrowFired, arrowTransform.position, arrowFired.transform.rotation);
 
-	//	go.TryGetComponent(out Arrow arrowComponent);
-
-	//	arrowComponent.Initialize(this, GetComponentInParent<PlayerController>());
-	//}
+	// Call this from your animation event at the moment the arrow should fire
 	public void InstantiateArrow()
 	{
-		if (!playerController.IsOwner) return;
+		Debug.Log("aaaaaa");
 
-		// call server to spawn arrow
-		SpawnArrowServerRpc(arrowTransform.position, arrowTransform.rotation);
-	}
+		if (!playerController || !playerController.IsOwner) return;
+		if (!bowNetcode) return;
 
-	[ServerRpc]
-	private void SpawnArrowServerRpc(Vector3 pos, Quaternion rot, ServerRpcParams rpcParams = default)
-	{
-		var arrowObj = Instantiate(arrowFired, pos, rot);
-		var arrow = arrowObj.GetComponent<Arrow>();
+		// Aim direction from the owner's camera
+		var cam = playerController.GetComponentInChildren<Camera>();
+		Vector3 shootDir = cam.transform.forward;
 
-		var shooterPos = playerController.transform.position;
+		// send stats + fire request to server
+		int[] effects = arrowEffect.Select(e => (int)e).ToArray();
 
-		Ray ray = playerController.cam.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
-		var shootDir = ray.direction.normalized;
-
-		arrow.ServerInitialize(
+		bowNetcode.SpawnArrowRequest(
+			arrowFired,
+			arrowTransform.position,
+			arrowTransform.rotation,
+			shootDir,
 			arrowDamage,
-			arrowEffect.ToArray(),
+			effects,
 			arrowSpeed,
 			arrowCutsTrees,
 			lightningChain,
-			arrowSize,
-			shootDir,
-			shooterPos,
-			rpcParams.Receive.SenderClientId
+			arrowSize
 		);
-
-		arrowObj.GetComponent<NetworkObject>().Spawn();
-
 	}
 
 	public void AssignMiddleString() => GetComponentInChildren<BowStringRend>().AssignMid();

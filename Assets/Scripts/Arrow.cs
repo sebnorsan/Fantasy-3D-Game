@@ -22,14 +22,33 @@ public class Arrow : NetworkBehaviour
 	private Vector3 velocity;
 	private Rigidbody rb;
 
-	// lightning specific
 	private Transform lightningTarget;
 
 	[Header("VFX")]
 	public GameObject explosion;
 
-	// ---- Server-side init ----
-	// Call this ONLY on server, BEFORE Spawn()
+	public override void OnNetworkSpawn()
+	{
+		rb = GetComponent<Rigidbody>();
+
+		if (!NetworkManager.Singleton.IsServer)
+		{
+			rb.isKinematic = true;   // clients don't simulate
+			rb.useGravity = false;
+		}
+		else
+		{
+			rb.isKinematic = false;  // server simulates
+			rb.useGravity = false;   // you handle drop manually
+		}
+	}
+
+	private void Awake()
+	{
+		rb = GetComponent<Rigidbody>();
+	}
+
+	// SERVER ONLY. Call BEFORE Spawn().
 	public void ServerInitialize(
 		int damage,
 		ArrowEffect[] effects,
@@ -42,7 +61,7 @@ public class Arrow : NetworkBehaviour
 		ulong shooterClientId
 	)
 	{
-		if (!IsServer) return;
+		if (!NetworkManager.Singleton.IsServer) return;
 
 		arrowDamage = damage;
 		arrowEffect = effects != null ? effects.ToArray() : new ArrowEffect[0];
@@ -60,25 +79,16 @@ public class Arrow : NetworkBehaviour
 		velocity = shootDir * initialSpeed;
 		transform.rotation = Quaternion.LookRotation(shootDir) * modelCorrection;
 
-		// lifetime on server -> despawn for everyone
 		StartCoroutine(LifeTimer());
 
-		// Shooter-only camera shake
 		ShakeShooterClientRpc(shooterClientId);
-
 		EnableTrailAfterDelayClientRpc(0.03f);
-	}
-
-	private void Awake()
-	{
-		rb = GetComponent<Rigidbody>();
 	}
 
 	private IEnumerator LifeTimer()
 	{
 		yield return new WaitForSeconds(lifeTime);
-		if (IsSpawned)
-			NetworkObject.Despawn();
+		NetworkObject.Despawn(true);
 	}
 
 	[ClientRpc]
@@ -97,11 +107,8 @@ public class Arrow : NetworkBehaviour
 	[ClientRpc]
 	private void ShakeShooterClientRpc(ulong shooterClientId)
 	{
-		// only shake on the shooter’s machine
-		if (NetworkManager.Singleton == null) return;
 		if (NetworkManager.Singleton.LocalClientId != shooterClientId) return;
 
-		// avoid singleton problems by finding a shaker on local camera
 		var shaker = FindFirstObjectByType<EZCameraShake.CameraShaker>();
 		if (shaker != null)
 			shaker.ShakeOnce(2f, 3f, .1f, .2f);
@@ -109,21 +116,18 @@ public class Arrow : NetworkBehaviour
 
 	private void FixedUpdate()
 	{
-		if (!IsServer) return;
+		if (!NetworkManager.Singleton.IsServer) return;
 
 		if (lightningTarget != null)
 		{
 			Vector3 dir = (lightningTarget.position - rb.position).normalized;
 			velocity = dir * initialSpeed;
-			Vector3 newPos = rb.position + velocity * Time.fixedDeltaTime;
-			rb.MovePosition(newPos);
+			rb.MovePosition(rb.position + velocity * Time.fixedDeltaTime);
 			rb.MoveRotation(Quaternion.LookRotation(dir) * modelCorrection);
 		}
 		else
 		{
-			Vector3 newPos = rb.position + velocity * Time.fixedDeltaTime;
-			rb.MovePosition(newPos);
-
+			rb.MovePosition(rb.position + velocity * Time.fixedDeltaTime);
 			velocity += Vector3.down * dropGravity * Time.fixedDeltaTime;
 
 			if (velocity.sqrMagnitude > 0.001f)
@@ -133,26 +137,21 @@ public class Arrow : NetworkBehaviour
 
 	private void OnCollisionEnter(Collision collision)
 	{
-		if (!IsServer) return;
+		if (!NetworkManager.Singleton.IsServer) return;
 
 		if (collision.gameObject.CompareTag("Tree"))
 		{
 			if (!cutTrees) return;
-			if (!collision.gameObject.TryGetComponent(out KillableObject killable))
-			{
-				var newComp = collision.gameObject.AddComponent<KillableObject>();
-				newComp.maxHealth = 5;
-				newComp.hitParticles = Resources.Load<GameObject>("PFX/HitFX (big)");
-				newComp.deathParticles = Resources.Load<GameObject>("PFX/Explosion Tree");
-				newComp.currentHealth = newComp.maxHealth;
-				newComp.parentHitFx = false;
-			}
+
+			if (collision.gameObject.TryGetComponent<KillableObject>(out var killable))
+				killable.TakeDamage(arrowDamage, initPlayerPos);
 		}
+
 
 		if (collision.gameObject.TryGetComponent(out BigguyDamagable compt))
 		{
 			compt.TakeDamage(transform, arrowDamage);
-			NetworkObject.Despawn();
+			NetworkObject.Despawn(true);
 			return;
 		}
 
@@ -164,15 +163,9 @@ public class Arrow : NetworkBehaviour
 				{
 					switch (effect)
 					{
-						case ArrowEffect.Fire:
-							enem.FireEffect();
-							break;
-						case ArrowEffect.Ice:
-							enem.IceEffect();
-							break;
-						case ArrowEffect.Lightning:
-							HandleLightningChain(collision.transform);
-							break;
+						case ArrowEffect.Fire: enem.FireEffect(); break;
+						case ArrowEffect.Ice: enem.IceEffect(); break;
+						case ArrowEffect.Lightning: HandleLightningChain(collision.transform); break;
 						case ArrowEffect.Bomb:
 							PlayExplosionClientRpc(transform.position, transform.rotation);
 							break;
@@ -180,9 +173,13 @@ public class Arrow : NetworkBehaviour
 				}
 			}
 
-			component.DamageEffects(initPlayerPos);
-			component.TakeDamage(arrowDamage);
+			//component.DamageEffects(initPlayerPos);
+			component.TakeDamage(arrowDamage, initPlayerPos);
 		}
+
+		// if it hit *anything* meaningful and isn't chaining lightning, kill it
+		if (lightningTarget == null)
+			if (IsSpawned) NetworkObject.Despawn(true);
 	}
 
 	[ClientRpc]
@@ -205,13 +202,13 @@ public class Arrow : NetworkBehaviour
 			}
 			else
 			{
-				NetworkObject.Despawn();
+				NetworkObject.Despawn(true);
 			}
 		}
 		else
 		{
 			lightningTarget = null;
-			NetworkObject.Despawn();
+			NetworkObject.Despawn(true);
 		}
 	}
 
@@ -236,7 +233,6 @@ public class Arrow : NetworkBehaviour
 				}
 			}
 		}
-
 		return closest;
 	}
 }

@@ -196,9 +196,12 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 		if (anim != null)
 			anim.SetTrigger("Damage");
 	}
-	public void TakeDamage(int amount)
+	public void TakeDamage(int amount, Vector3 hitPoint)
 	{
 		currentHealth = Mathf.Max(0, currentHealth - amount);
+
+		DamageEffects(hitPoint);
+
 		if (currentHealth == 0)
 			Die();
 	}
@@ -225,7 +228,7 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 		crystalScript.TakeDamage(damage);
 
 		if (crystalScript.thorns)
-			TakeDamage(5);
+			TakeDamage(5, transform.position);
 		if (crystalScript.deadly)
 			Die();
 	}
@@ -250,7 +253,7 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
     }
 	private void FireDamage()
     {
-		TakeDamage(1);
+		TakeDamage(1, transform.position);
 	}
 	private void ResetFireEffect()
     {
@@ -261,7 +264,7 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 
 public interface IDamagable
 {
-	void TakeDamage(int amount);
-	void DamageEffects(Vector3 hitPoint);
+	void TakeDamage(int amount, Vector3 hitPoint);
+	//void DamageEffects(Vector3 hitPoint);
 	void Heal(int amount);
 }

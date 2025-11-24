@@ -1,26 +1,68 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class BigguyDamagable : MonoBehaviour
+public class BigguyDamagable : NetworkBehaviour
 {
-    public GameObject damagePfx;
-    public void TakeDamage(Transform t, int dmg)
-    {
-        var pfx = Instantiate(damagePfx, t.position, Quaternion.identity);
-        GetComponentInParent<KillableObject>().TakeDamage(dmg);
-        if (GetComponentInParent<KillableObject>().currentHealth <= 0)
-        {
-			GetComponentInParent<Animator>().SetTrigger("Win");
+	[SerializeField] private GameObject damagePfx;
+
+	public void TakeDamage(Transform hitTransform, int dmg)
+	{
+		if (!NetworkManager.Singleton.IsServer) return; // gameplay happens only on server
+
+		// apply damage
+		var killable = GetComponentInParent<KillableObject>();
+		if (killable == null) return;
+
+		killable.TakeDamage(dmg, hitTransform.position);
+
+		// tell everyone to play hit VFX + anim
+		PlayHitClientRpc(hitTransform.position);
+
+		if (killable.CurrentHealth <= 0)
+		{
+			WinServer();
+		}
+		else
+		{
+			DamagedClientRpc();
+		}
+	}
+
+	[ClientRpc]
+	private void PlayHitClientRpc(Vector3 pos)
+	{
+		if (damagePfx != null)
+			Instantiate(damagePfx, pos, Quaternion.identity);
+	}
+
+	[ClientRpc]
+	private void DamagedClientRpc()
+	{
+		var anim = GetComponentInParent<Animator>();
+		if (anim != null) anim.SetTrigger("Damaged");
+	}
+
+	private void WinServer()
+	{
+		// server decides the win
+		WinClientRpc();
+
+		// stop spawner + clear enemies (server-side)
+		if (EnemySpawnerManager.instance != null)
+		{
 			EnemySpawnerManager.instance.StopAllCoroutines();
 			Destroy(EnemySpawnerManager.instance.gameObject);
-            var allenemeis = FindObjectsByType<AbstractEnemy>(FindObjectsSortMode.None);
-            foreach (var enemy in allenemeis)
-            {
-                Destroy(enemy.gameObject);
-            }
 		}
-        else
-        {
-			GetComponentInParent<Animator>().SetTrigger("Damaged");
-		}
+
+		var allEnemies = FindObjectsByType<AbstractEnemy>(FindObjectsSortMode.None);
+		foreach (var e in allEnemies)
+			Destroy(e.gameObject);
+	}
+
+	[ClientRpc]
+	private void WinClientRpc()
+	{
+		var anim = GetComponentInParent<Animator>();
+		if (anim != null) anim.SetTrigger("Win");
 	}
 }

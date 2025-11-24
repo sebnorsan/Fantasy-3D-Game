@@ -56,12 +56,12 @@ public class QuestObjectCounterTrees : MonoBehaviour
 		if (!actionToEnable.IsNullOrEmpty())
 			DialogueManager.SetActive(actionToEnable, true);
 
-		foreach (var item in GameObject.FindGameObjectsWithTag("Tree"))
-        {
-			var ko = item.GetComponent<KillableObject>();
-			if (ko != null)
-				ko.TakeDamage(100);
-        }
+		//foreach (var item in GameObject.FindGameObjectsWithTag("Tree"))
+  //      {
+		//	var ko = item.GetComponent<KillableObject>();
+		//	if (ko != null)
+		//		ko.TakeDamage(100, ko.transform.position);
+  //      }
 
 		switch (questType)
 		{

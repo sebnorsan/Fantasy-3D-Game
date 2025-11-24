@@ -20,7 +20,7 @@ public class Explosion : MonoBehaviour
 
         foreach (var enemy in enemies)
         {
-            enemy.TakeDamage(explosionDamage);
+            enemy.TakeDamage(explosionDamage, enemy.transform.position);
         }
     }
 
