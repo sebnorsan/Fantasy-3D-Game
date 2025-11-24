@@ -1,7 +1,9 @@
 using EasyTextEffects.Editor.MyBoxCopy.Extensions;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem.iOS;
 
-public class QuestObject : MonoBehaviour
+public class QuestObject : NetworkBehaviour
 {
 	[TextArea]
 	[SerializeField] private string questDesc;
@@ -29,6 +31,16 @@ public class QuestObject : MonoBehaviour
 	}
 	public void FinishQuest()
     {
+		FinishQuestServerRpc();
+	}
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+	private void FinishQuestServerRpc()
+	{
+		FinishQuestClientRpc();
+	}
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void FinishQuestClientRpc()
+	{
 		var questCounter = GetComponentInParent<QuestObjectCounter>();
 		if (questCounter != null && questCounter.isActive)
 		{
@@ -57,6 +69,16 @@ public class QuestObject : MonoBehaviour
 			FindFirstObjectByType<NPC_Interactable>().KingDialogue(dia);
 	}
 	public void SetQuest()
+	{
+		SetQuestServerRpc();
+	}
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+	private void SetQuestServerRpc()
+	{
+		SetQuestClientRpc();
+	}
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void SetQuestClientRpc()
 	{
 		var questCounter = GetComponentInParent<QuestObjectCounter>();
 		if (questCounter != null && questCounter.isActive)

@@ -15,6 +15,7 @@ MonoBehaviour:
   dialogueId: 
   npcVoiceLine:
     audioName: New Audio
+    randomizePitch: 0
     loop: 0
     audioToPlay: {fileID: 0}
     audioVolume: 1

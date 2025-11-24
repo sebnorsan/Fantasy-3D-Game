@@ -1,7 +1,5 @@
 using UnityEngine;
-using System.Linq;
 using System.Collections;
-using System.Net.NetworkInformation;
 using System;
 using Unity.Netcode;
 
@@ -12,13 +10,15 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 	public ScriptableObject_NPC_Dialogue nextDialogue;
 	public bool canInteract { get; set; } = true;
 
-	private int maxInteractions;
-	private int currentInteractions;
+	[Header("Dialogue Library (same on all clients)")]
+	[SerializeField] private ScriptableObject_NPC_Dialogue[] dialogueLibrary;
 
-	private float maxTime;
-	private float currentTime;
-
-	private bool dialogueEventActive = false;
+	// synced state: server writes, everyone reads
+	private NetworkVariable<int> currentDialogueId = new(
+		-1,
+		NetworkVariableReadPermission.Everyone,
+		NetworkVariableWritePermission.Server
+	);
 
 	public event Action OnTalkEnded;
 
@@ -28,13 +28,72 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 
 	private void Start()
 	{
-		if (nextDialogue.dialogueEvent_OnStart)
-			ApplyDialogueEvent(nextDialogue);
+		// only server sets initial state
+		if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+		{
+			int id = FindDialogueId(nextDialogue);
+			if (id >= 0)
+				currentDialogueId.Value = id;
+		}
 	}
+
+	public override void OnNetworkSpawn()
+	{
+		currentDialogueId.OnValueChanged += OnDialogueIdChanged;
+		ApplyDialogueLocally(currentDialogueId.Value);
+	}
+
+	public override void OnNetworkDespawn()
+	{
+		currentDialogueId.OnValueChanged -= OnDialogueIdChanged;
+	}
+
+	private void OnDialogueIdChanged(int oldId, int newId)
+	{
+		ApplyDialogueLocally(newId);
+	}
+
+	private void ApplyDialogueLocally(int id)
+	{
+		if (id < 0 || dialogueLibrary == null || id >= dialogueLibrary.Length) return;
+		var dlg = dialogueLibrary[id];
+		if (dlg == null) return;
+
+		// local set
+		nextDialogue = dlg;
+	}
+
+	private int FindDialogueId(ScriptableObject_NPC_Dialogue d)
+	{
+		if (d == null || dialogueLibrary == null) return -1;
+		for (int i = 0; i < dialogueLibrary.Length; i++)
+			if (dialogueLibrary[i] == d) return i;
+		return -1;
+	}
+
+	private int FindDialogueIdByName(string dialogueName)
+	{
+		if (string.IsNullOrEmpty(dialogueName) || dialogueLibrary == null) return -1;
+
+		for (int i = 0; i < dialogueLibrary.Length; i++)
+		{
+			var dlg = dialogueLibrary[i];
+			if (dlg != null && dlg.name == dialogueName)
+				return i;
+		}
+		return -1;
+	}
+
 	public void SetInteractionHandler(InteractionHandler iHandler)
 	{
 		interactionHandler = iHandler;
 	}
+
+	public void InteractRemotely()
+	{
+		// if remote answering should force a talk, you can call StartTalk() here
+	}
+
 	public void Interact()
 	{
 		if (!canInteract || isTalkingToPlayer)
@@ -42,38 +101,22 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 
 		StartTalk();
 	}
+
 	public void ChangeDialogue(ScriptableObject_NPC_Dialogue d)
 	{
 		nextDialogue = d;
-	}
-	private ScriptableObject_NPC_Dialogue savedDialogueEvent;
-	private void ApplyDialogueEvent(ScriptableObject_NPC_Dialogue dlg)
-	{
-		if (dialogueEventActive || !dlg.dialogueEvent_enabled)
-			return;
 
-		var tempEvent = dlg.dialogueEvent;
-
-		switch (tempEvent)
+		// keep synced state updated when server changes dialogue
+		if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
 		{
-			case DialogueEvent.AfterSomeTime:
-				maxTime = dlg.dialogueEvent_timeEvent;
-				StartTimer();
-				break;
-			case DialogueEvent.AfterSomeInteractions:
-				maxInteractions = dlg.dialogueEvent_interactionsEvent;
-				currentInteractions = 0;
-				break;
-			case DialogueEvent.AfterTalkNullify:
-				canInteract = false;
-				break;
-			default:
-				break;
+			int id = FindDialogueId(d);
+			if (id >= 0)
+			{
+				currentDialogueId.Value = id;
+			}
 		}
-
-		savedDialogueEvent = dlg.dialogueEvent_continuedDialogue;
-		dialogueEventActive = true;
 	}
+
 
 	private AudioClip currentlyPlayingAudio = null;
 	private bool exitOnFinish;
@@ -84,10 +127,9 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 		if (prevDialogue != null)
 		{
 			DoDialogueActions(prevDialogue);
-			if (!prevDialogue.dialogueEvent_OnStart)
-				ApplyDialogueEvent(prevDialogue);	
+			//if (!prevDialogue.dialogueEvent_OnStart)
+			//	ApplyDialogueEvent(prevDialogue);
 		}
-		
 
 		if (currentlyPlayingAudio != null)
 		{
@@ -105,13 +147,7 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 
 		NPC_Canvas.singleton.SetDialogue(npcBase.npcName, nextDialogue.dialogue, nextDialogue.affectedWords);
 
-		Sprite picToEnable;
-
-		if (nextDialogue.imageOverride != null)
-			picToEnable = nextDialogue.imageOverride;
-		else
-			picToEnable = npcBase.npcPic;
-
+		Sprite picToEnable = nextDialogue.imageOverride != null ? nextDialogue.imageOverride : npcBase.npcPic;
 		NPC_Canvas.singleton.SetNpcPicture(picToEnable);
 
 		if (nextDialogue.npcVoiceLine.audioToPlay != null)
@@ -119,74 +155,40 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 			EventManager.instance.PlayThisSound(nextDialogue.npcVoiceLine);
 			currentlyPlayingAudio = nextDialogue.npcVoiceLine.audioToPlay;
 		}
+
 		if (nextDialogue.continuedDialogue != null)
 			ChangeDialogue(nextDialogue.continuedDialogue);
 		else
 			exitOnFinish = true;
-	}	
-	
+	}
+
 	private void StartTalk()
 	{
 		SetNPCToTalkingServerRpc(true);
 
-		interactionHandler.EnterInteraction_NPC(this);
+		if (interactionHandler != null)
+			interactionHandler.EnterInteraction_NPC(this);
 
 		prevDialogue = null;
 		exitOnFinish = false;
-		CheckDialogueEvents();
+		//CheckDialogueEvents();
 		ContinueTalk();
 
 		NPC_Canvas.singleton.ActivateCanvas();
 	}
-	private void CheckDialogueEvents()
-	{
-		if (dialogueEventActive)
-		{
-			if (maxTime >= 1)
-			{
-				if (isTimerDone)
-				{
-					ChangeDialogue(savedDialogueEvent);
-					dialogueEventActive = false;
-				}
-			}
-			else if (maxInteractions >= 1)
-			{
-				currentInteractions++;
 
-				if (maxInteractions <= currentInteractions)
-				{
-					ChangeDialogue(savedDialogueEvent);
-					dialogueEventActive = false;
-				}
-			}
-		}
-	}
 	private void StopTalk()
 	{
 		SetNPCToTalkingServerRpc(false);
 
-		interactionHandler.ExitInteraction_NPC();
-		NPC_Canvas.singleton.DeactivateCanvas();
+		if (interactionHandler != null)
+			interactionHandler.ExitInteraction_NPC();
 
+		NPC_Canvas.singleton.DeactivateCanvas();
 		OnTalkEnded?.Invoke();
 	}
 
-	private void StartTimer()
-	{
-		currentTime = 0;
-		StartCoroutine(Timer());
-	}
-	private bool isTimerDone;
-	private IEnumerator Timer()
-	{
-		while (maxTime >= currentTime)
-		{
-			currentTime += Time.deltaTime;
-			yield return null;
-		}
-		isTimerDone = true;
-	}
+
 	private void DoDialogueActions(ScriptableObject_NPC_Dialogue dlg)
 	{
 		foreach (var a in dlg.actions)
@@ -197,30 +199,75 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 					DialogueManager.SetActive(a.targetID, true);
 					break;
 				case DialogueAction.ActionType.DisableObject:
-                    DialogueManager.SetActive(a.targetID, false);
+					DialogueManager.SetActive(a.targetID, false);
 					break;
 				case DialogueAction.ActionType.FinishQuest:
 					GetComponent<QuestObject>().FinishQuest();
-                    break;
+					break;
 			}
 		}
 	}
+
+	// ---------------- KING DIALOGUE (name-based) ----------------
 	public void KingDialogue(ScriptableObject_NPC_Dialogue d)
 	{
-		StartCoroutine(KingQuestReUpdate(d));
+		if (d == null) return;
+
+		string dialogueName = d.name;
+
+		if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+			StartKingSequenceServer(dialogueName);
+		else
+			KingDialogueServerRpc(dialogueName);
 	}
-	private IEnumerator KingQuestReUpdate(ScriptableObject_NPC_Dialogue d)
+
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+	private void KingDialogueServerRpc(string dialogueName)
+	{
+		StartKingSequenceServer(dialogueName);
+	}
+
+	private void StartKingSequenceServer(string dialogueName)
+	{
+		if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer) return;
+
+		int id = FindDialogueIdByName(dialogueName);
+		if (id < 0)
+		{
+			Debug.LogWarning($"[KingDialogue] No dialogue in library named '{dialogueName}'");
+			return;
+		}
+
+		currentDialogueId.Value = id;
+		nextDialogue = dialogueLibrary[id];
+
+		StartCoroutine(KingQuestReUpdateServer(id));
+	}
+
+	private IEnumerator KingQuestReUpdateServer(int dialogueId)
 	{
 		yield return new WaitForSeconds(4f);
-		GetComponent<QuestObject>().SetQuest();
-		ChangeDialogue(d);
+
+		if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer)
+			yield break;
+
+		var quest = GetComponent<QuestObject>();
+		if (quest != null) quest.SetQuest();
+
+		// ensure final state is still correct
+		currentDialogueId.Value = dialogueId;
+
+		ChangeDialogue(dialogueLibrary[dialogueId]);
 	}
+
+	// ---------------- TALKING FLAG ----------------
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
 	private void SetNPCToTalkingServerRpc(bool isTalking)
 	{
 		isTalkingToPlayer = isTalking;
 		SetNPCToTalkingClientRpc(isTalking);
 	}
+
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void SetNPCToTalkingClientRpc(bool isTalking)
 	{
