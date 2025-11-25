@@ -12,8 +12,6 @@ public class InteractionHandler : MonoBehaviour
 	private void Start()
 	{
 		playerController = GetComponentInParent<PlayerController>(includeInactive: true);
-		FindFirstObjectByType<NPC_Interactable>().SetInteractionHandler(this);
-
 		if (!playerController.IsOwner) return;
 
 		Invoke(nameof(StartChecks), 1f);
@@ -34,6 +32,8 @@ public class InteractionHandler : MonoBehaviour
 
 		if (Input.GetKeyDown(KeyCode.E))
 		{
+			FindFirstObjectByType<NPC_Interactable>().SetInteractionHandler(this);
+
 			if (isTalking)
 			{
 				npc.ContinueTalk();
