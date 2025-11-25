@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 2117908826068225785}
   - component: {fileID: 8331878134496135539}
   - component: {fileID: -3137156867596619232}
+  - component: {fileID: -2753696938914687015}
   m_Layer: 0
   m_Name: Red Goblin
   m_TagString: Untagged
@@ -264,8 +265,8 @@ MonoBehaviour:
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
-  PositionThreshold: 0.5
-  RotAngleThreshold: 15
+  PositionThreshold: 0.01
+  RotAngleThreshold: 10
   ScaleThreshold: 0.01
   UseQuaternionSynchronization: 0
   UseQuaternionCompression: 0
@@ -274,6 +275,28 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &-2753696938914687015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 738186516404999399}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 383521604
+    DestinationState: -596015043
+    TransitionDuration: 0.1
+    TriggerNameHash: 1080829965
+    TransitionIndex: 1
+  m_Animator: {fileID: 8981432982493809050}
 --- !u!1 &5665848300133171758
 GameObject:
   m_ObjectHideFlags: 0

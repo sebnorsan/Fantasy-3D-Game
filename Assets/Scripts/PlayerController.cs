@@ -103,7 +103,7 @@ public class PlayerController : NetworkBehaviour
 			DisableIfExists<HandsSmooth>();
 			DisableIfExists<HeadBob>();
 			DisableIfExists<InteractionHandler>();
-			DisableIfExists<BowScript>();
+			//DisableIfExists<BowScript>();
 			DisableIfExists<HandsHolder>();
 			DisableIfExists<EventAudioPlayer>();
 			DisableIfExists<CameraShaker>();

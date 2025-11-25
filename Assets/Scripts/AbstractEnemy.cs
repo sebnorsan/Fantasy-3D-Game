@@ -94,9 +94,8 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 			StopCoroutine(currKnockbackCoroutine);
 		currKnockbackCoroutine = StartCoroutine(OnKnockback(hitPoint));
 
-		if (currFlashCoroutine != null)
-			StopCoroutine(currFlashCoroutine);
-		currFlashCoroutine = StartCoroutine(OnFlashMaterial());
+		if (currFlashCoroutine == null)
+			currFlashCoroutine = StartCoroutine(OnFlashMaterial());
 
 		OnSpawnDamagePFX();
 		OnPlayDamageAnimation();
@@ -184,6 +183,8 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 
 		foreach (var (renderer, originals) in affected)
 			renderer.materials = originals;
+
+		currFlashCoroutine = null;
 	}
 
 	private GameObject hitParticles;

@@ -27,7 +27,7 @@ public class CrystalScript : NetworkBehaviour
 
 	public ParticleSystem explosionpfx;
 
-	private void Start()
+	public override void OnNetworkSpawn()
 	{
 		crystalShield.SetActive(true);
 

@@ -224,7 +224,7 @@ public class Arrow : NetworkBehaviour
 		{
 			var tr = hit.transform;
 			if (tr == exclude) continue;
-			if (tr.TryGetComponent<IDamagable>(out _))
+			if (tr.TryGetComponent<IDamagable>(out _) && !tr.GetComponent<KillableObject>())
 			{
 				float distSqr = (tr.position - transform.position).sqrMagnitude;
 				if (distSqr < minDistSqr)

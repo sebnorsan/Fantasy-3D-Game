@@ -259,6 +259,7 @@ GameObject:
   - component: {fileID: 1315244522697546602}
   - component: {fileID: 1277491528084641670}
   - component: {fileID: -8361273892413471813}
+  - component: {fileID: 3290109849882119196}
   m_Layer: 0
   m_Name: Skeleton
   m_TagString: Untagged
@@ -505,8 +506,8 @@ MonoBehaviour:
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
-  PositionThreshold: 0.5
-  RotAngleThreshold: 15
+  PositionThreshold: 0.01
+  RotAngleThreshold: 10
   ScaleThreshold: 0.01
   UseQuaternionSynchronization: 0
   UseQuaternionCompression: 0
@@ -515,6 +516,28 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &3290109849882119196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3070977239302808498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 383521604
+    DestinationState: -596015043
+    TransitionDuration: 0.1
+    TriggerNameHash: 1080829965
+    TransitionIndex: 1
+  m_Animator: {fileID: 440903288752805972}
 --- !u!1 &3637153038430837716
 GameObject:
   m_ObjectHideFlags: 0
