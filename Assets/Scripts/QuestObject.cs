@@ -39,23 +39,28 @@ public class QuestObject : NetworkBehaviour
 		CancelInvoke();
 	}
 	public void FinishQuest()
-    {
+	{
 		FinishQuestServerRpc();
 	}
+
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
 	private void FinishQuestServerRpc()
 	{
+		// only server needs the counter
+		if (counter != null && counter.isActive)
+		{
+			counter.RemoveCount();
+			return;
+		}
+
+		// now broadcast result
 		FinishQuestClientRpc();
 	}
+
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void FinishQuestClientRpc()
 	{
-		var questCounter = counter;
-		if (questCounter != null && questCounter.isActive)
-		{
-			questCounter.RemoveCount();
-			return;
-		}
+		// NO counter usage here anymore
 
 		GameManager.instance.AddXp(xpGain);
 
@@ -73,10 +78,13 @@ public class QuestObject : NetworkBehaviour
 		}
 
 		if (setKingSideQuest)
-			FindFirstObjectByType<NPC_Interactable>().gameObject.GetComponent<QuestObject>().questType = QuestType.SideQuest;
+			FindFirstObjectByType<NPC_Interactable>().gameObject
+				.GetComponent<QuestObject>().questType = QuestType.SideQuest;
+
 		if (reenableKingQuest)
 			FindFirstObjectByType<NPC_Interactable>().KingDialogue(dia);
 	}
+
 	public void SetQuest()
 	{
 		if (NetworkManager.Singleton.IsServer)
