@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2125885049808022428}
   - component: {fileID: 5680381780153879692}
   - component: {fileID: 791981249248097800}
-  - component: {fileID: 7398333624629841483}
+  - component: {fileID: 8852818881560722363}
   m_Layer: 0
   m_Name: Phone
   m_TagString: Untagged
@@ -172,7 +172,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcOwner: {fileID: 0}
---- !u!114 &7398333624629841483
+--- !u!114 &8852818881560722363
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -181,7 +181,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1019375252038045371}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Script: {fileID: 11500000, guid: fc8050108f406824591e01692bcc1501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
@@ -260,7 +260,7 @@ GameObject:
   - component: {fileID: 1227791032311695380}
   - component: {fileID: 6413132569534683115}
   - component: {fileID: 6784330846622331597}
-  - component: {fileID: 5853348521236689017}
+  - component: {fileID: 4357366110985303807}
   m_Layer: 0
   m_Name: Bow
   m_TagString: Untagged
@@ -390,7 +390,7 @@ MonoBehaviour:
     maxDistance: 500
     subtitlesEnabled: 0
     subtitles: []
---- !u!114 &5853348521236689017
+--- !u!114 &4357366110985303807
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -399,7 +399,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1778696884442115976}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Script: {fileID: 11500000, guid: fc8050108f406824591e01692bcc1501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1

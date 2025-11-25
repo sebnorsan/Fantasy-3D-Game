@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -7,11 +8,24 @@ public class SkillTree : MonoBehaviour
 	private CrystalScript crystal;
 	private BowScript bow;
 
-	private void Awake()
+	private void Start()
 	{
-		player = FindFirstObjectByType<PlayerController>();
+		// Get the local player's NetworkObject
+		var nm = NetworkManager.Singleton;
+		var localClient = nm?.LocalClient;
+		var playerObj = localClient?.PlayerObject;
+
+		if (playerObj != null)
+		{
+			// PlayerController should be on the player root
+			player = playerObj.GetComponent<PlayerController>();
+
+			// Bow is usually a child of the player
+			bow = playerObj.GetComponentInChildren<BowScript>(true);
+		}
+
+		// Crystal is global (only one), so normal find is fine
 		crystal = FindFirstObjectByType<CrystalScript>();
-		bow = FindFirstObjectByType<BowScript>();
 	}
 
 	// Each method now takes the Skill that was passed from the button click

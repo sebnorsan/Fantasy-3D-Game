@@ -7,23 +7,43 @@ public class Well : NetworkBehaviour, IInteractable
 
 	public void Interact()
 	{
-		if (!IsOwner) return;
+		// Don't check IsOwner here – the Well is owned by the server.
 		if (!canInteract)
 			return;
 
-		SetInteractServerRpc(false);
-		
-		GetComponent<AudioSource>().Play();
-		GetComponent<QuestObject>().FinishQuest();
+		// Ask the server to process the interaction
+		InteractServerRpc();
 	}
+
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-	private void SetInteractServerRpc(bool value)
+	private void InteractServerRpc()
 	{
-		SetInteractClientRpc(value);
+		if (!canInteract) return;
+		canInteract = false;
+
+		// sync canInteract to everyone
+		SetInteractClientRpc(false);
+
+		// do Well gameplay on server
+		var quest = GetComponent<QuestObject>();
+		if (quest != null)
+			quest.FinishQuest();
+
+		// play sound on all clients
+		PlayAudioClientRpc();
 	}
+
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void SetInteractClientRpc(bool value)
 	{
 		canInteract = value;
+	}
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void PlayAudioClientRpc()
+	{
+		var audio = GetComponent<AudioSource>();
+		if (audio != null)
+			audio.Play();
 	}
 }
