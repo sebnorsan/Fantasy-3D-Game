@@ -35,15 +35,15 @@ public class CrystalScript : NetworkBehaviour
 		foreach (var rend in renderersToFlash)
 			affected.Add((rend, rend.materials));
 
-		// Server is authority on actual health
-		if (NetworkManager.Singleton.IsServer)
-			currentHealth = maxHealth;
-
 		if (healthSlider != null)
 		{
 			healthSlider.maxValue = maxHealth;
 			healthSlider.value = maxHealth;
 		}
+
+		// Server is authority on actual health
+		if (NetworkManager.Singleton.IsServer)
+			currentHealth = maxHealth;
 	}
 
 	private void Update()

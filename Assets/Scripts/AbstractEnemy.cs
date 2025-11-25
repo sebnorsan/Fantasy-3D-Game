@@ -279,36 +279,62 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 
 	// ------------- Fire / Ice effects (still mostly local) -------------
 
+
 	public void IceEffect()
 	{
-		iceEffect.SetActive(true);
-		CancelInvoke(nameof(ResetIceEffect));
-		Invoke(nameof(ResetIceEffect), 6f);
-		agent.speed /= 2;
-	}
-
-	private void ResetIceEffect()
-	{
-		agent.speed = originalSpeed;
+		if (!NetworkManager.Singleton.IsServer) return;
+		IceEffectClientRpc();
 	}
 
 	public void FireEffect()
 	{
-		fireEffect.SetActive(true);
-		InvokeRepeating(nameof(FireDamage), .5f, 10);
+		if (!NetworkManager.Singleton.IsServer) return;
+		FireEffectClientRpc();
+	}
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void IceEffectClientRpc()
+	{
+		if (iceEffect != null)
+			iceEffect.SetActive(true);
+
+		CancelInvoke(nameof(ResetIceEffect));
+		Invoke(nameof(ResetIceEffect), 6f);
+
+		// slowdown on all instances (same as before, but now visible everywhere)
+		if (agent != null)
+			agent.speed /= 2f;
+	}
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void FireEffectClientRpc()
+	{
+		if (fireEffect != null)
+			fireEffect.SetActive(true);
+
+		// periodic damage still only really applies on server because TakeDamage has an IsServer guard
+		InvokeRepeating(nameof(FireDamage), .5f, 10f);
+
 		CancelInvoke(nameof(ResetFireEffect));
-		Invoke(nameof(ResetFireEffect), .5f * 10);
+		Invoke(nameof(ResetFireEffect), .5f * 10f);
+	}
+
+	private void ResetIceEffect()
+	{
+		if (agent != null)
+			agent.speed = originalSpeed;
+	}
+
+	private void ResetFireEffect()
+	{
+		if (fireEffect != null)
+			fireEffect.SetActive(false);
 	}
 
 	private void FireDamage()
 	{
 		// this will only actually change HP on server due to guard in TakeDamage
 		TakeDamage(1, transform.position);
-	}
-
-	private void ResetFireEffect()
-	{
-		fireEffect.SetActive(false);
 	}
 }
 
