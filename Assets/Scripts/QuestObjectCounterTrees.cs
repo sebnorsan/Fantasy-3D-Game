@@ -1,7 +1,8 @@
 using EasyTextEffects.Editor.MyBoxCopy.Extensions;
+using Unity.Netcode;
 using UnityEngine;
 
-public class QuestObjectCounterTrees : MonoBehaviour
+public class QuestObjectCounterTrees : NetworkBehaviour
 {
     public int countToReach;
     [TextArea]
@@ -18,15 +19,11 @@ public class QuestObjectCounterTrees : MonoBehaviour
 
 	public string actionToEnable = "";
 
-	private void OnEnable()
+	public override void OnNetworkSpawn()
 	{
-		Invoke(nameof(SetQuest), .1f);
+		if (NetworkManager.Singleton.IsServer)
+			Invoke(nameof(SetQuest), .1f);
 	}
-	private void OnDisable()
-	{
-		CancelInvoke();
-	}
-	
 	public void RemoveCount()
 	{
 		countToReach--;

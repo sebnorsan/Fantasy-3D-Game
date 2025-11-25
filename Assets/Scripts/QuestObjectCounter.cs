@@ -9,6 +9,8 @@ public class QuestObjectCounter : MonoBehaviour
 	public bool isActive = true;
 
 
+	public QuestObject[] objectives;
+
 	private void OnEnable()
 	{
 		Invoke(nameof(Function), 1f);
@@ -19,18 +21,23 @@ public class QuestObjectCounter : MonoBehaviour
 	}
 	private void Function()
 	{
+		if (!NetworkManager.Singleton.IsServer) return; // only server does quest + spawn
+
 		if (countToReach <= 0)
-			countToReach = GetComponentsInChildren<QuestObject>().Length;
+			countToReach = objectives.Length;
 
 		isActive = false;
-		GetComponentInChildren<QuestObject>().SetQuest();
-		isActive = true;
 
+		// Make sure all children are spawned before any RPCs:
 		var networkObjects = GetComponentsInChildren<NetworkObject>();
 		foreach (var nwo in networkObjects)
 		{
-			nwo.Spawn();
+			if (!nwo.IsSpawned)
+				nwo.Spawn();
 		}
+
+		objectives[0].SetQuest();
+		isActive = true;
 	}
 	public void RemoveCount()
 	{

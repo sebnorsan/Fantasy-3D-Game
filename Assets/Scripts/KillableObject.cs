@@ -178,6 +178,7 @@ public class KillableObject : NetworkBehaviour, IDamagable
 		currentHealth.OnValueChanged -= OnHealthChanged;
 
 		if (IsServer && gameObject.CompareTag("Tree"))
-			FindFirstObjectByType<QuestObjectCounterTrees>().RemoveCount();
+			if (FindFirstObjectByType<QuestObjectCounterTrees>())
+				FindFirstObjectByType<QuestObjectCounterTrees>().RemoveCount();
 	}
 }

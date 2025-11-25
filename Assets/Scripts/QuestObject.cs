@@ -21,13 +21,12 @@ public class QuestObject : NetworkBehaviour
 
 	public string actionToEnable = "";
 
-	private void OnEnable()
+	public QuestObjectCounter counter;
+
+	public override void OnNetworkSpawn()
 	{
-		Invoke(nameof(SetQuest), 1f);
-	}
-	private void OnDisable()
-	{
-		CancelInvoke();
+		if (!NetworkManager.Singleton.IsServer) return;
+		SetQuestClientRpc(); // already on server, no need for server RPC
 	}
 	public void FinishQuest()
     {
@@ -41,7 +40,7 @@ public class QuestObject : NetworkBehaviour
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void FinishQuestClientRpc()
 	{
-		var questCounter = GetComponentInParent<QuestObjectCounter>();
+		var questCounter = counter;
 		if (questCounter != null && questCounter.isActive)
 		{
 			questCounter.RemoveCount();
@@ -70,7 +69,10 @@ public class QuestObject : NetworkBehaviour
 	}
 	public void SetQuest()
 	{
-		SetQuestServerRpc();
+		if (NetworkManager.Singleton.IsServer)
+			SetQuestClientRpc();        // server -> everyone
+		else
+			SetQuestServerRpc();        // client -> server
 	}
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
 	private void SetQuestServerRpc()
@@ -80,7 +82,7 @@ public class QuestObject : NetworkBehaviour
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void SetQuestClientRpc()
 	{
-		var questCounter = GetComponentInParent<QuestObjectCounter>();
+		var questCounter = counter;
 		if (questCounter != null && questCounter.isActive)
 			return;
 

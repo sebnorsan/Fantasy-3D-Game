@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 public class DialogueTarget : MonoBehaviour
@@ -22,6 +23,8 @@ public class DialogueTarget : MonoBehaviour
 	}
 	private void Teleport()
 	{
+		if (!NetworkManager.Singleton.IsServer) return;
+
 		if (teleportToPlayer)
 			transform.position = FindFirstObjectByType<PlayerController>().transform.position;
 	}

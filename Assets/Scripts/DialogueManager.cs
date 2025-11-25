@@ -20,8 +20,18 @@ public class DialogueManager : MonoBehaviour
 	public static void SetActive(string id, bool active)
 	{
 		if (_lookup.TryGetValue(id, out var go))
-			go.SetActive(active);
+		{
+			SetActiveServerRpc(go, active);
+		}
 		else
 			Debug.LogWarning($"[DialogueManager] No target registered with ID '{id}'");
+	}
+	private static void SetActiveServerRpc(GameObject go, bool active)
+	{
+		SetActiveClientRpc(go, active);
+	}
+	private static void SetActiveClientRpc(GameObject go, bool active)
+	{
+		go.SetActive(active);
 	}
 }
