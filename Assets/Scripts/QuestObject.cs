@@ -33,7 +33,7 @@ public class QuestObject : NetworkBehaviour
 	private void OnEnable()
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
-		Invoke(nameof(SetQuestClientRpc), 1f);
+		Invoke(nameof(SetQuestClientRpc), 6f);
 		//SetQuestClientRpc(); // already on server, no need for server RPC
 	}
 	private void OnDisable()
