@@ -42,7 +42,11 @@ public class RecieveCall : NetworkBehaviour
 		if (npcRemote == null) return;
 
 		if (dialogueToReplace != null)
+		{
+			if (npcRemote.npcOwner == null) npcRemote.npcOwner = FindFirstObjectByType<NPC_Interactable>();
+
 			npcRemote.npcOwner.ChangeDialogue(dialogueToReplace);
+		}
 
 		npcRemote.CallUp();
 	}
