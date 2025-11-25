@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EZCameraShake
 {
@@ -36,7 +37,8 @@ namespace EZCameraShake
         void Awake()
         {
             Instance = this;
-            instanceList.Add(gameObject.name, this);
+            if (!instanceList.ContainsKey(gameObject.name))
+                instanceList.Add(gameObject.name, this);
         }
 
         void Update()

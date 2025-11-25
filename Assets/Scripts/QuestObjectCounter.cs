@@ -19,26 +19,31 @@ public class QuestObjectCounter : MonoBehaviour
 	{
 		CancelInvoke();
 	}
+	[SerializeField] private NetworkObject[] objectivePrefabs;
+
 	private void Function()
 	{
-		if (!NetworkManager.Singleton.IsServer) return; // only server does quest + spawn
+		if (!NetworkManager.Singleton.IsServer) return;
 
 		if (countToReach <= 0)
-			countToReach = objectives.Length;
+			countToReach = objectivePrefabs.Length;
 
 		isActive = false;
 
-		// Make sure all children are spawned before any RPCs:
-		var networkObjects = GetComponentsInChildren<NetworkObject>();
-		foreach (var nwo in networkObjects)
+		for (int i = 0; i < objectivePrefabs.Length; i++)
 		{
-			if (!nwo.IsSpawned)
-				nwo.Spawn();
+			var inst = Instantiate(objectivePrefabs[i], objectivePrefabs[i].transform.position, objectivePrefabs[i].transform.rotation);
+
+			inst.GetComponent<QuestObject>().counter = this;
+
+			inst.Spawn();
+			objectives[i] = inst.GetComponent<QuestObject>();
 		}
 
 		objectives[0].SetQuest();
 		isActive = true;
 	}
+
 	public void RemoveCount()
 	{
 		countToReach--;

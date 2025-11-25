@@ -3,12 +3,17 @@ using UnityEngine.Splines;
 
 public class MoveAroundClosedSpline : MonoBehaviour
 {
-    public SplineContainer splineContainer;
+    public string splineName;
+    private SplineContainer splineContainer;
     public float duration = 5f; // Time to complete one full loop
 
     private float t = 0f;
 
-    void Update()
+	private void Start()
+	{
+        splineContainer = GameObject.Find(splineName).GetComponent<SplineContainer>();
+	}
+	void Update()
     {
         if (splineContainer == null) return;
 
