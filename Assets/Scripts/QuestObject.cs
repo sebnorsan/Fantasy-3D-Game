@@ -25,8 +25,18 @@ public class QuestObject : NetworkBehaviour
 
 	public override void OnNetworkSpawn()
 	{
+		//if (!NetworkManager.Singleton.IsServer) return;
+		//SetQuestClientRpc(); // already on server, no need for server RPC
+	}
+	private void OnEnable()
+	{
 		if (!NetworkManager.Singleton.IsServer) return;
-		SetQuestClientRpc(); // already on server, no need for server RPC
+		Invoke(nameof(SetQuestClientRpc), 1f);
+		//SetQuestClientRpc(); // already on server, no need for server RPC
+	}
+	private void OnDisable()
+	{
+		CancelInvoke();
 	}
 	public void FinishQuest()
     {
