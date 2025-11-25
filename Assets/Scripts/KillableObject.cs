@@ -151,9 +151,10 @@ public class KillableObject : NetworkBehaviour, IDamagable
 
 		if (TryGetComponent(out QuestObject quester))
 			if (NetworkManager.Singleton.IsServer)
+			{
 				quester.FinishQuest();
-
-		GameManager.instance.AddXp(xpGain);
+				quester.AddXpClientRpc(xpGain);
+			}
 
 		DieEffectsClientRpc();
 

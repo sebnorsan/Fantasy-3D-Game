@@ -48,7 +48,8 @@ public class QuestObject : NetworkBehaviour
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
 	private void FinishQuestServerRpc()
 	{
-		AddXpClientRpc();
+		if (questFinished) return;
+		questFinished = true;
 
 		// only server needs the counter
 		if (counter != null && counter.isActive)
@@ -57,20 +58,18 @@ public class QuestObject : NetworkBehaviour
 			return;
 		}
 
+		AddXpClientRpc(xpGain);
 		// now broadcast result
 		FinishQuestClientRpc();
 	}
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void AddXpClientRpc()
+	public void AddXpClientRpc(int xp)
 	{
-		GameManager.instance.AddXp(xpGain);
+		GameManager.instance.AddXp(xp);
 	}
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void FinishQuestClientRpc()
 	{
-		if (questFinished) return;
-		questFinished = true;
-
 		// NO counter usage here anymore
 
 		if (!actionToEnable.IsNullOrEmpty())

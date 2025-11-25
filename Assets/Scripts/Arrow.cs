@@ -147,10 +147,11 @@ public class Arrow : NetworkBehaviour
 				killable.TakeDamage(arrowDamage, initPlayerPos);
 		}
 
+		var bigGuy = collision.gameObject.GetComponentInParent<BigguyDamagable>();
 
-		if (collision.gameObject.TryGetComponent(out BigguyDamagable compt))
+		if (bigGuy)
 		{
-			compt.TakeDamage(transform, arrowDamage);
+			bigGuy.TakeDamage(transform, arrowDamage);
 			NetworkObject.Despawn(true);
 			return;
 		}
@@ -178,8 +179,8 @@ public class Arrow : NetworkBehaviour
 		}
 
 		// if it hit *anything* meaningful and isn't chaining lightning, kill it
-		if (lightningTarget == null)
-			if (IsSpawned) NetworkObject.Despawn(true);
+		//if (lightningTarget == null)
+		//	if (IsSpawned) NetworkObject.Despawn(true);
 	}
 
 	[ClientRpc]

@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemySpawnerManager : MonoBehaviour
+public class EnemySpawnerManager : NetworkBehaviour
 {
 	public static EnemySpawnerManager instance;
 
@@ -31,13 +32,18 @@ public class EnemySpawnerManager : MonoBehaviour
 	public LayerMask obstacleMask;
 	public float maxNavSampleDistance = 1f;
 
-	public int _currentWave = 0;
+	[Header("DEFAULT VALUE IS -1")]
+	public int _currentWave = -1;
 	private int[] _remainingThisWave;
 	private Coroutine _spawnRoutine;
 
+	[SerializeField] private TMPro.TextMeshProUGUI timerText;
+	[SerializeField] private string[] actionAfterWave;
+
 	private void Awake()
 	{
-		timerText.text = string.Empty;
+		if (timerText != null)
+			timerText.text = string.Empty;
 
 		if (instance != null)
 			Destroy(gameObject);
@@ -45,26 +51,22 @@ public class EnemySpawnerManager : MonoBehaviour
 			instance = this;
 	}
 
-	//void OnEnable()
-	//{
-	//	_spawnRoutine = StartCoroutine(SpawnLoop());
-	//}
-
-	//void OnDisable()
-	//{
-	//	if (_spawnRoutine != null)
-	//		StopCoroutine(_spawnRoutine);
-	//}
-
+	/// <summary>
+	/// Called by WaveController. Only the server actually starts the wave.
+	/// </summary>
 	public void StartWave(int waveIndex)
 	{
-		FindFirstObjectByType<MusicManager>().BattleResume();
+		if (!NetworkManager.Singleton.IsServer)
+			return;
 
 		if (waveIndex < 0 || waveIndex >= waves.Length)
 		{
 			Debug.Log("No more waves to run.");
 			return;
 		}
+
+		_currentWave = waveIndex;
+
 		var wave = waves[waveIndex];
 
 		minSpawnInterval = wave.minimiumSpawnInterval;
@@ -72,21 +74,34 @@ public class EnemySpawnerManager : MonoBehaviour
 
 		_remainingThisWave = wave.countsPerTier.ToArray();
 		Debug.Log($"Wave {waveIndex + 1} started: total enemies = {_remainingThisWave.Sum()}");
-		_spawnRoutine = StartCoroutine(SpawnLoop());
-	}
-	[SerializeField] private TMPro.TextMeshProUGUI timerText;
-	[SerializeField] private string[] actionAfterWave;
-	private void WaveFinish()
-	{
-		FindFirstObjectByType<MusicManager>().BattlePause();
 
-		DialogueManager.instance.SetActive(actionAfterWave[_currentWave], true);
+		// music on all clients
+		SetBattleMusicStateClientRpc(true);
 
 		if (_spawnRoutine != null)
 			StopCoroutine(_spawnRoutine);
-			Debug.Log($"Wave {_currentWave + 1} complete.");
-		// Start countdown to next wave
-		StartCoroutine(TimerCountdown(60)); // 2 minutes = 120 seconds
+
+		_spawnRoutine = StartCoroutine(SpawnLoop());
+	}
+
+	private void WaveFinish()
+	{
+		if (!NetworkManager.Singleton.IsServer)
+			return;
+
+		// music off on all clients
+		SetBattleMusicStateClientRpc(false);
+
+		if (_currentWave >= 0 && _currentWave < actionAfterWave.Length)
+			DialogueManager.instance.SetActive(actionAfterWave[_currentWave], true);
+
+		if (_spawnRoutine != null)
+			StopCoroutine(_spawnRoutine);
+
+		Debug.Log($"Wave {_currentWave + 1} complete.");
+
+		// start countdown to next wave (server only; UI updated via RPC)
+		StartCoroutine(TimerCountdown(60));
 	}
 
 	private IEnumerator TimerCountdown(int totalSeconds)
@@ -94,34 +109,41 @@ public class EnemySpawnerManager : MonoBehaviour
 		int remaining = totalSeconds;
 		while (remaining >= 0)
 		{
-			int minutes = remaining / 60;
-			int seconds = remaining % 60;
-			timerText.text = $"{minutes}:{seconds:00}";
+			UpdateTimerClientRpc(remaining);
 			yield return new WaitForSeconds(1f);
 			remaining--;
 		}
 
-		timerText.text = string.Empty;
-		// Countdown finished, start next wave
-		FindFirstObjectByType<WaveController>().StartWaveAnimation();
+		ClearTimerClientRpc();
+
+		// Countdown finished, tell everyone to play wave intro animation
+		StartWaveAnimation();
 	}
 
 	private IEnumerator SpawnLoop()
 	{
 		while (true)
 		{
+			if (!NetworkManager.Singleton.IsServer)
+				yield break; // safety
+
 			yield return new WaitForSeconds(Random.Range(minSpawnInterval, maxSpawnInterval));
+
 			if (_remainingThisWave == null || _remainingThisWave.Sum() == 0)
 			{
 				WaveFinish();
 				yield break;
 			}
+
 			TrySpawnOne();
 		}
 	}
 
-	void TrySpawnOne()
+	private void TrySpawnOne()
 	{
+		if (!NetworkManager.Singleton.IsServer)
+			return;
+
 		// pick a random tier with remaining > 0
 		var available = _remainingThisWave
 			.Select((count, idx) => new { count, idx })
@@ -151,14 +173,21 @@ public class EnemySpawnerManager : MonoBehaviour
 		// NavMesh sample
 		if (NavMesh.SamplePosition(candidate, out var hit, maxNavSampleDistance, NavMesh.AllAreas))
 		{
-			Instantiate(prefab, hit.position, Quaternion.identity);
+			// SERVER spawns networked enemy
+			var inst = Instantiate(prefab, hit.position, Quaternion.identity);
+			var nwo = inst.GetComponent<NetworkObject>();
+			if (nwo != null)
+				nwo.Spawn();
+			else
+				Debug.LogWarning($"Spawned enemy '{prefab.name}' has no NetworkObject!");
+
 			_remainingThisWave[tierIdx]--;
 		}
 	}
 
-	void OnDrawGizmosSelected()
+	private void OnDrawGizmosSelected()
 	{
-		Gizmos.color = new Color(255,0,0,80);
+		Gizmos.color = new Color(1f, 0f, 0f, 0.3f);
 		if (spawnPoints != null)
 		{
 			foreach (var sp in spawnPoints)
@@ -166,10 +195,48 @@ public class EnemySpawnerManager : MonoBehaviour
 					Gizmos.DrawSphere(sp.position, spawnRadius);
 		}
 	}
+
 	public bool ReachedFinalWave()
 	{
-		if (_currentWave >= waves.Length-1)
-			return true;
-		return false;
+		return _currentWave >= waves.Length - 1;
+	}
+
+	// --------- RPCs for music, timer & wave UI ----------
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void SetBattleMusicStateClientRpc(bool inBattle)
+	{
+		var music = FindFirstObjectByType<MusicManager>();
+		if (music == null) return;
+
+		if (inBattle)
+			music.BattleResume();
+		else
+			music.BattlePause();
+	}
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void UpdateTimerClientRpc(int remainingSeconds)
+	{
+		if (timerText == null) return;
+
+		int minutes = remainingSeconds / 60;
+		int seconds = remainingSeconds % 60;
+		timerText.text = $"{minutes}:{seconds:00}";
+	}
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void ClearTimerClientRpc()
+	{
+		if (timerText != null)
+			timerText.text = string.Empty;
+	}
+
+	//[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void StartWaveAnimation()
+	{
+		var waveCtrl = FindFirstObjectByType<WaveController>();
+		if (waveCtrl != null)
+			waveCtrl.StartWaveAnimation();
 	}
 }

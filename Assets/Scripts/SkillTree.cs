@@ -72,7 +72,7 @@ public class SkillTree : MonoBehaviour
 	public void EnableCrystalThorns(Skill skill)
 	{
 		if (TryBuy(skill))
-			crystal.thorns = true;
+			crystal.SetThorns();
 	}
 
 	public void EnableLightningArrow(Skill skill)

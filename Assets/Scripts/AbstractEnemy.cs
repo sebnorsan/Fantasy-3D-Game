@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public abstract class AbstractEnemy : MonoBehaviour, IDamagable
+public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 {
 	private NavMeshAgent agent;
 	private Transform crystalPos;
@@ -24,6 +25,7 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 		new List<(MeshRenderer renderer, Material[] originals)>();
 
 	private void Awake() => currentHealth = maxHealth;
+
 	private void Start()
 	{
 		agent = GetComponent<NavMeshAgent>();
@@ -41,16 +43,19 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 
 		InitializeEnemy();
 	}
+
 	private Coroutine attackCoroutine;
 	public void StartAttack()
 	{
 		attackCoroutine = StartCoroutine(AttackNumerator());
 	}
+
 	public void StopAttack()
 	{
 		if (attackCoroutine != null)
 			StopCoroutine(attackCoroutine);
 	}
+
 	protected virtual IEnumerator AttackNumerator()
 	{
 		anim.SetBool("Walking", false);
@@ -58,7 +63,8 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 		anim.SetTrigger("Attack");
 		attackCoroutine = StartCoroutine(AttackNumerator());
 	}
-	protected virtual void InitializeEnemy() 
+
+	protected virtual void InitializeEnemy()
 	{
 		if (anim != null)
 			anim.SetBool("Walking", true);
@@ -67,6 +73,7 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 
 		InitializeDestination();
 	}
+
 	private Vector3 targetDestination;
 	protected virtual void InitializeDestination()
 	{
@@ -83,7 +90,7 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 	Coroutine currKnockbackCoroutine, currFlashCoroutine;
 	public void DamageEffects(Vector3 hitPoint)
 	{
-		if (currKnockbackCoroutine != null) 
+		if (currKnockbackCoroutine != null)
 			StopCoroutine(currKnockbackCoroutine);
 		currKnockbackCoroutine = StartCoroutine(OnKnockback(hitPoint));
 
@@ -94,11 +101,13 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 		OnSpawnDamagePFX();
 		OnPlayDamageAnimation();
 	}
+
 	[Header("Knockback Settings")]
 	private float originalSpeed;
 	private float originalAcceleration;
 	public float knockbackForce = 5f;
 	public float knockbackDuration = .2f;
+
 	protected virtual IEnumerator OnKnockback(Vector3 hitPoint)
 	{
 		yield return new WaitForSeconds(0.001f);
@@ -109,8 +118,8 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 		Vector3 dir = (transform.position - hitPoint).normalized;
 
 		// Set a far destination in the knockback direction
-		Vector3 dest = transform.position + dir * 10f; // 3 units back
-		agent.SetDestination(dest); 
+		Vector3 dest = transform.position + dir * 10f;
+		agent.SetDestination(dest);
 
 		// Apply high initial knockback speed
 		agent.speed = knockbackForce;
@@ -149,37 +158,30 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 		if (anim != null)
 			anim.SetBool("Walking", true);
 	}
+
 	private Material flashMaterial;
 	private float flashDuration = .1f;
 	protected virtual IEnumerator OnFlashMaterial()
 	{
-		// 1) Load flash material if not already loaded
 		if (flashMaterial == null)
 			flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
 
-		// 2) Find ALL MeshRenderers in this object’s hierarchy
 		var allRenderers = GetComponentsInChildren<MeshRenderer>(includeInactive: true);
 
-		// 3) Store originals and apply flash
 		var affected = new List<(MeshRenderer renderer, Material[] originals)>(allRenderers.Length);
 		foreach (var rend in allRenderers)
 		{
-			// store original materials
 			affected.Add((rend, rend.materials));
 
-			// create an array filled with flashMaterial
 			var flashMats = new Material[rend.materials.Length];
 			for (int i = 0; i < flashMats.Length; i++)
 				flashMats[i] = flashMaterial;
 
-			// apply
 			rend.materials = flashMats;
 		}
 
-		// 4) Wait
 		yield return new WaitForSeconds(flashDuration);
 
-		// 5) Revert all
 		foreach (var (renderer, originals) in affected)
 			renderer.materials = originals;
 	}
@@ -188,79 +190,128 @@ public abstract class AbstractEnemy : MonoBehaviour, IDamagable
 	private GameObject deathParticles;
 	protected virtual void OnSpawnDamagePFX()
 	{
+		if (hitParticles == null) return;
+
 		var pfx = Instantiate(hitParticles, transform.position, Quaternion.identity);
 		Destroy(pfx, 5);
 	}
+
 	protected virtual void OnPlayDamageAnimation()
 	{
 		if (anim != null)
 			anim.SetTrigger("Damage");
 	}
+
+	// ------------- IDamagable --------------
+
 	public void TakeDamage(int amount, Vector3 hitPoint)
 	{
+		if (!NetworkManager.Singleton.IsServer) return;
+
 		currentHealth = Mathf.Max(0, currentHealth - amount);
 
-		DamageEffects(hitPoint);
+		DamageEffectsClientRpc(hitPoint);
 
 		if (currentHealth == 0)
-			Die();
+			DieServer();
 	}
+
 	public void Heal(int amount)
 	{
+		if (!NetworkManager.Singleton.IsServer) return;
+
 		if (currentHealth == maxHealth) return;
 		currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
 	}
 
-	public void Die()
-	{
-		var pfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
-		pfx.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = $"+{xpDrop}xp";
-		Destroy(pfx, 5);
-		Destroy(gameObject);
+	// ------------- Death & XP (server authoritative) -------------
 
-		GameManager.instance.AddXp(xpDrop);
+	private void DieServer()
+	{
+		DieClientRpc(xpDrop);
 
 		StopAllCoroutines();
+
+		// server despawns, clients will despawn automatically
+		if (TryGetComponent(out NetworkObject nwo) && nwo.IsSpawned)
+			nwo.Despawn(true);
+		else
+			Destroy(gameObject);
 	}
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void DamageEffectsClientRpc(Vector3 hitPoint)
+	{
+		DamageEffects(hitPoint);
+	}
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void DieClientRpc(int xpAmount)
+	{
+		if (deathParticles != null)
+		{
+			var pfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
+			var text = pfx.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+			if (text != null)
+				text.text = $"+{xpAmount}xp";
+			Destroy(pfx, 5);
+		}
+
+		GameManager.instance.AddXp(xpAmount);
+	}
+
+	// ------------- Crystal attacks -------------
+
 	public void AttackCrystal()
 	{
+		if (!NetworkManager.Singleton.IsServer) return;
+
 		var crystalScript = FindFirstObjectByType<CrystalScript>();
+		if (crystalScript == null) return;
+
 		crystalScript.TakeDamage(damage);
 
 		if (crystalScript.thorns)
 			TakeDamage(5, transform.position);
 		if (crystalScript.deadly)
-			Die();
+			DieServer();
 	}
 
+	// ------------- Fire / Ice effects (still mostly local) -------------
+
 	public void IceEffect()
-    {
+	{
 		iceEffect.SetActive(true);
 		CancelInvoke(nameof(ResetIceEffect));
 		Invoke(nameof(ResetIceEffect), 6f);
 		agent.speed /= 2;
-    }
+	}
+
 	private void ResetIceEffect()
-    {
+	{
 		agent.speed = originalSpeed;
-    }
+	}
+
 	public void FireEffect()
-    {
+	{
 		fireEffect.SetActive(true);
 		InvokeRepeating(nameof(FireDamage), .5f, 10);
 		CancelInvoke(nameof(ResetFireEffect));
 		Invoke(nameof(ResetFireEffect), .5f * 10);
-    }
+	}
+
 	private void FireDamage()
-    {
+	{
+		// this will only actually change HP on server due to guard in TakeDamage
 		TakeDamage(1, transform.position);
 	}
-	private void ResetFireEffect()
-    {
-		fireEffect.SetActive(false);
 
+	private void ResetFireEffect()
+	{
+		fireEffect.SetActive(false);
 	}
 }
+
 
 public interface IDamagable
 {
