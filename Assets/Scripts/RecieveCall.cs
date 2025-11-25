@@ -12,12 +12,11 @@ public class RecieveCall : NetworkBehaviour
 	{
 		if (!NetworkManager.Singleton.IsServer || fired) return;
 
-		if (other.GetComponent<PlayerController>() == null) return;
+		if (!other.TryGetComponent<PlayerController>(out _)) return;
 
 		fired = true;
 
-		if (other.GetComponent<PlayerController>())
-			CallUpClientRpc();
+		CallUpClientRpc(); // one call, all clients react
 
 		foreach (var obj in objToRemove)
 		{
@@ -31,16 +30,20 @@ public class RecieveCall : NetworkBehaviour
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void CallUpClientRpc()
 	{
-		foreach (var p in FindObjectsByType<PlayerController>(FindObjectsSortMode.None))
-		{
-			NPC_Interactable_Remote npcRemote = p.GetComponentInChildren<NPC_Interactable_Remote>();
+		// this runs on every client (+ host)
 
-			if (dialogueToReplace != null)
-				npcRemote.npcOwner.ChangeDialogue(dialogueToReplace);
+		var localPlayerObject = NetworkManager.Singleton.LocalClient?.PlayerObject;
+		if (localPlayerObject == null) return;
 
-			npcRemote.CallUp();
-		}
+		var p = localPlayerObject.GetComponent<PlayerController>();
+		if (p == null) return;
+
+		var npcRemote = p.GetComponentInChildren<NPC_Interactable_Remote>();
+		if (npcRemote == null) return;
+
+		if (dialogueToReplace != null)
+			npcRemote.npcOwner.ChangeDialogue(dialogueToReplace);
+
+		npcRemote.CallUp();
 	}
 }
-
-
