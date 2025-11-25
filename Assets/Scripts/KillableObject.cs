@@ -150,7 +150,8 @@ public class KillableObject : NetworkBehaviour, IDamagable
 		if (bigguy) return;
 
 		if (TryGetComponent(out QuestObject quester))
-			quester.FinishQuest();
+			if (NetworkManager.Singleton.IsServer)
+				quester.FinishQuest();
 
 		GameManager.instance.AddXp(xpGain);
 

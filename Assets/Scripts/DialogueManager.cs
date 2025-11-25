@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class DialogueManager : MonoBehaviour
@@ -26,10 +27,12 @@ public class DialogueManager : MonoBehaviour
 		else
 			Debug.LogWarning($"[DialogueManager] No target registered with ID '{id}'");
 	}
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
 	private static void SetActiveServerRpc(GameObject go, bool active)
 	{
 		SetActiveClientRpc(go, active);
 	}
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private static void SetActiveClientRpc(GameObject go, bool active)
 	{
 		go.SetActive(active);
