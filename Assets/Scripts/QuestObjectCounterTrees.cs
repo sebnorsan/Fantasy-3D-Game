@@ -23,8 +23,15 @@ public class QuestObjectCounterTrees : NetworkBehaviour
 
 	public override void OnNetworkSpawn()
 	{
-		if (!IsServer) return;
+		//if (!NetworkManager.Singleton.IsServer) return;
+		//SetQuestClientRpc(); // already on server, no need for server RPC
+	}
+	private void OnEnable()
+	{
+		if (!NetworkManager.Singleton.IsServer) return;
 		Invoke(nameof(SetQuestServer), 6f);
+
+		//SetQuestClientRpc(); // already on server, no need for server RPC
 	}
 	private void OnDisable()
 	{
@@ -33,7 +40,7 @@ public class QuestObjectCounterTrees : NetworkBehaviour
 	// called from KillableObject.OnNetworkDespawn on SERVER only
 	public void RemoveCount()
 	{
-		if (!IsServer) return;
+		if (!NetworkManager.Singleton.IsServer) return;
 
 		countToReach--;
 		if (countToReach <= 0 && isActive)
@@ -56,9 +63,6 @@ public class QuestObjectCounterTrees : NetworkBehaviour
 
 	private void FinishQuestServer()
 	{
-		// server XP
-		GameManager.instance.AddXp(xpGain);
-
 		// stop cutting trees for everyone
 		ToggleCutTreesClientRpc(false);
 
@@ -101,6 +105,8 @@ public class QuestObjectCounterTrees : NetworkBehaviour
 	{
 		if (!actionToEnable.IsNullOrEmpty())
 			DialogueManager.instance.SetActive(actionToEnable, true);
+
+		GameManager.instance.AddXp(xpGain);
 
 		switch (questType)
 		{

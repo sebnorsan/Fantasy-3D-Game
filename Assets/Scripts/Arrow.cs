@@ -145,6 +145,9 @@ public class Arrow : NetworkBehaviour
 
 			if (collision.gameObject.TryGetComponent<KillableObject>(out var killable))
 				killable.TakeDamage(arrowDamage, initPlayerPos);
+
+			NetworkObject.Despawn(true);
+			return;
 		}
 
 		var bigGuy = collision.gameObject.GetComponentInParent<BigguyDamagable>();
