@@ -20,21 +20,21 @@ public class DialogueManager : MonoBehaviour
 
 	public static void SetActive(string id, bool active)
 	{
+		SetActiveServerRpc(id, active);
+	}
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+	private static void SetActiveServerRpc(string id, bool active)
+	{
+		SetActiveClientRpc(id, active);
+	}
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private static void SetActiveClientRpc(string id, bool active)
+	{
 		if (_lookup.TryGetValue(id, out var go))
 		{
-			SetActiveServerRpc(go, active);
+			go.SetActive(active);
 		}
 		else
 			Debug.LogWarning($"[DialogueManager] No target registered with ID '{id}'");
-	}
-	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-	private static void SetActiveServerRpc(GameObject go, bool active)
-	{
-		SetActiveClientRpc(go, active);
-	}
-	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private static void SetActiveClientRpc(GameObject go, bool active)
-	{
-		go.SetActive(active);
 	}
 }
