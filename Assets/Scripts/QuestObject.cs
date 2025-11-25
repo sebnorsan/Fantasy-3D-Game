@@ -2,6 +2,7 @@ using EasyTextEffects.Editor.MyBoxCopy.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem.iOS;
+using UnityEngine.UIElements;
 
 public class QuestObject : NetworkBehaviour
 {
@@ -22,6 +23,7 @@ public class QuestObject : NetworkBehaviour
 	public string actionToEnable = "";
 
 	public QuestObjectCounter counter;
+	public bool questFinished;
 
 	public override void OnNetworkSpawn()
 	{
@@ -46,6 +48,8 @@ public class QuestObject : NetworkBehaviour
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
 	private void FinishQuestServerRpc()
 	{
+		AddXpClientRpc();
+
 		// only server needs the counter
 		if (counter != null && counter.isActive)
 		{
@@ -56,13 +60,18 @@ public class QuestObject : NetworkBehaviour
 		// now broadcast result
 		FinishQuestClientRpc();
 	}
-
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void AddXpClientRpc()
+	{
+		GameManager.instance.AddXp(xpGain);
+	}
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void FinishQuestClientRpc()
 	{
-		// NO counter usage here anymore
+		if (questFinished) return;
+		questFinished = true;
 
-		GameManager.instance.AddXp(xpGain);
+		// NO counter usage here anymore
 
 		if (!actionToEnable.IsNullOrEmpty())
 			DialogueManager.instance.SetActive(actionToEnable, true);
@@ -100,6 +109,8 @@ public class QuestObject : NetworkBehaviour
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void SetQuestClientRpc()
 	{
+		questFinished = false;
+
 		var questCounter = counter;
 		if (questCounter != null && questCounter.isActive)
 			return;

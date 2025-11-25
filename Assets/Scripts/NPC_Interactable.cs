@@ -91,7 +91,10 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 
 	public void InteractRemotely()
 	{
-		// if remote answering should force a talk, you can call StartTalk() here
+		if (!canInteract)
+			return;
+
+		StartTalk();
 	}
 
 	public void Interact()

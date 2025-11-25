@@ -28,14 +28,14 @@ public class BigguyDamagable : NetworkBehaviour
 		}
 	}
 
-	[ClientRpc]
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void PlayHitClientRpc(Vector3 pos)
 	{
 		if (damagePfx != null)
 			Instantiate(damagePfx, pos, Quaternion.identity);
 	}
 
-	[ClientRpc]
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void DamagedClientRpc()
 	{
 		var anim = GetComponentInParent<Animator>();
@@ -59,7 +59,7 @@ public class BigguyDamagable : NetworkBehaviour
 			Destroy(e.gameObject);
 	}
 
-	[ClientRpc]
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void WinClientRpc()
 	{
 		var anim = GetComponentInParent<Animator>();

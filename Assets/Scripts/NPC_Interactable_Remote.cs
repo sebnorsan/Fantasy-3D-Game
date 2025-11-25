@@ -30,7 +30,7 @@ public class NPC_Interactable_Remote : MonoBehaviour, IInteractable
 		anim.SetTrigger("Answer");
 		yield return new WaitForEndOfFrame();
 		yield return new WaitForSeconds(GetTransitioningAnimationLength());
-		npcOwner.Interact();
+		npcOwner.InteractRemotely();
 	}
 	private void TalkEnded()
 	{

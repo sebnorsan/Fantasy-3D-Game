@@ -4,36 +4,84 @@ using UnityEngine;
 
 public class QuestObjectCounterTrees : NetworkBehaviour
 {
-    public int countToReach;
-    [TextArea]
-    public string questDescription;
-    public bool isActive = true;
+	public int countToReach;
+	[TextArea] public string questDescription;
+	public bool isActive = true;
+
 	public enum QuestType
 	{
 		MainQuest,
 		SideQuest
 	}
+
 	[SerializeField] private QuestType questType;
 
 	public int xpGain = 100;
-
 	public string actionToEnable = "";
+
+	// ================= NETCODE FLOW =================
 
 	public override void OnNetworkSpawn()
 	{
-		if (NetworkManager.Singleton.IsServer)
-			Invoke(nameof(SetQuest), .1f);
+		if (!IsServer) return;
+		Invoke(nameof(SetQuestServer), 0.1f);
 	}
+
+	// called from KillableObject.OnNetworkDespawn on SERVER only
 	public void RemoveCount()
 	{
-		countToReach--;
-		if (countToReach <= 0)
-			FinishQuest();
-	}
-	public void SetQuest()
-	{
-		FindFirstObjectByType<BowScript>().arrowCutsTrees = true;
+		if (!IsServer) return;
 
+		countToReach--;
+		if (countToReach <= 0 && isActive)
+		{
+			isActive = false;
+			FinishQuestServer();
+		}
+	}
+
+	// ---------------- SERVER SIDE ----------------
+
+	private void SetQuestServer()
+	{
+		// enable tree-cutting for everyone
+		ToggleCutTreesClientRpc(true);
+
+		// update quest text on all clients
+		SetQuestClientRpc();
+	}
+
+	private void FinishQuestServer()
+	{
+		// server XP
+		GameManager.instance.AddXp(xpGain);
+
+		// stop cutting trees for everyone
+		ToggleCutTreesClientRpc(false);
+
+		// UI + dialogue, etc. on all clients
+		FinishQuestClientRpc();
+
+		// this object is probably server-only bookkeeping, despawn/destroy on server
+		if (TryGetComponent(out NetworkObject nwo) && nwo.IsSpawned)
+			nwo.Despawn(true);
+		else
+			Destroy(gameObject);
+	}
+
+	// ---------------- CLIENT RPCs ----------------
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void ToggleCutTreesClientRpc(bool canCut)
+	{
+		var bow = FindFirstObjectByType<BowScript>();
+		if (bow != null)
+			bow.arrowCutsTrees = canCut;
+	}
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void SetQuestClientRpc()
+	{
 		switch (questType)
 		{
 			case QuestType.MainQuest:
@@ -44,21 +92,12 @@ public class QuestObjectCounterTrees : NetworkBehaviour
 				break;
 		}
 	}
-	public void FinishQuest()
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void FinishQuestClientRpc()
 	{
-		FindFirstObjectByType<BowScript>().arrowCutsTrees = false;
-
-		GameManager.instance.AddXp(xpGain);
-
 		if (!actionToEnable.IsNullOrEmpty())
 			DialogueManager.instance.SetActive(actionToEnable, true);
-
-		//foreach (var item in GameObject.FindGameObjectsWithTag("Tree"))
-  //      {
-		//	var ko = item.GetComponent<KillableObject>();
-		//	if (ko != null)
-		//		ko.TakeDamage(100, ko.transform.position);
-  //      }
 
 		switch (questType)
 		{
@@ -69,6 +108,5 @@ public class QuestObjectCounterTrees : NetworkBehaviour
 				QuestManager.instance.FinishSideQuest();
 				break;
 		}
-		Destroy(gameObject);
 	}
 }

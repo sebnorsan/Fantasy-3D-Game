@@ -12,6 +12,7 @@ public class InteractionHandler : MonoBehaviour
 	private void Start()
 	{
 		playerController = GetComponentInParent<PlayerController>(includeInactive: true);
+		FindFirstObjectByType<NPC_Interactable>().SetInteractionHandler(this);
 
 		if (!playerController.IsOwner) return;
 
@@ -42,8 +43,8 @@ public class InteractionHandler : MonoBehaviour
 			if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
 				if (hit.transform.TryGetComponent<IInteractable>(out var interactable))
 				{
-					if (interactable is NPC_Interactable npcInteractable)
-						npcInteractable.SetInteractionHandler(this);
+					//if (interactable is NPC_Interactable npcInteractable)
+					//	npcInteractable.SetInteractionHandler(this);
 
 					interactable.Interact();
 				}
