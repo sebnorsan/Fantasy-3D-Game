@@ -6,7 +6,7 @@ public class DialogueTarget : MonoBehaviour
 	[Tooltip("Unique key this object responds to.")]
 	public string targetID;
 	[SerializeField] private bool teleportToPlayer = false;
-	private void Awake()
+	private void Start()
 	{
 		OnRegister();
 		gameObject.SetActive(false);

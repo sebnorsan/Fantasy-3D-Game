@@ -10,7 +10,7 @@ public class DialogueManager : NetworkBehaviour
 	public Dictionary<string, GameObject> _lookup = new Dictionary<string, GameObject>();
 	private void Awake()
 	{
-		if (instance == null) instance = this;
+		instance = this;
 	}
 	public void Register(string id, GameObject go)
 	{
