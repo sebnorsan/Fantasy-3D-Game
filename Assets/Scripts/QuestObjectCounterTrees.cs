@@ -24,9 +24,12 @@ public class QuestObjectCounterTrees : NetworkBehaviour
 	public override void OnNetworkSpawn()
 	{
 		if (!IsServer) return;
-		Invoke(nameof(SetQuestServer), 0.1f);
+		Invoke(nameof(SetQuestServer), 6f);
 	}
-
+	private void OnDisable()
+	{
+		CancelInvoke();
+	}
 	// called from KillableObject.OnNetworkDespawn on SERVER only
 	public void RemoveCount()
 	{
