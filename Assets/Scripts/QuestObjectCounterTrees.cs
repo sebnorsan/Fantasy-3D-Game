@@ -51,7 +51,7 @@ public class QuestObjectCounterTrees : NetworkBehaviour
 		GameManager.instance.AddXp(xpGain);
 
 		if (!actionToEnable.IsNullOrEmpty())
-			DialogueManager.SetActive(actionToEnable, true);
+			DialogueManager.instance.SetActive(actionToEnable, true);
 
 		//foreach (var item in GameObject.FindGameObjectsWithTag("Tree"))
   //      {

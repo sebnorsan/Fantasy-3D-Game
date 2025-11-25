@@ -34,11 +34,11 @@ public class DialogueTarget : MonoBehaviour
 	}
 	private void OnRegister()
 	{
-		DialogueManager.Register(targetID, gameObject);
+		DialogueManager.instance.Register(targetID, gameObject);
 	}
 
 	private void OnUnregister()
 	{
-		DialogueManager.Unregister(targetID);
+		DialogueManager.instance.Unregister(targetID);
 	}
 }

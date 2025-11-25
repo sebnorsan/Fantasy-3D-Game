@@ -80,7 +80,7 @@ public class EnemySpawnerManager : MonoBehaviour
 	{
 		FindFirstObjectByType<MusicManager>().BattlePause();
 
-		DialogueManager.SetActive(actionAfterWave[_currentWave], true);
+		DialogueManager.instance.SetActive(actionAfterWave[_currentWave], true);
 
 		if (_spawnRoutine != null)
 			StopCoroutine(_spawnRoutine);

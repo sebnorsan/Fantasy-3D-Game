@@ -196,10 +196,10 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 			switch (a.actionType)
 			{
 				case DialogueAction.ActionType.EnableObject:
-					DialogueManager.SetActive(a.targetID, true);
+					DialogueManager.instance.SetActive(a.targetID, true);
 					break;
 				case DialogueAction.ActionType.DisableObject:
-					DialogueManager.SetActive(a.targetID, false);
+					DialogueManager.instance.SetActive(a.targetID, false);
 					break;
 				case DialogueAction.ActionType.FinishQuest:
 					GetComponent<QuestObject>().FinishQuest();

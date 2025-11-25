@@ -50,7 +50,7 @@ public class QuestObject : NetworkBehaviour
 		GameManager.instance.AddXp(xpGain);
 
 		if (!actionToEnable.IsNullOrEmpty())
-			DialogueManager.SetActive(actionToEnable, true);
+			DialogueManager.instance.SetActive(actionToEnable, true);
 
 		switch (questType)
 		{
