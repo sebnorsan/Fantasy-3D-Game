@@ -407,6 +407,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneToLoad: LobbyScene
+  directlyToGame: 1
 --- !u!4 &1584682221
 Transform:
   m_ObjectHideFlags: 0

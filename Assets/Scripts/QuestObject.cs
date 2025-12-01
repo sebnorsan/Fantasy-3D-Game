@@ -1,7 +1,6 @@
 using EasyTextEffects.Editor.MyBoxCopy.Extensions;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.InputSystem.iOS;
 using UnityEngine.UIElements;
 
 public class QuestObject : NetworkBehaviour
