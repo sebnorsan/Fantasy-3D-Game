@@ -85,11 +85,11 @@ public class PlayerController : NetworkBehaviour
 	private Vector3 spawnPos;
 	private Quaternion spawnRot;
 
-	public void SetSpawnPoint(Vector3 pos, Quaternion rot)
-	{
-		spawnPos = pos;
-		spawnRot = rot;
-	}
+	//public void SetSpawnPoint(Vector3 pos, Quaternion rot)
+	//{
+	//	spawnPos = pos;
+	//	spawnRot = rot;
+	//}
 	public override void OnNetworkSpawn()
 	{
 		if (!IsOwner)
@@ -111,31 +111,29 @@ public class PlayerController : NetworkBehaviour
 			DisableIfExists<EventAudioPlayer>();
 			DisableIfExists<CameraShaker>();
 		}
-		else
-			TeleportToSpawnpoint();
+		//else
+		//	TeleportToSpawnpoint();
 	}
-	private void TeleportToSpawnpoint()
-	{
-		if (IsSpawned && characterController && EventManager.instance != null)
-			EventManager.instance.TeleportPlayer(this, spawnPos + new Vector3(0,1.5f,0));
-		else
-			Invoke(nameof(TeleportToSpawnpoint), .1f);
-	}
+	//private void TeleportToSpawnpoint()
+	//{
+	//	if (IsSpawned && characterController && EventManager.instance != null)
+	//		EventManager.instance.TeleportPlayer(this, spawnPos + new Vector3(0,1.5f,0));
+	//	else
+	//		Invoke(nameof(TeleportToSpawnpoint), .1f);
+	//}
 	private void DisableIfExists<T>() where T : Behaviour
 	{
 		var comps = GetComponentsInChildren<T>(true);
 		foreach (var comp in comps)
 			comp.enabled = false;
 	}
-	private void Awake()
+	void Start()
 	{
 		cam = GetComponentInChildren<Camera>();
 		initialFOV = cam.fieldOfView;
 		runningFovMultiplier = runningFOV / initialFOV;
 		footsteps = GetComponent<Footsteps>();
-	}
-	void Start()
-	{
+
 		characterController = GetComponent<CharacterController>();
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
@@ -147,6 +145,8 @@ public class PlayerController : NetworkBehaviour
 
 		if (Application.isEditor)
 			overrideDev = true;
+
+		Debug.Log($"Player {OwnerClientId} start at {transform.position}");
 	}
 	public void ChangeFieldOfView(float newFov)
 	{

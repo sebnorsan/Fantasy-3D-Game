@@ -84,9 +84,11 @@ public class GameSceneSpawnManager : NetworkBehaviour
 		var player = Instantiate(playerPrefab, spawnPos, spawnRot);
 		player.SpawnAsPlayerObject(clientId, destroyWithScene: false);
 
-		player.GetComponent<PlayerController>().SetSpawnPoint(spawnPos, spawnRot);
+		//player.GetComponent<PlayerController>().SetSpawnPoint(spawnPos, spawnRot);
 
 		usedSpawnPoints.Add(spawnPos);
+
+		Debug.Log($"Spawn {clientId} at {spawnPos}");
 	}
 
 	private Vector3 FindValidSpawnPoint()
