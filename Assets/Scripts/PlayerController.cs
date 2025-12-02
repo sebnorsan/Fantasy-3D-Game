@@ -110,9 +110,7 @@ public class PlayerController : NetworkBehaviour
 			//DisableIfExists<HandsHolder>();
 			//DisableIfExists<EventAudioPlayer>();
 			//DisableIfExists<CameraShaker>();
-		}
-		else
-			EventManager.instance.TeleportPlayer(this, spawnPos);
+		}	
 	}
 	private void DisableIfExists<T>() where T : Behaviour
 	{
@@ -140,6 +138,8 @@ public class PlayerController : NetworkBehaviour
 
 		if (Application.isEditor)
 			overrideDev = true;
+
+		EventManager.instance.TeleportPlayer(this, spawnPos);
 	}
 	public void ChangeFieldOfView(float newFov)
 	{
