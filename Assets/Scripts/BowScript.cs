@@ -98,7 +98,7 @@ public class BowScript : MonoBehaviour
 		var arrowObj = Instantiate(go, pos, rot);
 		var arrow = arrowObj.GetComponent<Arrow>();
 
-		arrow.Initialize(dmg, spd, size, shootDir, playerController.transform.position, shooterId, true);
+		arrow.Initialize(dmg, spd, size, shootDir, playerController.transform.position, shooterId, true, bowNetcode);
 
 		bowNetcode.SpawnArrowVisualServerRpc(pos, rot, shootDir, dmg, spd, size, shooterId);
 	}
