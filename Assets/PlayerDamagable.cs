@@ -31,6 +31,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
+		Debug.Log("i hit a player");
+
 		currentHealth = Mathf.Max(0, currentHealth - amount);
 
 		DamageEffectsClientRpc(hitPoint);
