@@ -4,60 +4,61 @@ using UnityEngine;
 
 public class NetworkTransformChild : NetworkBehaviour
 {
-	[SerializeField] private List<Transform> targets = new();
+	[SerializeField] private List<Transform> targets = new List<Transform>();
 	[SerializeField] private float lerpSpeed = 10f;
 
-	// MUST be initialized here, not later
-	private NetworkList<Quaternion> _rots = new NetworkList<Quaternion>();
+	private Quaternion[] _sendBuffer;
 
 	public override void OnNetworkSpawn()
 	{
-		if (IsOwner)
-		{
-			_rots.Clear();
-			for (int i = 0; i < targets.Count; i++)
-				_rots.Add(targets[i] ? targets[i].localRotation : Quaternion.identity);
-		}
-	}
+		if (targets == null)
+			targets = new List<Transform>();
 
-	public override void OnNetworkDespawn()
-	{
-		// don't Dispose, just clear
-		_rots.Clear();
+		_sendBuffer = new Quaternion[targets.Count];
 	}
 
 	private void Update()
 	{
-		if (!IsSpawned || targets.Count == 0 || _rots == null)
+		if (!IsSpawned || targets.Count == 0)
 			return;
 
-		if (IsOwner)
-		{
-			// keep list sized
-			while (_rots.Count < targets.Count)
-				_rots.Add(Quaternion.identity);
-			while (_rots.Count > targets.Count)
-				_rots.RemoveAt(_rots.Count - 1);
+		// Only OWNER sends rotations
+		if (!IsOwner)
+			return;
 
-			for (int i = 0; i < targets.Count; i++)
-			{
-				if (!targets[i]) continue;
-				_rots[i] = targets[i].localRotation;
-			}
+		for (int i = 0; i < targets.Count; i++)
+		{
+			_sendBuffer[i] = targets[i]
+				? targets[i].localRotation
+				: Quaternion.identity;
 		}
-		else
-		{
-			int count = Mathf.Min(_rots.Count, targets.Count);
-			for (int i = 0; i < count; i++)
-			{
-				if (!targets[i]) continue;
 
-				targets[i].localRotation = Quaternion.Slerp(
-					targets[i].localRotation,
-					_rots[i],
-					Time.deltaTime * lerpSpeed
-				);
-			}
+		SendRotationsServerRpc(_sendBuffer);
+	}
+
+	[ServerRpc]
+	private void SendRotationsServerRpc(Quaternion[] rots)
+	{
+		ApplyRotationsClientRpc(rots);
+	}
+
+	[ClientRpc]
+	private void ApplyRotationsClientRpc(Quaternion[] rots)
+	{
+		// Owner already has correct rotations locally
+		if (IsOwner)
+			return;
+
+		int count = Mathf.Min(rots.Length, targets.Count);
+		for (int i = 0; i < count; i++)
+		{
+			if (!targets[i]) continue;
+
+			targets[i].localRotation = Quaternion.Slerp(
+				targets[i].localRotation,
+				rots[i],
+				Time.deltaTime * lerpSpeed
+			);
 		}
 	}
 }
