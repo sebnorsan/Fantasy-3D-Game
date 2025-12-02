@@ -143,7 +143,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerWhoKilled: {fileID: 0}
-  deathPostProcessing: {fileID: 0}
+  deathPostProcessing: {fileID: 7319767542871743239}
   duration: 4
 --- !u!1 &4386024982698388605
 GameObject:
