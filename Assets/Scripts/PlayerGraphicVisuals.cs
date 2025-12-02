@@ -1,6 +1,5 @@
 using TMPro;
 using Unity.Netcode;
-using Unity.Collections;
 using UnityEngine;
 using Steamworks;
 
@@ -8,6 +7,7 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 {
 	private PlayerController localPlayer;
 	private Quaternion baseRot;
+
 	[SerializeField] private GameObject gfx;
 	[SerializeField] private TextMeshProUGUI textUsername;
 
@@ -15,42 +15,54 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 	[SerializeField] private float maxSideTilt = 8f;
 	[SerializeField] private float tiltSpeed = 8f;
 
-	// synced name
-	public NetworkVariable<FixedString32Bytes> PlayerName =
-		new NetworkVariable<FixedString32Bytes>("Player");
+	// store the name on the server so it can be re-sent
+	private string cachedName;
 
 	public override void OnNetworkSpawn()
 	{
+		localPlayer = GetComponentInParent<PlayerController>();
+		baseRot = transform.localRotation;
+
 		if (IsOwner)
 		{
-			gfx.SetActive(false);
-			SetNameServerRpc(SteamClient.Name);   // use Steam username
-		}
+			if (gfx != null)
+				gfx.SetActive(false);
 
-		PlayerName.OnValueChanged += OnNameChanged;
-		OnNameChanged(default, PlayerName.Value);
+			// send our Steam name once when we spawn
+			SetNameServerRpc(SteamClient.Name);
+		}
+		else
+		{
+			// I’m a copy of SOMEONE ELSE’s player – ask server what their name is
+			RequestNameServerRpc();
+		}
 	}
 
 	[ServerRpc]
-	void SetNameServerRpc(string name)
+	private void SetNameServerRpc(string name)
 	{
-		PlayerName.Value = name;
+		cachedName = name;
+		SetNameClientRpc(name);
 	}
 
-	void OnNameChanged(FixedString32Bytes _, FixedString32Bytes newName)
+	// called by late joiners to get the name again
+	[ServerRpc(RequireOwnership = false)]
+	private void RequestNameServerRpc()
 	{
-		textUsername.text = newName.ToString();
+		if (!string.IsNullOrEmpty(cachedName))
+			SetNameClientRpc(cachedName);
 	}
 
-	private void Start()
+	[ClientRpc]
+	private void SetNameClientRpc(string name)
 	{
-		localPlayer = GetComponentInParent<PlayerController>();
-		baseRot = transform.localRotation;
+		if (textUsername != null)
+			textUsername.text = name;
 	}
 
 	private void Update()
 	{
-		if (localPlayer == null) return;
+		if (localPlayer == null || gfx == null) return;
 
 		float targetX = -localPlayer.inputVertical * maxForwardTilt;
 		float targetZ = -localPlayer.inputHorizontal * maxSideTilt;
