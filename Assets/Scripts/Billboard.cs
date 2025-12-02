@@ -6,18 +6,8 @@ public class Billboard : MonoBehaviour
 	private Transform target;
 	public bool lockRotationToY = true;
 
-	private bool init = false;
-
-	private void Start()
-	{
-		Invoke(nameof(SetInit), 5f);
-	}
-	private void SetInit() => init = true;
-
 	private void LateUpdate()
 	{
-		if (!init) return;
-
 		if (target == null)
 		{
 			TryFindTarget();
