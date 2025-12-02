@@ -31,6 +31,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	private ulong lastHitByClientId = ulong.MaxValue;
 
+	private Vector3 deathPosition = new Vector3(9999, 9999, 9999);
+
 	private void Start()
 	{
 		flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
@@ -46,7 +48,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 		DamageEffectsClientRpc(hitPoint);
 
-		if (currentHealth == 0)
+		if (currentHealth <= 0)
 			DieServer();
 	}
 
@@ -128,20 +130,56 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	#region Dying
 	private void DieServer()
 	{
-		DieClientRpc();
+		//pfx
+		DieParticlesClientRpc();
+
+		// server-side state
 		SetDeadStateClientRpc();
-		//StopAllCoroutines();
 
-		StartCoroutine(DeathFlow());
+		// tell clients; only the dead player's client will actually spawn the cam
+		SpawnDeathCamClientRpc(lastHitByClientId);
 
+		StartCoroutine(DeathFlowServer()); // teleports + heal etc on server
 		localPlayer.canMove = false;
-
-		// server despawns, clients will despawn automatically
-		//if (TryGetComponent(out NetworkObject nwo) && nwo.IsSpawned)
-		//	nwo.Despawn(true);
-		//else
-		//	Destroy(gameObject);
 	}
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void SpawnDeathCamClientRpc(ulong killerClientId)
+	{
+		if (!IsOwner) return;           // only this player's client
+
+		StartCoroutine(DeathCamFlow(killerClientId));
+	}
+
+	private IEnumerator DeathCamFlow(ulong killerClientId)
+	{
+		var dCam = Instantiate(
+			deathCam,
+			localPlayer.cam.transform.position,
+			localPlayer.cam.transform.rotation);
+
+		if (NetworkManager.Singleton.ConnectedClients.TryGetValue(killerClientId, out var killerCc))
+		{
+			var killerPc = killerCc.PlayerObject.GetComponent<PlayerController>();
+			dCam.GetComponent<DeathCam>().playerWhoKilled = killerPc;
+		}
+
+		yield return new WaitForSeconds(deathTime);
+		Destroy(dCam);
+	}
+
+	private IEnumerator DeathFlowServer()
+	{
+		EventManager.instance.TeleportPlayer(localPlayer, deathPosition);
+
+		yield return new WaitForSeconds(deathTime);
+
+		Heal(maxHealth); // still server-side
+		EventManager.instance.TeleportPlayer(
+			localPlayer,
+			FindFirstObjectByType<GameSceneSpawnManager>().FindValidSpawnPoint());
+	}
+
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void SetDeadStateClientRpc()
 	{
@@ -156,7 +194,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	}
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void DieClientRpc()
+	private void DieParticlesClientRpc()
 	{
 		if (deathParticles != null)
 		{
@@ -165,26 +203,25 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		}
 	
 	}
-	Vector3 deathPosition;
-	private IEnumerator DeathFlow()
-	{
-		EventManager.instance.TeleportPlayer(localPlayer, deathPosition);
+	//private IEnumerator DeathFlow()
+	//{
+	//	EventManager.instance.TeleportPlayer(localPlayer, deathPosition);
 
-		var dCam = Instantiate(deathCam, localPlayer.cam.transform.position, localPlayer.cam.transform.rotation);
+	//	var dCam = Instantiate(deathCam, localPlayer.cam.transform.position, localPlayer.cam.transform.rotation);
 
-		if (NetworkManager.Singleton.ConnectedClients.TryGetValue(lastHitByClientId, out var killerCc))
-		{
-			var killerPc = killerCc.PlayerObject.GetComponent<PlayerController>();
-			dCam.GetComponent<DeathCam>().playerWhoKilled = killerPc;
-		}
+	//	if (NetworkManager.Singleton.ConnectedClients.TryGetValue(lastHitByClientId, out var killerCc))
+	//	{
+	//		var killerPc = killerCc.PlayerObject.GetComponent<PlayerController>();
+	//		dCam.GetComponent<DeathCam>().playerWhoKilled = killerPc;
+	//	}
 
-		yield return new WaitForSeconds(deathTime);
+	//	yield return new WaitForSeconds(deathTime);
 
-		Destroy(dCam);
+	//	Destroy(dCam);
 
-		Heal(maxHealth); // direct, no RPC
-		EventManager.instance.TeleportPlayer(localPlayer, FindFirstObjectByType<GameSceneSpawnManager>().FindValidSpawnPoint());
-	}
+	//	Heal(maxHealth); // direct, no RPC
+	//	EventManager.instance.TeleportPlayer(localPlayer, FindFirstObjectByType<GameSceneSpawnManager>().FindValidSpawnPoint());
+	//}
 
 	#endregion
 

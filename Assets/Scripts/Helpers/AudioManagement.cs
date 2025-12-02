@@ -37,6 +37,12 @@ public class AudioManagement : MonoBehaviour
 	public void RandomizePitchOnSound(AudioSource src, float min, float max)
 	{
 		if (src) src.pitch = Random.Range(min, max);
+
+		if (src.isPlaying)
+		{
+			src.Stop();
+			src.Play();
+		}
 	}
 
 	public void PlayThisSound(string libId, string audioId, bool randomizePitch = false, float min = .9f, float max = 1.1f, GameObject parentToGameObject = null)
