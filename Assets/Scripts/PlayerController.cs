@@ -270,7 +270,7 @@ public class PlayerController : NetworkBehaviour
 		}
 
 		// Ground check
-		isGrounded = Physics.CheckSphere(groundCheck.position, checkRadius, LayerMask.GetMask("Ground", "MovingPlatform"));
+		isGrounded = Physics.CheckSphere(groundCheck.position, checkRadius, LayerMask.GetMask("Ground", "MovingPlatform", "GameController"));
 
 		// Handle vertical movement when not grounded
 		if (!isGrounded)
@@ -383,7 +383,7 @@ public class PlayerController : NetworkBehaviour
 
 		Moving = Mathf.Abs(inputVertical) > 0 || Mathf.Abs(inputHorizontal) > 0;
 
-		bool crouchSphere = Physics.CheckSphere(headCheck.position, headCheckRadius, LayerMask.GetMask("Ground", "MovingPlatform"));
+		bool crouchSphere = Physics.CheckSphere(headCheck.position, headCheckRadius, LayerMask.GetMask("Ground", "MovingPlatform", "GameController"));
 
 		// Crouching
 		if (Input.GetKeyDown(crouchKey))
@@ -441,7 +441,7 @@ public class PlayerController : NetworkBehaviour
 		Collider[] hits = Physics.OverlapSphere(
 			groundCheck.position,
 			checkRadius,
-			LayerMask.GetMask("Ground", "MovingPlatform"),
+			LayerMask.GetMask("Ground", "MovingPlatform", "GameController"),
 			QueryTriggerInteraction.Collide
 		);
 
