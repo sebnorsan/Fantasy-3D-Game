@@ -106,7 +106,9 @@ public class Arrow : MonoBehaviour
 			return;
 
 		ulong targetNetId = netObj.NetworkObjectId;
-		Vector3 hitPoint = collision.GetContact(0).point;
+		Vector3 hitPoint = initPlayerPos;
+
+		HitServerRpc(targetNetId, arrowDamage, hitPoint);
 	}
 
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
