@@ -116,10 +116,11 @@ public class Arrow : MonoBehaviour
 		if (!go.TryGetComponent<NetworkObject>(out var netObj))
 			return;
 
-		Debug.Log("We made it to after the trygetcomponent flow");
-
 		ulong targetNetId = netObj.NetworkObjectId;
 		Vector3 hitPoint = initPlayerPos;
+
+		if (targetNetId == NetworkManager.Singleton.LocalClientId)
+			return;
 
 		HitServerRpc(targetNetId, arrowDamage, hitPoint);
 	}
@@ -127,7 +128,7 @@ public class Arrow : MonoBehaviour
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
 	void HitServerRpc(ulong targetNetId, int amount, Vector3 hitPoint)
 	{
-		Debug.Log(NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetNetId].name + "Has been hit");
+		Debug.Log(NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetNetId] + "Has been hit");
 
 		var target = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetNetId];
 		if (target.TryGetComponent<PlayerDamagable>(out var dmg))

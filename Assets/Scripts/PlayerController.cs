@@ -82,10 +82,20 @@ public class PlayerController : NetworkBehaviour
 	private Footsteps footsteps;
 	public ulong MyId => NetworkObject.OwnerClientId;
 
+	private Vector3 spawnPos;
+	private Quaternion spawnRot;
+
+	public void SetSpawnPoint(Vector3 pos, Quaternion rot)
+	{
+		spawnPos = pos;
+		spawnRot = rot;
+	}
 	public override void OnNetworkSpawn()
 	{
 		if (!IsOwner)
 		{
+			gameObject.layer = LayerMask.GetMask("OtherGameController");
+
 			foreach (var c in GetComponentsInChildren<Camera>(true))
 				c.enabled = false;
 
@@ -101,6 +111,8 @@ public class PlayerController : NetworkBehaviour
 			//DisableIfExists<EventAudioPlayer>();
 			//DisableIfExists<CameraShaker>();
 		}
+		else
+			EventManager.instance.TeleportPlayer(this, spawnPos);
 	}
 	private void DisableIfExists<T>() where T : Behaviour
 	{
@@ -270,7 +282,7 @@ public class PlayerController : NetworkBehaviour
 		}
 
 		// Ground check
-		isGrounded = Physics.CheckSphere(groundCheck.position, checkRadius, LayerMask.GetMask("Ground", "MovingPlatform", "GameController"));
+		isGrounded = Physics.CheckSphere(groundCheck.position, checkRadius, LayerMask.GetMask("Ground", "MovingPlatform", "OtherGameController"));
 
 		// Handle vertical movement when not grounded
 		if (!isGrounded)
@@ -383,7 +395,7 @@ public class PlayerController : NetworkBehaviour
 
 		Moving = Mathf.Abs(inputVertical) > 0 || Mathf.Abs(inputHorizontal) > 0;
 
-		bool crouchSphere = Physics.CheckSphere(headCheck.position, headCheckRadius, LayerMask.GetMask("Ground", "MovingPlatform", "GameController"));
+		bool crouchSphere = Physics.CheckSphere(headCheck.position, headCheckRadius, LayerMask.GetMask("Ground", "MovingPlatform", "OtherGameController"));
 
 		// Crouching
 		if (Input.GetKeyDown(crouchKey))
@@ -441,7 +453,7 @@ public class PlayerController : NetworkBehaviour
 		Collider[] hits = Physics.OverlapSphere(
 			groundCheck.position,
 			checkRadius,
-			LayerMask.GetMask("Ground", "MovingPlatform", "GameController"),
+			LayerMask.GetMask("Ground", "MovingPlatform", "OtherGameController"),
 			QueryTriggerInteraction.Collide
 		);
 
