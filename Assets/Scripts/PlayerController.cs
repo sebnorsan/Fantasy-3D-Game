@@ -94,7 +94,7 @@ public class PlayerController : NetworkBehaviour
 	{
 		if (!IsOwner)
 		{
-			gameObject.layer = LayerMask.GetMask("OtherGameController");
+			gameObject.layer = LayerMask.NameToLayer("OtherGameController");
 
 			foreach (var c in GetComponentsInChildren<Camera>(true))
 				c.enabled = false;
@@ -110,7 +110,16 @@ public class PlayerController : NetworkBehaviour
 			//DisableIfExists<HandsHolder>();
 			//DisableIfExists<EventAudioPlayer>();
 			//DisableIfExists<CameraShaker>();
-		}	
+		}
+		else
+			TeleportToSpawnpoint();
+	}
+	private void TeleportToSpawnpoint()
+	{
+		if (IsSpawned && characterController)
+			EventManager.instance.TeleportPlayer(this, spawnPos);
+		else
+			Invoke(nameof(TeleportToSpawnpoint), .1f);
 	}
 	private void DisableIfExists<T>() where T : Behaviour
 	{
@@ -138,8 +147,6 @@ public class PlayerController : NetworkBehaviour
 
 		if (Application.isEditor)
 			overrideDev = true;
-
-		EventManager.instance.TeleportPlayer(this, spawnPos);
 	}
 	public void ChangeFieldOfView(float newFov)
 	{
