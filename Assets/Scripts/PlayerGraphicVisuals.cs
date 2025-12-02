@@ -38,7 +38,7 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 		}
 	}
 
-	[ServerRpc]
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
 	private void SetNameServerRpc(string name)
 	{
 		cachedName = name;
@@ -46,14 +46,14 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 	}
 
 	// called by late joiners to get the name again
-	[ServerRpc(RequireOwnership = false)]
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
 	private void RequestNameServerRpc()
 	{
 		if (!string.IsNullOrEmpty(cachedName))
 			SetNameClientRpc(cachedName);
 	}
 
-	[ClientRpc]
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void SetNameClientRpc(string name)
 	{
 		if (textUsername != null)
