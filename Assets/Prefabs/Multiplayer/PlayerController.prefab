@@ -1583,8 +1583,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   animator: {fileID: 994555372891957732}
   localPlayer: {fileID: 4808590262637696532}
-  maxHealth: 100
-  currentHealth: 100
+  maxHealth: 10
+  currentHealth: 10
 --- !u!114 &994555372891957732
 MonoBehaviour:
   m_ObjectHideFlags: 0

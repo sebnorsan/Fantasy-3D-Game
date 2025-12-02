@@ -11,6 +11,10 @@ public class NPC_Interactable_Remote : MonoBehaviour, IInteractable
 		anim = GetComponent<Animator>();
 		playerController = GetComponentInParent<PlayerController>();
 		npcOwner = FindFirstObjectByType<NPC_Interactable>();
+
+		canInteract = false;
+		if (playerController.IsOwner)
+			canInteract = true;
 	}
 	public void Interact()
 	{
