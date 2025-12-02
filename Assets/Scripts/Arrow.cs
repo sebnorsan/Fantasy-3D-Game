@@ -96,13 +96,24 @@ public class Arrow : MonoBehaviour
 			rb.MoveRotation(Quaternion.LookRotation(velocity.normalized) * modelCorrection);
 	}
 
+	private void OnTriggerEnter(Collider other)
+	{
+		if (!isAuthority) return;
+
+		CheckDamage(other.gameObject);
+	}
 	private void OnCollisionEnter(Collision collision)
 	{
 		if (!isAuthority) return;
 
-		if (!collision.gameObject.TryGetComponent<IDamagable>(out var dmg))
+		CheckDamage(collision.gameObject);
+	}
+
+	private void CheckDamage(GameObject go)
+	{
+		if (!go.TryGetComponent<IDamagable>(out var dmg))
 			return;
-		if (!collision.gameObject.TryGetComponent<NetworkObject>(out var netObj))
+		if (!go.TryGetComponent<NetworkObject>(out var netObj))
 			return;
 
 		Debug.Log("We made it to after the trygetcomponent flow");
