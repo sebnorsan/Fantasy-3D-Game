@@ -76,7 +76,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		currentHealth = Mathf.Max(0, currentHealth - amount);
 
 		UpdateHealthClientRpc(currentHealth);
-
+		ShakeCameraOwnerRpc();
 		DamageEffectsClientRpc(hitPoint);
 
 		if (currentHealth <= 0)
@@ -115,9 +115,12 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	private void DamageEffectsClientRpc(Vector3 hitPoint)
 	{
 		DamageEffects(hitPoint);
-
-		if (IsOwner)
-			CameraShaker.Instance.ShakeOnce(7f, 3f, .1f, 1f);
+	}
+	[Rpc(SendTo.Owner, InvokePermission = RpcInvokePermission.Server)]
+	private void ShakeCameraOwnerRpc()
+	{
+		// this runs ONLY on the owning client (host or normal client)
+		CameraShaker.Instance.ShakeOnce(7f, 3f, .1f, 1f);
 	}
 	public void DamageEffects(Vector3 hitPoint)
 	{
