@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using Unity.VisualScripting;
@@ -21,6 +23,8 @@ public class Arrow : MonoBehaviour
 	private Rigidbody rb;
 	private ulong shooterClientId;
 	[SerializeField] private bool isAuthority = false;
+
+	private List<ulong> clientsHit = new List<ulong>();
 
 	private void Awake()
 	{
@@ -119,9 +123,10 @@ public class Arrow : MonoBehaviour
 		ulong targetNetId = netObj.NetworkObjectId;
 		Vector3 hitPoint = initPlayerPos;
 
-		if (targetNetId == NetworkManager.Singleton.LocalClientId)
+		if (targetNetId == NetworkManager.Singleton.LocalClientId || clientsHit.Contains(targetNetId))
 			return;
 
+		clientsHit.Add(targetNetId);
 		HitServerRpc(targetNetId, arrowDamage, hitPoint);
 	}
 

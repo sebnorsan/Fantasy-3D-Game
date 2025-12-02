@@ -102,14 +102,14 @@ public class PlayerController : NetworkBehaviour
 			foreach (var a in GetComponentsInChildren<AudioListener>(true))
 				a.enabled = false;
 
-			//DisableIfExists<MovementEffects>();
-			//DisableIfExists<HandsSmooth>();
-			//DisableIfExists<HeadBob>();
-			//DisableIfExists<InteractionHandler>();
 			//DisableIfExists<BowScript>();
-			//DisableIfExists<HandsHolder>();
-			//DisableIfExists<EventAudioPlayer>();
-			//DisableIfExists<CameraShaker>();
+			DisableIfExists<MovementEffects>();
+			DisableIfExists<HandsSmooth>();
+			DisableIfExists<HeadBob>();
+			DisableIfExists<InteractionHandler>();
+			DisableIfExists<HandsHolder>();
+			DisableIfExists<EventAudioPlayer>();
+			DisableIfExists<CameraShaker>();
 		}
 		else
 			TeleportToSpawnpoint();
@@ -117,7 +117,7 @@ public class PlayerController : NetworkBehaviour
 	private void TeleportToSpawnpoint()
 	{
 		if (IsSpawned && characterController && EventManager.instance != null)
-			EventManager.instance.TeleportPlayer(this, spawnPos);
+			EventManager.instance.TeleportPlayer(this, spawnPos + new Vector3(0,1.5f,0));
 		else
 			Invoke(nameof(TeleportToSpawnpoint), .1f);
 	}
