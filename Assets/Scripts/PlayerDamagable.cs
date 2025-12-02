@@ -117,7 +117,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		DamageEffects(hitPoint);
 
 		if (IsOwner)
-			CameraShaker.Instance.ShakeOnce(12f, 6f, .1f, 1f);
+			CameraShaker.Instance.ShakeOnce(7f, 3f, .1f, 1f);
 	}
 	public void DamageEffects(Vector3 hitPoint)
 	{
