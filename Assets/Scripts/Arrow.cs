@@ -26,6 +26,8 @@ public class Arrow : MonoBehaviour
 
 	private List<ulong> clientsHit = new List<ulong>();
 
+	private BowNetCode bowNetCode;
+
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody>();
@@ -41,10 +43,12 @@ public class Arrow : MonoBehaviour
 		Vector3 shootDir,
 		Vector3 shooterPos,
 		ulong clientShooting,
-		bool isAuthority
+		bool isAuthority,
+		BowNetCode localNetCode = null
 	)
 	{
 		this.isAuthority = isAuthority;
+		bowNetCode = localNetCode;
 
 		shooterClientId = clientShooting;
 
@@ -127,17 +131,9 @@ public class Arrow : MonoBehaviour
 			return;
 
 		clientsHit.Add(targetNetId);
-		HitServerRpc(targetNetId, arrowDamage, hitPoint);
+		bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint);
 	}
 
-	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-	void HitServerRpc(ulong targetNetId, int amount, Vector3 hitPoint)
-	{
-		Debug.Log(NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetNetId] + "Has been hit");
-
-		var target = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetNetId];
-		if (target.TryGetComponent<PlayerDamagable>(out var dmg))
-			dmg.TakeDamage(amount, hitPoint);
-	}
+	
 
 }
