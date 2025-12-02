@@ -92,8 +92,8 @@ public class EnemySpawnerManager : NetworkBehaviour
 		// music off on all clients
 		SetBattleMusicStateClientRpc(false);
 
-		if (_currentWave >= 0 && _currentWave < actionAfterWave.Length)
-			DialogueManager.instance.SetActive(actionAfterWave[_currentWave], true);
+		//if (_currentWave >= 0 && _currentWave < actionAfterWave.Length)
+		//	DialogueManager.instance.SetActive(actionAfterWave[_currentWave], true);
 
 		if (_spawnRoutine != null)
 			StopCoroutine(_spawnRoutine);

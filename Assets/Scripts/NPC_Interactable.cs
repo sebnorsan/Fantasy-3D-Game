@@ -129,14 +129,14 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 	{
 		if (prevDialogue != null)
 		{
-			DoDialogueActions(prevDialogue);
+			//DoDialogueActions(prevDialogue);
 			//if (!prevDialogue.dialogueEvent_OnStart)
 			//	ApplyDialogueEvent(prevDialogue);
 		}
 
 		if (currentlyPlayingAudio != null)
 		{
-			EventManager.instance.StopThisSound(currentlyPlayingAudio);
+			AudioManagement.instance.StopThisSound(currentlyPlayingAudio);
 			currentlyPlayingAudio = null;
 		}
 
@@ -155,7 +155,7 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 
 		if (nextDialogue.npcVoiceLine.audioToPlay != null)
 		{
-			EventManager.instance.PlayThisSound(nextDialogue.npcVoiceLine);
+			AudioManagement.instance.PlayThisSound(nextDialogue.npcVoiceLine);
 			currentlyPlayingAudio = nextDialogue.npcVoiceLine.audioToPlay;
 		}
 
@@ -192,24 +192,24 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 	}
 
 
-	private void DoDialogueActions(ScriptableObject_NPC_Dialogue dlg)
-	{
-		foreach (var a in dlg.actions)
-		{
-			switch (a.actionType)
-			{
-				case DialogueAction.ActionType.EnableObject:
-					DialogueManager.instance.SetActive(a.targetID, true);
-					break;
-				case DialogueAction.ActionType.DisableObject:
-					DialogueManager.instance.SetActive(a.targetID, false);
-					break;
-				case DialogueAction.ActionType.FinishQuest:
-					GetComponent<QuestObject>().FinishQuest();
-					break;
-			}
-		}
-	}
+	//private void DoDialogueActions(ScriptableObject_NPC_Dialogue dlg)
+	//{
+	//	foreach (var a in dlg.actions)
+	//	{
+	//		switch (a.actionType)
+	//		{
+	//			case DialogueAction.ActionType.EnableObject:
+	//				DialogueManager.instance.SetActive(a.targetID, true);
+	//				break;
+	//			case DialogueAction.ActionType.DisableObject:
+	//				DialogueManager.instance.SetActive(a.targetID, false);
+	//				break;
+	//			case DialogueAction.ActionType.FinishQuest:
+	//				GetComponent<QuestObject>().FinishQuest();
+	//				break;
+	//		}
+	//	}
+	//}
 
 	// ---------------- KING DIALOGUE (name-based) ----------------
 	public void KingDialogue(ScriptableObject_NPC_Dialogue d)
@@ -254,8 +254,8 @@ public class NPC_Interactable : NetworkBehaviour, IInteractable
 		if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer)
 			yield break;
 
-		var quest = GetComponent<QuestObject>();
-		if (quest != null) quest.SetQuest();
+		//var quest = GetComponent<QuestObject>();
+		//if (quest != null) quest.SetQuest();
 
 		// ensure final state is still correct
 		currentDialogueId.Value = dialogueId;

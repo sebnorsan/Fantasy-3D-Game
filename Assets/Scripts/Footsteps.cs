@@ -52,8 +52,7 @@ public class Footsteps : MonoBehaviour
 			a.audioVolume = 1f;
 			a.maxDistance = 500f;
 
-			EventManager.instance.PlayThisSound(a);
-			EventManager.instance.RandomizePitchOnSound(audio, .9f, 1.1f);
+			AudioManagement.instance.PlayThisSound(a, true, .9f, 1.1f);
 		}
 	}
 

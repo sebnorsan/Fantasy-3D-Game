@@ -141,7 +141,7 @@ public class CrystalScript : NetworkBehaviour
 		if (audio != null)
 		{
 			audio.Play();
-			EventManager.instance.RandomizePitchOnSound(audio.clip, .6f, .9f);
+			//EventManager.instance.RandomizePitchOnSound(audio.clip, .6f, .9f);
 		}
 
 		var anim = GetComponent<Animator>();

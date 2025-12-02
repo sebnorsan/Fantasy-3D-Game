@@ -5,10 +5,10 @@ public class EventAudioPlayer : MonoBehaviour
     [SerializeField] private AudioToPlay[] audios;
     public void PlayAudio(int i)
     {
-        EventManager.instance.PlayThisSound(audios[i]);
+        AudioManagement.instance.PlayThisSound(audios[i]);
     }
     public void StopAudio(int i)
     {
-        EventManager.instance.StopThisSound(audios[i].audioToPlay);
+		AudioManagement.instance.StopThisSound(audios[i].audioToPlay);
     }
 }

@@ -139,51 +139,51 @@ public class Arrow : NetworkBehaviour
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
-		if (collision.gameObject.CompareTag("Tree"))
-		{
-			if (!cutTrees) return;
+		//if (collision.gameObject.CompareTag("Tree"))
+		//{
+		//	if (!cutTrees) return;
 
-			if (collision.gameObject.TryGetComponent<KillableObject>(out var killable))
-				killable.TakeDamage(arrowDamage, initPlayerPos);
+		//	if (collision.gameObject.TryGetComponent<KillableObject>(out var killable))
+		//		killable.TakeDamage(arrowDamage, initPlayerPos);
 
-			NetworkObject.Despawn(true);
-			return;
-		}
+		//	NetworkObject.Despawn(true);
+		//	return;
+		//}
 
-		var bigGuy = collision.gameObject.GetComponentInParent<BigguyDamagable>();
+		//var bigGuy = collision.gameObject.GetComponentInParent<BigguyDamagable>();
 
-		if (bigGuy)
-		{
-			bigGuy.TakeDamage(transform, arrowDamage);
-			NetworkObject.Despawn(true);
-			return;
-		}
+		//if (bigGuy)
+		//{
+		//	bigGuy.TakeDamage(transform, arrowDamage);
+		//	NetworkObject.Despawn(true);
+		//	return;
+		//}
 
-		if (collision.gameObject.TryGetComponent<IDamagable>(out var component))
-		{
-			if (collision.gameObject.TryGetComponent<AbstractEnemy>(out var enem))
-			{
-				foreach (var effect in arrowEffect)
-				{
-					switch (effect)
-					{
-						case ArrowEffect.Fire: enem.FireEffect(); break;
-						case ArrowEffect.Ice: enem.IceEffect(); break;
-						case ArrowEffect.Lightning: HandleLightningChain(collision.transform); break;
-						case ArrowEffect.Bomb:
-							PlayExplosionClientRpc(transform.position, transform.rotation);
-							break;
-					}
-				}
-			}
+		//if (collision.gameObject.TryGetComponent<IDamagable>(out var component))
+		//{
+		//	if (collision.gameObject.TryGetComponent<AbstractEnemy>(out var enem))
+		//	{
+		//		foreach (var effect in arrowEffect)
+		//		{
+		//			switch (effect)
+		//			{
+		//				case ArrowEffect.Fire: enem.FireEffect(); break;
+		//				case ArrowEffect.Ice: enem.IceEffect(); break;
+		//				case ArrowEffect.Lightning: HandleLightningChain(collision.transform); break;
+		//				case ArrowEffect.Bomb:
+		//					PlayExplosionClientRpc(transform.position, transform.rotation);
+		//					break;
+		//			}
+		//		}
+		//	}
 
-			//component.DamageEffects(initPlayerPos);
-			component.TakeDamage(arrowDamage, initPlayerPos);
-		}
+		//	//component.DamageEffects(initPlayerPos);
+		//	component.TakeDamage(arrowDamage, initPlayerPos);
+		//}
 
-		// if it hit *anything* meaningful and isn't chaining lightning, kill it
-		//if (lightningTarget == null)
-		//	if (IsSpawned) NetworkObject.Despawn(true);
+		//// if it hit *anything* meaningful and isn't chaining lightning, kill it
+		////if (lightningTarget == null)
+		////	if (IsSpawned) NetworkObject.Despawn(true);
 	}
 
 	[ClientRpc]

@@ -149,12 +149,12 @@ public class KillableObject : NetworkBehaviour, IDamagable
 	{
 		if (bigguy) return;
 
-		if (TryGetComponent(out QuestObject quester))
-			if (NetworkManager.Singleton.IsServer)
-			{
-				quester.FinishQuest();
-				quester.AddXpClientRpc(xpGain);
-			}
+		//if (TryGetComponent(out QuestObject quester))
+		//	if (NetworkManager.Singleton.IsServer)
+		//	{
+		//		quester.FinishQuest();
+		//		quester.AddXpClientRpc(xpGain);
+		//	}
 
 		DieEffectsClientRpc();
 
@@ -178,9 +178,5 @@ public class KillableObject : NetworkBehaviour, IDamagable
 	public override void OnNetworkDespawn()
 	{
 		currentHealth.OnValueChanged -= OnHealthChanged;
-
-		if (IsServer && gameObject.CompareTag("Tree"))
-			if (FindFirstObjectByType<QuestObjectCounterTrees>())
-				FindFirstObjectByType<QuestObjectCounterTrees>().RemoveCount();
 	}
 }
