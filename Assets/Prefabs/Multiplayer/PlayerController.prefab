@@ -803,6 +803,8 @@ MeshRenderer:
   - {fileID: 1325080530704350514, guid: 89f02830a3294db41846a8d9fdbc2e4f, type: 3}
   - {fileID: -7027795390989401427, guid: 89f02830a3294db41846a8d9fdbc2e4f, type: 3}
   - {fileID: -4255798285696512132, guid: 89f02830a3294db41846a8d9fdbc2e4f, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -994,6 +996,8 @@ LineRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1220,6 +1224,8 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1564,6 +1570,8 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 575c7a17a71847a4f8a2aada8f34fbd8, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1865,8 +1873,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   gfx: {fileID: 8827951681074446768}
   textUsername: {fileID: 7283792964927178359}
-  maxForwardTilt: 12
-  maxSideTilt: 8
+  maxForwardTilt: 50
+  maxSideTilt: 40
   tiltSpeed: 10
 --- !u!114 &-4300034968420110970
 MonoBehaviour:
@@ -2000,6 +2008,8 @@ MeshRenderer:
   - {fileID: -2267990058227477169, guid: 89f02830a3294db41846a8d9fdbc2e4f, type: 3}
   - {fileID: -7027795390989401427, guid: 89f02830a3294db41846a8d9fdbc2e4f, type: 3}
   - {fileID: 1325080530704350514, guid: 89f02830a3294db41846a8d9fdbc2e4f, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
