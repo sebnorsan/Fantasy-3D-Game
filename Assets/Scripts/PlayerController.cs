@@ -147,6 +147,9 @@ public class PlayerController : NetworkBehaviour
 			overrideDev = true;
 
 		Debug.Log($"Player {OwnerClientId} start at {transform.position}");
+
+		if (IsOwner)
+			characterController.enabled = true;
 	}
 	public void ChangeFieldOfView(float newFov)
 	{
