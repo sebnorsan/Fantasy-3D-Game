@@ -1585,6 +1585,10 @@ MonoBehaviour:
   localPlayer: {fileID: 4808590262637696532}
   maxHealth: 10
   currentHealth: 10
+  deathTime: 6
+  deathCam: {fileID: 3697209131461708778, guid: ab6915eb62cd27142847f8cc4b7addc1, type: 3}
+  deathParticles: {fileID: 3548588485384254792, guid: 7fb0f6e51e8cdbe4e99603aa917a2d53, type: 3}
+  hitParticles: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
 --- !u!114 &994555372891957732
 MonoBehaviour:
   m_ObjectHideFlags: 0

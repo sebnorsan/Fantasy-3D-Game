@@ -131,7 +131,7 @@ public class Arrow : MonoBehaviour
 			return;
 
 		clientsHit.Add(targetNetId);
-		bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint);
+		bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint, shooterClientId);
 	}
 
 	

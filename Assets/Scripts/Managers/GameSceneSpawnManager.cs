@@ -91,7 +91,7 @@ public class GameSceneSpawnManager : NetworkBehaviour
 		Debug.Log($"Spawn {clientId} at {spawnPos}");
 	}
 
-	private Vector3 FindValidSpawnPoint()
+	public Vector3 FindValidSpawnPoint()
 	{
 		if (spawnArea == null)
 		{
