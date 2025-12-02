@@ -8,6 +8,8 @@ using EZCameraShake;
 public class PlayerDamagable : NetworkBehaviour, IDamagable
 {
 
+	[SerializeField] CameraShaker camShaker;
+
 	[SerializeField] private PlayerAnimator animator;
 	[SerializeField] private PlayerController localPlayer;
 
@@ -45,6 +47,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	private void Start()
 	{
+		ScreenSummoner.SummonScreen(Color.black, 1f, false);
+
 		flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
 
 		displayedHealth = currentHealth;
@@ -76,7 +80,6 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		currentHealth = Mathf.Max(0, currentHealth - amount);
 
 		UpdateHealthClientRpc(currentHealth);
-		ShakeCameraOwnerRpc();
 		DamageEffectsClientRpc(hitPoint);
 
 		if (currentHealth <= 0)
@@ -115,13 +118,11 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	private void DamageEffectsClientRpc(Vector3 hitPoint)
 	{
 		DamageEffects(hitPoint);
+
+		if (IsOwner)
+			camShaker.ShakeOnce(7f, 3f, .1f, .4f);
 	}
-	[Rpc(SendTo.Owner, InvokePermission = RpcInvokePermission.Server)]
-	private void ShakeCameraOwnerRpc()
-	{
-		// this runs ONLY on the owning client (host or normal client)
-		CameraShaker.Instance.ShakeOnce(7f, 3f, .1f, 1f);
-	}
+	
 	public void DamageEffects(Vector3 hitPoint)
 	{
 		//if (currKnockbackCoroutine != null)
@@ -219,12 +220,17 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 		EventManager.instance.TeleportPlayer(localPlayer, deathPosition);
 
-		yield return new WaitForSeconds(deathTime);
+		yield return new WaitForSeconds(deathTime-2);
+		ScreenSummoner.SummonScreen(Color.black, 1f, true);
+		yield return new WaitForSeconds(1);
+		ScreenSummoner.SummonScreen(Color.black, 1f, false);
 		Destroy(dCam);
 
 		EventManager.instance.TeleportPlayer(
 			localPlayer,
 			FindFirstObjectByType<GameSceneSpawnManager>().FindValidSpawnPoint());
+
+		
 	}
 
 	private IEnumerator DeathFlowServer()
