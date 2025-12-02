@@ -1306,6 +1306,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5219615711813225076}
   - component: {fileID: 4702842973208242300}
+  - component: {fileID: 6778015122654442836}
   - component: {fileID: 6262575431432307872}
   - component: {fileID: 4808590262637696532}
   - component: {fileID: 8668623681890277092}
@@ -1314,7 +1315,7 @@ GameObject:
   - component: {fileID: 515831196404787215}
   - component: {fileID: 6813694573278187587}
   - component: {fileID: 994555372891957732}
-  - component: {fileID: 6778015122654442836}
+  - component: {fileID: 147051769140427139}
   m_Layer: 3
   m_Name: PlayerController
   m_TagString: GameController
@@ -1365,6 +1366,29 @@ CharacterController:
   m_StepOffset: 1.08
   m_SkinWidth: 0.05
   m_MinMoveDistance: 0
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!136 &6778015122654442836
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7758727492805073096}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.21
+  m_Height: 1.6
+  m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6262575431432307872
 MonoBehaviour:
@@ -1576,30 +1600,23 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   firstPersonAnim: {fileID: 0}
   thirdPersonAnim: {fileID: 0}
-  gfx: {fileID: 8827951681074446768}
---- !u!136 &6778015122654442836
-CapsuleCollider:
+--- !u!114 &147051769140427139
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7758727492805073096}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.21
-  m_Height: 1.6
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53ae7ab21de15654fa7e46301f23a2fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  gfx: {fileID: 8827951681074446768}
+  maxForwardTilt: 12
+  maxSideTilt: 8
+  tiltSpeed: 10
 --- !u!1 &7973304527205840717
 GameObject:
   m_ObjectHideFlags: 0
@@ -1762,7 +1779,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3562491346119374754}
-  - component: {fileID: 8931343434356406464}
   m_Layer: 3
   m_Name: GFX
   m_TagString: Untagged
@@ -1786,21 +1802,6 @@ Transform:
   - {fileID: 8130206500709271075}
   m_Father: {fileID: 5219615711813225076}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8931343434356406464
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8827951681074446768}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53ae7ab21de15654fa7e46301f23a2fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxForwardTilt: 12
-  maxSideTilt: 8
-  tiltSpeed: 10
 --- !u!1 &8958351093931936041
 GameObject:
   m_ObjectHideFlags: 0

@@ -116,7 +116,7 @@ public class PlayerController : NetworkBehaviour
 	}
 	private void TeleportToSpawnpoint()
 	{
-		if (IsSpawned && characterController)
+		if (IsSpawned && characterController && EventManager.instance != null)
 			EventManager.instance.TeleportPlayer(this, spawnPos);
 		else
 			Invoke(nameof(TeleportToSpawnpoint), .1f);
