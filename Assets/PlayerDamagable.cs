@@ -111,7 +111,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	private void DieServer()
 	{
 		DieClientRpc();
-
+		SetDeadStateClientRpc();
 		StopAllCoroutines();
 
 		localPlayer.canMove = false;
@@ -122,6 +122,19 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		//else
 		//	Destroy(gameObject);
 	}
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void SetDeadStateClientRpc()
+	{
+		var pc = GetComponent<PlayerController>();
+		if (pc != null)
+			pc.canMove = false;
+
+		if (IsOwner)
+		{
+			// e.g. show death screen, disable bow input, etc.
+		}
+	}
+
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void DieClientRpc()
 	{
