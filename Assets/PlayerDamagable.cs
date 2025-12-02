@@ -61,12 +61,19 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
-
 		if (currentHealth == maxHealth) return;
 		currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
 
-		if (!localPlayer.canMove && currentHealth > 0)
-			localPlayer.canMove = true;
+		if (currentHealth > 0)
+			SetAliveStateClientRpc();
+	}
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void SetAliveStateClientRpc()
+	{
+		var pc = GetComponent<PlayerController>();
+		if (pc != null)
+			pc.canMove = true;
 	}
 
 	#region DamageEffects
@@ -150,9 +157,11 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 		StartCoroutine(DeathCamFlow(killerClientId));
 	}
-
+	
 	private IEnumerator DeathCamFlow(ulong killerClientId)
 	{
+		EventManager.instance.TeleportPlayer(localPlayer, deathPosition);
+
 		var dCam = Instantiate(
 			deathCam,
 			localPlayer.cam.transform.position,
@@ -166,18 +175,16 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 		yield return new WaitForSeconds(deathTime);
 		Destroy(dCam);
+
+		EventManager.instance.TeleportPlayer(
+			localPlayer,
+			FindFirstObjectByType<GameSceneSpawnManager>().FindValidSpawnPoint());
 	}
 
 	private IEnumerator DeathFlowServer()
 	{
-		EventManager.instance.TeleportPlayer(localPlayer, deathPosition);
-
 		yield return new WaitForSeconds(deathTime);
-
 		Heal(maxHealth); // still server-side
-		EventManager.instance.TeleportPlayer(
-			localPlayer,
-			FindFirstObjectByType<GameSceneSpawnManager>().FindValidSpawnPoint());
 	}
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
