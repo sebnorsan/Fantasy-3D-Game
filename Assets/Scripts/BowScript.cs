@@ -25,7 +25,11 @@ public class BowScript : MonoBehaviour
 		playerController = GetComponentInParent<PlayerController>();
 		if (!playerController) return;
 
-		if (!playerController.IsOwner) return;
+		if (!playerController.IsOwner)
+		{
+			GetComponent<Outline>().OutlineMode = Outline.Mode.OutlineVisible;
+			return;
+		}
 
 		hs = GetComponentInParent<HandsSmooth>();
 		anim = GetComponent<Animator>();

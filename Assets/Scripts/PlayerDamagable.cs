@@ -3,6 +3,7 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using EZCameraShake;
 
 public class PlayerDamagable : NetworkBehaviour, IDamagable
 {
@@ -114,6 +115,9 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	private void DamageEffectsClientRpc(Vector3 hitPoint)
 	{
 		DamageEffects(hitPoint);
+
+		if (IsOwner)
+			CameraShaker.Instance.ShakeOnce(4f, 2f, .1f, 1f);
 	}
 	public void DamageEffects(Vector3 hitPoint)
 	{
