@@ -7,15 +7,14 @@ public class NetworkTransformChild : NetworkBehaviour
 	[SerializeField] private List<Transform> targets = new();
 	[SerializeField] private float lerpSpeed = 10f;
 
-	private NetworkList<Quaternion> _rots;
+	// MUST be initialized here, not later
+	private NetworkList<Quaternion> _rots = new NetworkList<Quaternion>();
 
 	public override void OnNetworkSpawn()
 	{
-		// create a fresh list for this spawn
-		_rots = new NetworkList<Quaternion>();
-
 		if (IsOwner)
 		{
+			_rots.Clear();
 			for (int i = 0; i < targets.Count; i++)
 				_rots.Add(targets[i] ? targets[i].localRotation : Quaternion.identity);
 		}
@@ -23,21 +22,18 @@ public class NetworkTransformChild : NetworkBehaviour
 
 	public override void OnNetworkDespawn()
 	{
-		if (_rots != null)
-		{
-			_rots.Dispose();
-			_rots = null;
-		}
+		// don't Dispose, just clear
+		_rots.Clear();
 	}
 
 	private void Update()
 	{
-		if (!IsSpawned || _rots == null || targets.Count == 0)
+		if (!IsSpawned || targets.Count == 0 || _rots == null)
 			return;
 
 		if (IsOwner)
 		{
-			// keep sizes in sync
+			// keep list sized
 			while (_rots.Count < targets.Count)
 				_rots.Add(Quaternion.identity);
 			while (_rots.Count > targets.Count)
