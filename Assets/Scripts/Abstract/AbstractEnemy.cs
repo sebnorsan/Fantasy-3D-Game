@@ -342,7 +342,6 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 
 public interface IDamagable
 {
-	void TakeDamage(int amount, Vector3 hitPoint);
-	//void DamageEffects(Vector3 hitPoint);
-	void Heal(int amount);
+	public void TakeDamage(int amount, Vector3 hitPoint);
+	public void Heal(int amount);
 }

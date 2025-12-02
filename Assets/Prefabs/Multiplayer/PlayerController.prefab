@@ -292,6 +292,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxDistance: 30
+  sphereRadius: 0.2
+  ignoreLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  ignoreTags: []
+  interactionKeyAnimator: {fileID: 0}
   isTalking: 0
 --- !u!1 &1778696884442115976
 GameObject:
@@ -371,11 +377,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arrowDamage: 1
   arrowSpeed: 150
-  arrowEffect: 00000000
   arrowDrawSpeed: 1
   arrowSize: 1
-  lightningChain: 3
-  arrowCutsTrees: 0
   arrowFired: {fileID: 5657210549004271310, guid: d6446b95a8d411843a8b5b5ce19c79f3, type: 3}
   arrowTransform: {fileID: 1401572086649830073}
 --- !u!114 &6413132569534683115
@@ -1309,6 +1312,8 @@ GameObject:
   - component: {fileID: 8365578267376534845}
   - component: {fileID: 465981164401472135}
   - component: {fileID: 515831196404787215}
+  - component: {fileID: 6813694573278187587}
+  - component: {fileID: 994555372891957732}
   m_Layer: 3
   m_Name: PlayerController
   m_TagString: GameController
@@ -1536,7 +1541,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  localBowScript: {fileID: 1227791032311695380}
   arrowPrefab: {fileID: 5657210549004271310, guid: d6446b95a8d411843a8b5b5ce19c79f3, type: 3}
+--- !u!114 &6813694573278187587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7758727492805073096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64955f54254f33e4ca4f0183e1438dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  maxHealth: 100
+  animator: {fileID: 994555372891957732}
+--- !u!114 &994555372891957732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7758727492805073096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1de663ceaeca444e94939f1e7724702, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  firstPersonAnim: {fileID: 0}
+  thirdPersonAnim: {fileID: 0}
+  gfx: {fileID: 8827951681074446768}
 --- !u!1 &7973304527205840717
 GameObject:
   m_ObjectHideFlags: 0
@@ -1735,9 +1772,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53ae7ab21de15654fa7e46301f23a2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxForwardTilt: 10
+  maxForwardTilt: 12
   maxSideTilt: 8
-  tiltSpeed: 8
+  tiltSpeed: 10
 --- !u!1 &8958351093931936041
 GameObject:
   m_ObjectHideFlags: 0

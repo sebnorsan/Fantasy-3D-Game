@@ -1,24 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Unity.Netcode;
+﻿using Unity.Netcode;
 using UnityEngine;
 
 public class BowScript : MonoBehaviour
 {
 	public int arrowDamage = 1;
 	public float arrowSpeed = 30f;
-	public List<ArrowEffect> arrowEffect = new List<ArrowEffect>();
+
 	public float arrowDrawSpeed = 1f;
 	public float arrowSize = 1f;
-	public int lightningChain = 3;
-	public bool arrowCutsTrees = false;
 
 	[Space(75)]
 	private Animator anim;
 	private HandsSmooth hs;
 	private bool canShoot = true;
 
-	[SerializeField] private GameObject arrowFired;   // MUST be the NetworkObject arrow prefab
+	[SerializeField] private GameObject arrowFired;
 	[SerializeField] private Transform arrowTransform;
 
 	private PlayerController playerController;
@@ -42,7 +38,8 @@ public class BowScript : MonoBehaviour
 	private void Update()
 	{
 		if (!playerController || !playerController.IsOwner) return;
-		if (!canShoot) return;
+
+		if (!canShoot || !playerController.canMove) return;
 
 		if (Input.GetMouseButton(0)) LoadBow();
 		else UnLoadBow();
@@ -78,8 +75,6 @@ public class BowScript : MonoBehaviour
 	// Call this from your animation event at the moment the arrow should fire
 	public void InstantiateArrow()
 	{
-		Debug.Log("aaaaaa");
-
 		if (!playerController || !playerController.IsOwner) return;
 		if (!bowNetcode) return;
 
@@ -87,23 +82,26 @@ public class BowScript : MonoBehaviour
 		var cam = playerController.GetComponentInChildren<Camera>();
 		Vector3 shootDir = cam.transform.forward;
 
-		// send stats + fire request to server
-		int[] effects = arrowEffect.Select(e => (int)e).ToArray();
-
-		bowNetcode.SpawnArrowRequest(
-			arrowFired,
-			arrowTransform.position,
-			arrowTransform.rotation,
-			shootDir,
-			arrowDamage,
-			effects,
-			arrowSpeed,
-			arrowCutsTrees,
-			lightningChain,
-			arrowSize
-		);
+		SpawnArrow(arrowFired, arrowTransform.position, arrowTransform.rotation, shootDir, arrowDamage, arrowSpeed, arrowSize);
 	}
+	private void SpawnArrow(
+		GameObject go,
+		Vector3 pos,
+		Quaternion rot,
+		Vector3 shootDir,
+		int dmg,
+		float spd,
+		float size)
+	{
+		ulong shooterId = NetworkManager.Singleton.LocalClientId;
 
+		var arrowObj = Instantiate(go, pos, rot);
+		var arrow = arrowObj.GetComponent<Arrow>();
+
+		arrow.Initialize(dmg, spd, size, shootDir, playerController.transform.position, shooterId, true);
+
+		bowNetcode.SpawnArrowVisualServerRpc(pos, rot, shootDir, dmg, spd, size, shooterId);
+	}
 	public void AssignMiddleString() => GetComponentInChildren<BowStringRend>().AssignMid();
 	public void UnAssignMiddleString() => GetComponentInChildren<BowStringRend>().UnAssignMid();
 }

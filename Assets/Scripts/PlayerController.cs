@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using EvolveGames;
+using EZCameraShake;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -78,6 +80,34 @@ public class PlayerController : NetworkBehaviour
 	//private bool sliding = false;
 	float runningFovMultiplier;
 	private Footsteps footsteps;
+	public ulong MyId => NetworkObject.OwnerClientId;
+
+	public override void OnNetworkSpawn()
+	{
+		if (!IsOwner)
+		{
+			foreach (var c in GetComponentsInChildren<Camera>(true))
+				c.enabled = false;
+
+			foreach (var a in GetComponentsInChildren<AudioListener>(true))
+				a.enabled = false;
+
+			//DisableIfExists<MovementEffects>();
+			//DisableIfExists<HandsSmooth>();
+			//DisableIfExists<HeadBob>();
+			//DisableIfExists<InteractionHandler>();
+			//DisableIfExists<BowScript>();
+			//DisableIfExists<HandsHolder>();
+			//DisableIfExists<EventAudioPlayer>();
+			//DisableIfExists<CameraShaker>();
+		}
+	}
+	private void DisableIfExists<T>() where T : Behaviour
+	{
+		var comps = GetComponentsInChildren<T>(true);
+		foreach (var comp in comps)
+			comp.enabled = false;
+	}
 	private void Awake()
 	{
 		cam = GetComponentInChildren<Camera>();

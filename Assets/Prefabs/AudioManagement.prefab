@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7672494942044888320
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6618374781039601739}
+  - component: {fileID: 1003786125968826249}
+  m_Layer: 0
+  m_Name: AudioManagement
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6618374781039601739
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7672494942044888320}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1003786125968826249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7672494942044888320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c02a42d0115f08b47bc75204a87b7b29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSourceTemplate: {fileID: 4507143242590177643, guid: aeba320fe8e7ddf4ca7e9910cc65f504, type: 3}
+  subtitleTemplate: {fileID: 901854775799315975, guid: 1da9e54e41de2d649b8aefaf468aa12d, type: 3}
+  audioLibraries:
+  - libName: Movement
+    audios:
+    - audioName: Slide
+      loop: 0
+      audioToPlay: {fileID: 8300000, guid: 8fe737a67df49ed45b8410079e9fccd5, type: 3}
+      audioVolume: 1
+      spatialBlend: 0
+      minDistance: 0
+      maxDistance: 500
+      subtitlesEnabled: 0
+      subtitles: []
