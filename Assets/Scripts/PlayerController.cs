@@ -18,6 +18,10 @@ public class PlayerController : NetworkBehaviour
 	[Range(0.5f, 10)] public float lookSpeed = 2.0f;
 	[Range(10, 120)] public float lookXLimit = 80.0f;
 
+	[Header("Knockback")]
+	[SerializeField] private float knockbackDecay = 5f;
+	private Vector3 knockbackVelocity = Vector3.zero;
+
 	[Header("Advanced")]
 	[SerializeField] float runningFOV = 65.0f;
 	[SerializeField] float fovTransitionSpeed = 4.0f;
@@ -378,12 +382,18 @@ public class PlayerController : NetworkBehaviour
 			runningValue = walkingSpeed;
 
 		Vector3 desiredMove = (transform.TransformDirection(Vector3.forward) * inputVertical) +
-							  (transform.TransformDirection(Vector3.right) * inputHorizontal);
+					  (transform.TransformDirection(Vector3.right) * inputHorizontal);
 		if (desiredMove.sqrMagnitude > 1f) desiredMove.Normalize();
 
 		float verticalSpeed = moveDirection.y;
-		moveDirection = desiredMove * baseSpeed;
-		moveDirection.y = verticalSpeed;
+
+		// add knockback on top of input
+		Vector3 horizontalMove = desiredMove * baseSpeed + knockbackVelocity;
+		moveDirection = new Vector3(horizontalMove.x, verticalSpeed, horizontalMove.z);
+
+		// decay knockback
+		knockbackVelocity = Vector3.Lerp(knockbackVelocity, Vector3.zero, knockbackDecay * Time.deltaTime);
+
 
 
 
@@ -493,6 +503,13 @@ public class PlayerController : NetworkBehaviour
 			evt.CallEvent();
 		}
 	}
+
+	public void AddKnockback(Vector3 force)
+	{
+		if (!IsOwner) return;
+		knockbackVelocity += force;
+	}
+
 
 	void OnDrawGizmos()
 	{

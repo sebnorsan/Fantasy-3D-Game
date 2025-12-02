@@ -34,6 +34,11 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	[SerializeField] private Slider healthSlider;
 	[SerializeField] private float sliderLerpSpeed = 10f;
 
+	[Space(15)]
+
+	[Header("Knockback")]
+	[SerializeField] private float knockbackStrength = 10f;
+
 	private float displayedHealth;
 
 	private Coroutine currFlashCoroutine;
@@ -75,12 +80,18 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
-		Debug.Log("i hit a player");
-
 		currentHealth = Mathf.Max(0, currentHealth - amount);
 
 		UpdateHealthClientRpc(currentHealth);
 		DamageEffectsClientRpc(hitPoint);
+
+		Vector3 dir = (transform.position - hitPoint);
+		dir.y = 0f;
+		if (dir.sqrMagnitude > 0.001f)
+		{
+			dir.Normalize();
+			ApplyKnockbackOwnerRpc(dir * knockbackStrength);
+		}
 
 		if (currentHealth <= 0)
 			DieServer();
@@ -179,6 +190,17 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	{
 		currentHealth = newHealth;
 	}
+
+	#endregion
+	#region Knockback
+
+	[Rpc(SendTo.Owner, InvokePermission = RpcInvokePermission.Server)]
+	private void ApplyKnockbackOwnerRpc(Vector3 force)
+	{
+		if (localPlayer != null)
+			localPlayer.AddKnockback(force);
+	}
+
 
 	#endregion
 	#region Dying

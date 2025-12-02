@@ -84,43 +84,4 @@ public class EventManager : MonoBehaviour
 
 		player.moveDirection = Vector3.zero;
 	}
-
-	#region UI-Events
-
-	[SerializeField] private GameObject screenSummon;
-
-	public void SummonScreen(Color screenColor, float lerpTime, bool transToFilled)
-	{
-		StartCoroutine(SummonScreenNumerator(screenColor, lerpTime, transToFilled));
-	}
-
-	private IEnumerator SummonScreenNumerator(Color screenColor, float lerpTime, bool transToFilled)
-	{
-		GameObject temp = Instantiate(screenSummon);
-		Image img = temp.GetComponentInChildren<Image>();
-
-		float startAlpha = transToFilled ? 0f : 1f;
-		float endAlpha = transToFilled ? 1f : 0f;
-
-		float timeElapsed = 0f;
-
-		while (timeElapsed < lerpTime)
-		{
-			timeElapsed += Time.deltaTime;
-			float t = timeElapsed / lerpTime;
-
-			float currentAlpha = Mathf.Lerp(startAlpha, endAlpha, t);
-			img.color = new Color(screenColor.r, screenColor.g, screenColor.b, currentAlpha);
-
-			yield return null;
-		}
-
-		img.color = new Color(screenColor.r, screenColor.g, screenColor.b, endAlpha);
-
-		if (!transToFilled)
-			Destroy(temp);
-	}
-
-
-	#endregion
 }
