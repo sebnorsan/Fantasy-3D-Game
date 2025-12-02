@@ -1,19 +1,22 @@
+using Unity.Netcode;
 using UnityEngine;
 
-[ExecuteAlways] // makes it update in Edit mode as well
 public class Billboard : MonoBehaviour
 {
-	[Tooltip("If left empty, will default to Camera.main")]
-	public Transform target;
+	private Transform target;
 
 	[Tooltip("If true, will only rotate around Y (for UI that should stay upright)")]
 	public bool lockRotationToY = true;
 
+	private void Start()
+	{
+		target = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform;
+	}
 	private void LateUpdate()
 	{
 		// Find the camera if nothing’s assigned
-		if (target == null && Camera.main != null)
-			target = Camera.main.transform;
+		if (target == null)
+			target = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject.transform;
 
 		if (target == null)
 			return;

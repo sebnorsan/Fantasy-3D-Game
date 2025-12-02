@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerDamagable : NetworkBehaviour, IDamagable
 {
@@ -24,6 +25,14 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	[SerializeField] private GameObject deathParticles;
 	[SerializeField] private GameObject hitParticles;
 
+	[Space(15)]
+
+	[Header("Health UI")]
+	[SerializeField] private Slider healthSlider;
+	[SerializeField] private float sliderLerpSpeed = 10f;
+
+	private float displayedHealth;
+
 	private Coroutine currFlashCoroutine;
 
 	private Material flashMaterial;
@@ -36,6 +45,25 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	private void Start()
 	{
 		flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
+
+		displayedHealth = currentHealth;
+		if (healthSlider != null)
+		{
+			healthSlider.maxValue = maxHealth;
+			healthSlider.value = currentHealth;
+		}
+	}
+	private void Update()
+	{
+		if (healthSlider == null) return;
+
+		displayedHealth = Mathf.Lerp(
+			displayedHealth,
+			currentHealth,
+			Time.deltaTime * sliderLerpSpeed
+		);
+
+		healthSlider.value = displayedHealth;
 	}
 
 	public void TakeDamage(int amount, Vector3 hitPoint)
@@ -45,6 +73,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		Debug.Log("i hit a player");
 
 		currentHealth = Mathf.Max(0, currentHealth - amount);
+
+		UpdateHealthClientRpc(currentHealth);
 
 		DamageEffectsClientRpc(hitPoint);
 
@@ -63,6 +93,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 		if (currentHealth == maxHealth) return;
 		currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
+
+		UpdateHealthClientRpc(currentHealth);
 
 		if (currentHealth > 0)
 			SetAliveStateClientRpc();
@@ -133,6 +165,13 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 		currFlashCoroutine = null;
 	}
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void UpdateHealthClientRpc(int newHealth)
+	{
+		currentHealth = newHealth;
+	}
+
 	#endregion
 	#region Dying
 	private void DieServer()
@@ -160,8 +199,6 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	
 	private IEnumerator DeathCamFlow(ulong killerClientId)
 	{
-		EventManager.instance.TeleportPlayer(localPlayer, deathPosition);
-
 		var dCam = Instantiate(
 			deathCam,
 			localPlayer.cam.transform.position,
@@ -172,6 +209,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 			var killerPc = killerCc.PlayerObject.GetComponent<PlayerController>();
 			dCam.GetComponent<DeathCam>().playerWhoKilled = killerPc;
 		}
+
+		EventManager.instance.TeleportPlayer(localPlayer, deathPosition);
 
 		yield return new WaitForSeconds(deathTime);
 		Destroy(dCam);
