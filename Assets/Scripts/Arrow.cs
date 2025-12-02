@@ -20,7 +20,7 @@ public class Arrow : MonoBehaviour
 	private Vector3 velocity;
 	private Rigidbody rb;
 	private ulong shooterClientId;
-	private bool isAuthority;
+	[SerializeField] private bool isAuthority = false;
 
 	private void Awake()
 	{
