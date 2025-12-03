@@ -17,6 +17,8 @@ public class PlayerAnimator : NetworkBehaviour
 
 	private BowScript localBowScript;
 
+	private bool jumpBuffer = false;
+
 	private void Start()
 	{
 		localBowScript = localPlayer.GetComponentInChildren<BowScript>();
@@ -43,6 +45,8 @@ public class PlayerAnimator : NetworkBehaviour
 
 	private void CheckForInAir()
 	{
+		if (jumpBuffer) return;
+
 		if (multiplayerCharacterAnim.GetBool("InAir"))
 			if (localPlayer.isGrounded)
 			{
@@ -79,14 +83,18 @@ public class PlayerAnimator : NetworkBehaviour
 	{
 		multiplayerCharacterAnim.SetBool("Walking", localPlayer.Moving);
 	}
+	private float bufferTimer = .4f;
 	public void A_Jump() 
 	{
+		jumpBuffer = true;
+		Invoke(nameof(ResetJumpBuffer), bufferTimer);
 
 		multiplayerCharacterAnim.ResetTrigger("Jump");
 		multiplayerCharacterAnim.SetTrigger("Jump");
 
 		SetInAir(true);
 	}
+	private void ResetJumpBuffer() => jumpBuffer = false;
 	public void A_Land()
 	{
 		multiplayerCharacterAnim.ResetTrigger("Land");
