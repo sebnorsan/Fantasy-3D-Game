@@ -99,6 +99,15 @@ public class PlayerAnimator : NetworkBehaviour
 	private void ResetJumpBuffer() => jumpBuffer = false;
 	public void A_Land()
 	{
+		if (landBuffer)
+		{
+			SetInAir(false);
+
+			ResetLandingBuffer();
+
+			return;
+		}
+
 		if (!multiplayerCharacterAnim.GetBool("InAir")) return;
 
 		multiplayerCharacterAnim.ResetTrigger("Land");
@@ -107,8 +116,16 @@ public class PlayerAnimator : NetworkBehaviour
 		SetInAir(false);
 	}
 
+	private bool landBuffer = false;
 	public void SetInAir(bool b)
 	{
+		if (b)
+		{
+			landBuffer = true;
+			Invoke(nameof(ResetLandingBuffer), .1f);
+		}
+
 		multiplayerCharacterAnim.SetBool("InAir", b);
 	}
+	private void ResetLandingBuffer() => landBuffer = false;
 }
