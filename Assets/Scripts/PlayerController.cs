@@ -23,6 +23,9 @@ public class PlayerController : NetworkBehaviour
 	[SerializeField] private float knockbackDecay = 5f;
 	private Vector3 knockbackVelocity = Vector3.zero;
 
+	[Header("Air detection")]
+	[SerializeField] private float minAirGap = 0.4f; // how far below feet before we consider it a real "in air"
+
 	[Header("Advanced")]
 	[SerializeField] float runningFOV = 65.0f;
 	[SerializeField] float fovTransitionSpeed = 4.0f;
@@ -174,11 +177,27 @@ public class PlayerController : NetworkBehaviour
 
 	private void init_LeavingGrounded()
 	{
+		// Only treat this as a "real" leave-ground if there's no ground within minAirGap below us.
+		int groundMask = LayerMask.GetMask("Ground", "MovingPlatform", "OtherGameController");
+
+		// Start ray a tiny bit above groundCheck to avoid starting inside colliders.
+		Vector3 rayOrigin = groundCheck.position + Vector3.up * 0.05f;
+		float rayDistance = checkRadius + minAirGap;
+
+		if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, rayDistance, groundMask))
+		{
+			// There's still ground close below → it's probably just a slope / small step.
+			// Don't trigger SetInAir / jump animation.
+			return;
+		}
+
+		// Now we know we're actually "falling"
 		initFall = transform.position;
 		lastLeftGroundTime = Time.time;
 
-		playerAnimator.A_Jump();
+		playerAnimator.A_Jump();   // or SetInAir(), whatever you call here
 	}
+
 
 	private void init_EnteringGrounded()
 	{

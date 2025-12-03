@@ -99,6 +99,8 @@ public class PlayerAnimator : NetworkBehaviour
 	private void ResetJumpBuffer() => jumpBuffer = false;
 	public void A_Land()
 	{
+		if (!multiplayerCharacterAnim.GetBool("InAir")) return;
+
 		multiplayerCharacterAnim.ResetTrigger("Land");
 		multiplayerCharacterAnim.SetTrigger("Land");
 
