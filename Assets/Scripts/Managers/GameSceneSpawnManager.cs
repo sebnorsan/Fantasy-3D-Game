@@ -88,7 +88,6 @@ public class GameSceneSpawnManager : NetworkBehaviour
 
 		usedSpawnPoints.Add(spawnPos);
 
-		Debug.Log($"Spawn {clientId} at {spawnPos}");
 	}
 
 	public Vector3 FindValidSpawnPoint()

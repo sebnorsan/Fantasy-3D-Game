@@ -154,7 +154,6 @@ public class PlayerController : NetworkBehaviour
 		if (Application.isEditor)
 			overrideDev = true;
 
-		Debug.Log($"Player {OwnerClientId} start at {transform.position}");
 
 		if (IsOwner)
 			characterController.enabled = true;

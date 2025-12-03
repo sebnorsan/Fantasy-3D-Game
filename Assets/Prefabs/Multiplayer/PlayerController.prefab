@@ -3332,6 +3332,7 @@ MonoBehaviour:
   lookSpeed: 2
   lookXLimit: 80
   knockbackDecay: 5
+  minAirGap: 0.05
   runningFOV: 105
   fovTransitionSpeed: 4
   crouchHeight: 1.0692
