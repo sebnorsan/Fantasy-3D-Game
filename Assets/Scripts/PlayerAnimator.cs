@@ -65,8 +65,7 @@ public class PlayerAnimator : NetworkBehaviour
 	}
 	public void A_WalkingChecker()
 	{
-		if (localPlayer.Moving)
-			multiplayerCharacterAnim.SetBool("Walking", true);
+		multiplayerCharacterAnim.SetBool("Walking", localPlayer.Moving);
 	}
 	public void A_Jump() 
 	{

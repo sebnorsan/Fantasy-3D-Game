@@ -115,6 +115,4 @@ public class BowScript : MonoBehaviour
 
 		bowNetcode.SpawnArrowVisualServerRpc(pos, rot, shootDir, dmg, spd, size, shooterId);
 	}
-	public void AssignMiddleString() => GetComponentInChildren<BowStringRend>().AssignMid();
-	public void UnAssignMiddleString() => GetComponentInChildren<BowStringRend>().UnAssignMid();
 }

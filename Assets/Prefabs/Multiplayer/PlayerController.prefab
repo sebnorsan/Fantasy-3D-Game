@@ -748,6 +748,7 @@ GameObject:
   - component: {fileID: 1227791032311695380}
   - component: {fileID: 6413132569534683115}
   - component: {fileID: 6784330846622331597}
+  - component: {fileID: 1117162942100770194}
   m_Layer: 0
   m_Name: Bow
   m_TagString: Untagged
@@ -874,6 +875,18 @@ MonoBehaviour:
     maxDistance: 500
     subtitlesEnabled: 0
     subtitles: []
+--- !u!114 &1117162942100770194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778696884442115976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6120ea733eea04b9c5917dd59dfa4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1825410108401040611
 GameObject:
   m_ObjectHideFlags: 0
@@ -2762,6 +2775,7 @@ GameObject:
   - component: {fileID: 7790377399799966768}
   - component: {fileID: 5992513773659047312}
   - component: {fileID: 1580953526540048981}
+  - component: {fileID: 1675141792546304797}
   m_Layer: 0
   m_Name: ThirdPersonBow
   m_TagString: Untagged
@@ -2874,6 +2888,18 @@ MonoBehaviour:
     TriggerNameHash: -1316629574
     TransitionIndex: 0
   m_Animator: {fileID: 7790377399799966768}
+--- !u!114 &1675141792546304797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6461153865382936948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6120ea733eea04b9c5917dd59dfa4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6564734663791927061
 GameObject:
   m_ObjectHideFlags: 0
@@ -3424,7 +3450,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  localBowAnim: {fileID: 5685961037242288458}
   multiplayerBowAnim: {fileID: 7790377399799966768}
   multiplayerCharacterAnim: {fileID: 2021122553746785438}
   walkSpeedAnim: 0
@@ -3835,7 +3860,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  TransitionStateInfoList: []
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 2081823275
+    DestinationState: 819769265
+    TransitionDuration: 0.1
+    TriggerNameHash: 125937960
+    TransitionIndex: 1
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 1420930469
+    DestinationState: 132228977
+    TransitionDuration: 0.1
+    TriggerNameHash: 137525990
+    TransitionIndex: 0
   m_Animator: {fileID: 2021122553746785438}
 --- !u!1 &8588383917548274506
 GameObject:
