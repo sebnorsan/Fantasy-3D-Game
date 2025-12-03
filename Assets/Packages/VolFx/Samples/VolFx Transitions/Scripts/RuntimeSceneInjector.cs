@@ -23,7 +23,7 @@ public class RuntimeSceneInjector : MonoBehaviour
         if (state == PlayModeStateChange.ExitingEditMode)
         {
             // Find all RuntimeSceneInjector instances in open scenes
-            var injectors = GameObject.FindObjectsOfType<RuntimeSceneInjector>();
+            var injectors = GameObject.FindObjectsByType<RuntimeSceneInjector>(FindObjectsSortMode.None);
             if (injectors.Length == 0) return;
 
             // Save original Build Settings

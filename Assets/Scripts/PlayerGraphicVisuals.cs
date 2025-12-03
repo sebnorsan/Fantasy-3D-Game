@@ -9,6 +9,10 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 	private Quaternion baseRot;
 
 	[SerializeField] private GameObject gfx;
+
+	[SerializeField] private Renderer[] multiplayerGfx;
+	[SerializeField] private Renderer[] singlePlayerGfx;
+
 	[SerializeField] private TextMeshProUGUI textUsername;
 
 	[SerializeField] private float maxForwardTilt = 10f;
@@ -25,14 +29,19 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 
 		if (IsOwner)
 		{
-			if (gfx != null)
-				gfx.SetActive(false);
+			if (multiplayerGfx != null && multiplayerGfx.Length > 0)
+				foreach (var go in multiplayerGfx)
+					go.enabled = false;
 
 			// send our Steam name once when we spawn
 			SetNameServerRpc(SteamClient.Name);
 		}
 		else
 		{
+			if (singlePlayerGfx != null && singlePlayerGfx.Length > 0)
+				foreach (var go in singlePlayerGfx)
+					go.enabled = false;
+
 			// I’m a copy of SOMEONE ELSE’s player – ask server what their name is
 			RequestNameServerRpc();
 		}

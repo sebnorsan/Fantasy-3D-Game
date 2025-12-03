@@ -10,6 +10,7 @@ public class PlayerController : NetworkBehaviour
 {
 	// Player Settings
 	[Header("Player Settings")]
+	[SerializeField] private PlayerAnimator playerAnimator;
 	[SerializeField] public Transform playerCamera;
 	[Range(1, 10)] public float walkingSpeed = 3.0f;
 	[Range(0.1f, 5)] public float crouchSpeed = 1.0f;
@@ -169,10 +170,14 @@ public class PlayerController : NetworkBehaviour
 
 	private Vector3 initFall;
 
+	private float distForLanding = 1f;
+
 	private void init_LeavingGrounded()
 	{
 		initFall = transform.position;
 		lastLeftGroundTime = Time.time;
+
+		playerAnimator.SetInAir(true);
 	}
 
 	private void init_EnteringGrounded()
@@ -187,6 +192,9 @@ public class PlayerController : NetworkBehaviour
 
 		if (Time.time - lastLeftGroundTime >= landThreshold)
 			footsteps.PlayOneOff();
+
+		if (dist > distForLanding)
+			playerAnimator.A_Land();
 	}
 
 	private void PlayMovementSound(string clipName, float min, float max)
@@ -406,6 +414,8 @@ public class PlayerController : NetworkBehaviour
 			moveDirection.y = jumpSpeed;
 
 			PlayMovementSound("Slide", .65f, 1.35f);
+
+			playerAnimator.A_Jump();
 
 			footsteps.StopFootsteps();
 			footstepStopPending = false;

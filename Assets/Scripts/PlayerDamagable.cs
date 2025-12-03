@@ -12,6 +12,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	[SerializeField] private PlayerAnimator animator;
 	[SerializeField] private PlayerController localPlayer;
+	[SerializeField] private PlayerAnimator playerAnimator;
 
 	[Space(15)]
 
@@ -38,6 +39,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	[Header("Knockback")]
 	[SerializeField] private float knockbackStrength = 10f;
+
 
 	private float displayedHealth;
 
@@ -131,7 +133,10 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		DamageEffects(hitPoint);
 
 		if (IsOwner)
+		{
 			camShaker.ShakeOnce(7f, 3f, .1f, .4f);
+			playerAnimator.A_TakeDamage();
+		}
 	}
 	
 	public void DamageEffects(Vector3 hitPoint)

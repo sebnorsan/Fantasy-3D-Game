@@ -20,9 +20,12 @@ public class BowScript : MonoBehaviour
 	private PlayerController playerController;
 	private BowNetCode bowNetcode;
 
+	private PlayerAnimator playerAnimator;
+
 	private void Start()
 	{
 		playerController = GetComponentInParent<PlayerController>();
+		playerController.GetComponentInChildren<PlayerAnimator>();
 		if (!playerController) return;
 
 		if (!playerController.IsOwner)
@@ -56,6 +59,8 @@ public class BowScript : MonoBehaviour
 
 	private void LoadBow()
 	{
+		playerAnimator.A_LoadBow();
+
 		anim.ResetTrigger("Shoot");
 		hs.UnassignMaxAmounts();
 		anim.SetBool("Load", true);
@@ -63,12 +68,16 @@ public class BowScript : MonoBehaviour
 
 	private void UnLoadBow()
 	{
+		playerAnimator.A_UnLoadBow();
+
 		hs.ReassignMaxAmounts();
 		anim.SetBool("Load", false);
 	}
 
 	private void ShootBow()
 	{
+		playerAnimator.A_ShootBow();
+
 		anim.SetTrigger("Shoot");
 		canShoot = false;
 		Invoke(nameof(ResetShot), .35f);
