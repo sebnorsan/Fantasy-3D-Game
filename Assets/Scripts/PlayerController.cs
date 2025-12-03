@@ -176,25 +176,10 @@ public class PlayerController : NetworkBehaviour
 
 	private void init_LeavingGrounded()
 	{
-		// Only treat this as a "real" leave-ground if there's no ground within minAirGap below us.
-		int groundMask = LayerMask.GetMask("Ground", "MovingPlatform", "OtherGameController");
-
-		// Start ray a tiny bit above groundCheck to avoid starting inside colliders.
-		Vector3 rayOrigin = groundCheck.position + Vector3.up * 0.05f;
-		float rayDistance = checkRadius + minAirGap;
-
-		if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, rayDistance, groundMask))
-		{
-			// There's still ground close below → it's probably just a slope / small step.
-			// Don't trigger SetInAir / jump animation.
-			return;
-		}
-
-		// Now we know we're actually "falling"
 		initFall = transform.position;
 		lastLeftGroundTime = Time.time;
 
-		playerAnimator.A_Jump();   // or SetInAir(), whatever you call here
+		playerAnimator.A_Jump();
 	}
 
 
