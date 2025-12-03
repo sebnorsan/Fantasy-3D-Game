@@ -13,7 +13,7 @@ public class CopyRotationOfObject : MonoBehaviour
 		if (!target) return;
 
 		// Get target's world euler
-		Vector3 targetEuler = target.rotation.eulerAngles;
+		Vector3 targetEuler = target.localRotation.eulerAngles;
 
 		// Convert 0–360 → -180–180 so clamping makes sense
 		float x = targetEuler.x;
@@ -23,7 +23,7 @@ public class CopyRotationOfObject : MonoBehaviour
 		x = Mathf.Clamp(x, minX, maxX);
 
 		// Apply clamped X, keep current Y/Z
-		Vector3 myEuler = transform.rotation.eulerAngles;
-		transform.rotation = Quaternion.Euler(x, myEuler.y, myEuler.z);
+		Vector3 myEuler = transform.localRotation.eulerAngles;
+		transform.localRotation = Quaternion.Euler(x, myEuler.y, myEuler.z);
 	}
 }
