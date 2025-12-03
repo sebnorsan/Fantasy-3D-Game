@@ -284,6 +284,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxDistance: 3
+  sphereRadius: 0.2
+  ignoreLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  ignoreTags: []
   interactionKeyAnimator: {fileID: 0}
   isTalking: 0
 --- !u!1 &8519620015595101908
@@ -296,6 +301,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1484801976697885679}
   - component: {fileID: 5105325705060403356}
+  - component: {fileID: -6865545208854128630}
   - component: {fileID: 3747271047151479085}
   - component: {fileID: 5932811329201777030}
   - component: {fileID: 5158395717258779853}
@@ -349,6 +355,31 @@ CharacterController:
   m_SkinWidth: 0.05
   m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-6865545208854128630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8519620015595101908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3258824907
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &3747271047151479085
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -361,6 +392,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ce34b4bf8dbcd24d9d4da51e93218ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  playerAnimator: {fileID: 0}
   playerCamera: {fileID: 0}
   walkingSpeed: 3
   crouchSpeed: 1
@@ -368,6 +401,7 @@ MonoBehaviour:
   jumpSpeed: 6
   lookSpeed: 2
   lookXLimit: 80
+  knockbackDecay: 5
   runningFOV: 65
   fovTransitionSpeed: 4
   crouchHeight: 1
@@ -379,13 +413,16 @@ MonoBehaviour:
   checkRadius: 0.2
   coyoteTimeDuration: 0.2
   maxFallSpeed: -15
+  headCheck: {fileID: 0}
+  headCheckRadius: 0.3
   crouchKey: 306
   runToggle: 0
-  cameraLock: 0
   characterController: {fileID: 0}
   moveDirection: {x: 0, y: 0, z: 0}
   isRunning: 0
   Moving: 0
+  cam: {fileID: 0}
+  rotationX: 0
   isGrounded: 0
   inputVertical: 0
   inputHorizontal: 0
