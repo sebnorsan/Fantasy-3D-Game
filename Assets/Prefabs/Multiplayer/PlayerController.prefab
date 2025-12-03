@@ -3469,14 +3469,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   gfx: {fileID: 8827951681074446768}
-  multiplayerGfx:
-  - {fileID: 2403484915536638094}
-  - {fileID: 6803833735646330706}
-  - {fileID: 6687811885609288578}
-  - {fileID: 1307337018724288108}
-  - {fileID: 4865587274794707827}
-  - {fileID: 3419079707560980135}
-  - {fileID: 6685196923763311800}
+  multiplayerGfx: []
   singlePlayerGfx:
   - {fileID: 4698612090648555707}
   - {fileID: 2691332437555054812}
@@ -3876,6 +3869,20 @@ MonoBehaviour:
     TransitionDuration: 0.1
     TriggerNameHash: 125937960
     TransitionIndex: 0
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 1420930469
+    DestinationState: 819769265
+    TransitionDuration: 0.2
+    TriggerNameHash: 125937960
+    TransitionIndex: 0
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 132228977
+    DestinationState: 819769265
+    TransitionDuration: 0.1
+    TriggerNameHash: 125937960
+    TransitionIndex: 1
   m_Animator: {fileID: 2021122553746785438}
 --- !u!1 &8588383917548274506
 GameObject:
