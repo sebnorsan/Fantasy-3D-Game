@@ -177,7 +177,7 @@ public class PlayerController : NetworkBehaviour
 		initFall = transform.position;
 		lastLeftGroundTime = Time.time;
 
-		playerAnimator.SetInAir(true);
+		playerAnimator.A_Jump();
 	}
 
 	private void init_EnteringGrounded()
@@ -194,7 +194,7 @@ public class PlayerController : NetworkBehaviour
 			footsteps.PlayOneOff();
 
 		//if (dist > distForLanding)
-		//	playerAnimator.A_Land();
+		playerAnimator.A_Land();
 	}
 
 	private void PlayMovementSound(string clipName, float min, float max)
@@ -412,8 +412,6 @@ public class PlayerController : NetworkBehaviour
 
 			PlayMovementSound("Slide", .65f, 1.35f);
 
-			playerAnimator.A_Jump();
-
 			footsteps.StopFootsteps();
 			footstepStopPending = false;
 		}
@@ -457,7 +455,7 @@ public class PlayerController : NetworkBehaviour
 
 		//transform.localScale = new Vector3(transform.localScale.x, newHeight, transform.localScale.z);
 		//characterController.enabled = false;
-		EventManager.instance.TeleportPlayer(this, new Vector3(transform.position.x, transform.position.y - ((initialCrouchHeight - newHeight) / 2), transform.position.z));
+		EventManager.instance.TeleportPlayer(this, new Vector3(transform.position.x, transform.position.y - ((initialCrouchHeight - newHeight) / 2), transform.position.z), false);
 		//characterController.enabled = true;
 	}
 
@@ -469,7 +467,7 @@ public class PlayerController : NetworkBehaviour
 
 		//transform.localScale = new Vector3(transform.localScale.x, newHeight, transform.localScale.z);
 		//characterController.enabled = false;
-		EventManager.instance.TeleportPlayer(this, new Vector3(transform.position.x, transform.position.y + ((initialCrouchHeight - crouchHeight) / 2), transform.position.z));
+		EventManager.instance.TeleportPlayer(this, new Vector3(transform.position.x, transform.position.y + ((initialCrouchHeight - crouchHeight) / 2), transform.position.z), false);
 		//characterController.enabled = true;
 	}
 

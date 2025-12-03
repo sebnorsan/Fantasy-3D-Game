@@ -45,14 +45,14 @@ public class PlayerAnimator : NetworkBehaviour
 
 	private void CheckForInAir()
 	{
-		if (jumpBuffer) return;
+		//if (jumpBuffer) return;
 
-		if (multiplayerCharacterAnim.GetBool("InAir"))
-			if (localPlayer.isGrounded)
-			{
-				A_Land();
-				SetInAir(false);
-			}
+		//if (multiplayerCharacterAnim.GetBool("InAir"))
+		//	if (localPlayer.isGrounded)
+		//	{
+		//		A_Land();
+		//		SetInAir(false);
+		//	}
 	}
 
 	public void A_LoadBow()

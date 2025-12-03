@@ -76,12 +76,13 @@ public class EventManager : MonoBehaviour
 		if (Camera.main) Camera.main.clearFlags = CameraClearFlags.Skybox;
 	}
 	#endregion
-	public void TeleportPlayer(PlayerController player, Vector3 tpPos)
+	public void TeleportPlayer(PlayerController player, Vector3 tpPos, bool resetDir = true)
 	{
 		player.characterController.enabled = false;
 		player.transform.position = tpPos;
 		player.characterController.enabled = true;
 
-		player.moveDirection = Vector3.zero;
+		if (resetDir)
+			player.moveDirection = Vector3.zero;
 	}
 }
