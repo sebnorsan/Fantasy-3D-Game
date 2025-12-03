@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
@@ -103,7 +104,8 @@ public class PlayerAnimator : NetworkBehaviour
 		{
 			SetInAir(false);
 
-			ResetLandingBuffer();
+			if (bufferCoroutine != null)
+				StopCoroutine(bufferCoroutine);
 
 			return;
 		}
@@ -122,10 +124,17 @@ public class PlayerAnimator : NetworkBehaviour
 		if (b)
 		{
 			landBuffer = true;
-			Invoke(nameof(ResetLandingBuffer), .1f);
+			if (bufferCoroutine != null)
+				StopCoroutine(bufferCoroutine);
+			bufferCoroutine = StartCoroutine(ResetLandingBuffer(.2f));
 		}
 
 		multiplayerCharacterAnim.SetBool("InAir", b);
 	}
-	private void ResetLandingBuffer() => landBuffer = false;
+	private Coroutine bufferCoroutine = null;
+	private IEnumerator ResetLandingBuffer(float timeSet)
+	{
+		yield return new WaitForSeconds(timeSet);
+		landBuffer = false;
+	}
 }
