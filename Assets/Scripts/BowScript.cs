@@ -25,7 +25,7 @@ public class BowScript : MonoBehaviour
 	private void Start()
 	{
 		playerController = GetComponentInParent<PlayerController>();
-		playerController.GetComponentInChildren<PlayerAnimator>();
+		playerAnimator = playerController.GetComponentInChildren<PlayerAnimator>();
 		if (!playerController) return;
 
 		if (!playerController.IsOwner)
