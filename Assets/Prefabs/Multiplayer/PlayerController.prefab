@@ -3432,7 +3432,7 @@ MonoBehaviour:
   currentHealth: 10
   deathTime: 6
   deathCam: {fileID: 3697209131461708778, guid: ab6915eb62cd27142847f8cc4b7addc1, type: 3}
-  deathParticles: {fileID: 3548588485384254792, guid: 7fb0f6e51e8cdbe4e99603aa917a2d53, type: 3}
+  deathParticles: {fileID: 3548588485384254792, guid: 3a1bfe20f1684bc4ca15eb061cba3362, type: 3}
   hitParticles: {fileID: 5024009746357069194, guid: 5540ed9c3d556b24d9f00eefefe68cc1, type: 3}
   healthSlider: {fileID: 2622446098186953589}
   sliderLerpSpeed: 10
