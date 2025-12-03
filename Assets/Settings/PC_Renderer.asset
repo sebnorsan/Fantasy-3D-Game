@@ -78,7 +78,7 @@ MonoBehaviour:
     - {fileID: 583605133065610032}
     - {fileID: 26966392418919102}
     - {fileID: -3426172812857707780}
-    - {fileID: 8704681216024929752}
+    - {fileID: 0}
     - {fileID: 5739384935227669731}
     - {fileID: -309408722590786099}
     - {fileID: -2090989004800186230}
@@ -1678,6 +1678,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _active: 1
   _shader: {fileID: 4800000, guid: fc78cc8bb01197248b8a758ee38592b9, type: 3}
+  _material: {fileID: 0}
+  _isActive: 0
 --- !u!114 &8761198859238146475
 MonoBehaviour:
   m_ObjectHideFlags: 3

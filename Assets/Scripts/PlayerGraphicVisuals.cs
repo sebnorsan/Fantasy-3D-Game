@@ -13,6 +13,8 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 	[SerializeField] private Renderer[] multiplayerGfx;
 	[SerializeField] private Renderer[] singlePlayerGfx;
 
+	[SerializeField] private GameObject playerCanvas;
+
 	[SerializeField] private TextMeshProUGUI textUsername;
 
 	[SerializeField] private float maxForwardTilt = 10f;
@@ -29,6 +31,9 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 
 		if (IsOwner)
 		{
+			if (playerCanvas)
+				playerCanvas.SetActive(false);
+
 			if (multiplayerGfx != null && multiplayerGfx.Length > 0)
 				foreach (var go in multiplayerGfx)
 					go.enabled = false;

@@ -402,9 +402,6 @@ public class PlayerController : NetworkBehaviour
 		// decay knockback
 		knockbackVelocity = Vector3.Lerp(knockbackVelocity, Vector3.zero, knockbackDecay * Time.deltaTime);
 
-
-
-
 		// Handle jumping
 		if (Input.GetButton("Jump") && canMove && (isGrounded || coyoteActive) && !isClimbing)
 		{
