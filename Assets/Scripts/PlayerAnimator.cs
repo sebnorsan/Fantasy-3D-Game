@@ -86,10 +86,10 @@ public class PlayerAnimator : NetworkBehaviour
 	private float bufferTimer = .2f;
 	public void A_Jump() 
 	{
+		if (jumpBuffer) return;
+
 		jumpBuffer = true;
 		Invoke(nameof(ResetJumpBuffer), bufferTimer);
-
-		if (jumpBuffer) return;
 
 		multiplayerCharacterAnim.ResetTrigger("Jump");
 		multiplayerCharacterAnim.SetTrigger("Jump");
