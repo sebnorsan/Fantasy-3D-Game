@@ -170,7 +170,7 @@ public class PlayerController : NetworkBehaviour
 
 	private Vector3 initFall;
 
-	private float distForLanding = 1f;
+	private float distForLanding = 0.2f;
 
 	private void init_LeavingGrounded()
 	{
@@ -193,8 +193,8 @@ public class PlayerController : NetworkBehaviour
 		if (Time.time - lastLeftGroundTime >= landThreshold)
 			footsteps.PlayOneOff();
 
-		if (dist > distForLanding)
-			playerAnimator.A_Land();
+		//if (dist > distForLanding)
+		//	playerAnimator.A_Land();
 	}
 
 	private void PlayMovementSound(string clipName, float min, float max)

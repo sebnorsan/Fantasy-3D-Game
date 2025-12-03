@@ -3452,8 +3452,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   multiplayerBowAnim: {fileID: 7790377399799966768}
   multiplayerCharacterAnim: {fileID: 2021122553746785438}
-  walkSpeedAnim: 0
-  runSpeedAnim: 0
+  walkSpeedAnim: 1
+  runSpeedAnim: 1.5
   localPlayer: {fileID: 4808590262637696532}
 --- !u!114 &147051769140427139
 MonoBehaviour:
@@ -3481,6 +3481,7 @@ MonoBehaviour:
   - {fileID: 4698612090648555707}
   - {fileID: 2691332437555054812}
   - {fileID: 3972146315545381423}
+  playerCanvas: {fileID: 1838311705572959035}
   textUsername: {fileID: 7283792964927178359}
   maxForwardTilt: 35
   maxSideTilt: 28
@@ -3870,10 +3871,10 @@ MonoBehaviour:
     TransitionIndex: 1
   - IsCrossFadeExit: 0
     Layer: 0
-    OriginatingState: 1420930469
-    DestinationState: 132228977
+    OriginatingState: 765711723
+    DestinationState: 819769265
     TransitionDuration: 0.1
-    TriggerNameHash: 137525990
+    TriggerNameHash: 125937960
     TransitionIndex: 0
   m_Animator: {fileID: 2021122553746785438}
 --- !u!1 &8588383917548274506

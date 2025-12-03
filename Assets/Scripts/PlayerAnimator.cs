@@ -40,6 +40,16 @@ public class PlayerAnimator : NetworkBehaviour
 			multiplayerCharacterAnim.speed = walkSpeedAnim;
 	}
 
+	private void CheckForInAir()
+	{
+		if (multiplayerCharacterAnim.GetBool("InAir"))
+			if (localPlayer.isGrounded)
+			{
+				A_Land();
+				SetInAir(false);
+			}
+	}
+
 	public void A_LoadBow()
 	{
 		multiplayerBowAnim.ResetTrigger("Shoot");
