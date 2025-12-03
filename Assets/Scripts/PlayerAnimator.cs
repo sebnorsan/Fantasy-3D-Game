@@ -83,11 +83,13 @@ public class PlayerAnimator : NetworkBehaviour
 	{
 		multiplayerCharacterAnim.SetBool("Walking", localPlayer.Moving);
 	}
-	private float bufferTimer = .4f;
+	private float bufferTimer = .2f;
 	public void A_Jump() 
 	{
 		jumpBuffer = true;
 		Invoke(nameof(ResetJumpBuffer), bufferTimer);
+
+		if (jumpBuffer) return;
 
 		multiplayerCharacterAnim.ResetTrigger("Jump");
 		multiplayerCharacterAnim.SetTrigger("Jump");
