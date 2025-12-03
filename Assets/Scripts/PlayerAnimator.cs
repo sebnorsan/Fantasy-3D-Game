@@ -28,6 +28,7 @@ public class PlayerAnimator : NetworkBehaviour
 		if (!IsOwner) return;
 
 		A_WalkingChecker();
+		CheckForInAir();
 
 		AnimatorStateInfo bowStateInfo = multiplayerBowAnim.GetCurrentAnimatorStateInfo(0);
 		multiplayerBowAnim.speed = bowStateInfo.IsName("bow_loadIn") ? localBowScript.arrowDrawSpeed : 1f;
@@ -71,6 +72,7 @@ public class PlayerAnimator : NetworkBehaviour
 
 	public void A_TakeDamage()
 	{
+		multiplayerCharacterAnim.ResetTrigger("TakeDamage");
 		multiplayerCharacterAnim.SetTrigger("TakeDamage");
 	}
 	public void A_WalkingChecker()
@@ -79,12 +81,15 @@ public class PlayerAnimator : NetworkBehaviour
 	}
 	public void A_Jump() 
 	{
+
+		multiplayerCharacterAnim.ResetTrigger("Jump");
 		multiplayerCharacterAnim.SetTrigger("Jump");
 
 		SetInAir(true);
 	}
 	public void A_Land()
 	{
+		multiplayerCharacterAnim.ResetTrigger("Land");
 		multiplayerCharacterAnim.SetTrigger("Land");
 
 		SetInAir(false);

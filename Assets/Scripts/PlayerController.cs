@@ -170,7 +170,7 @@ public class PlayerController : NetworkBehaviour
 
 	private Vector3 initFall;
 
-	private float distForLanding = 0.2f;
+	//private float distForLanding = 0.2f;
 
 	private void init_LeavingGrounded()
 	{
