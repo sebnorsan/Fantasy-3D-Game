@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class BowScript : MonoBehaviour
 {
+	[SerializeField] private PlayerReferences pRef;
+	[SerializeField] private PlayerInputs pInput;
+
 	public int arrowDamage = 1;
 	public float arrowSpeed = 30f;
 
@@ -17,18 +20,11 @@ public class BowScript : MonoBehaviour
 	[SerializeField] private GameObject arrowFired;
 	[SerializeField] private Transform arrowTransform;
 
-	private PlayerController playerController;
-	private BowNetCode bowNetcode;
-
-	private PlayerAnimator playerAnimator;
-
 	private void Start()
 	{
-		playerController = GetComponentInParent<PlayerController>();
-		playerAnimator = playerController.GetComponentInChildren<PlayerAnimator>();
-		if (!playerController) return;
+		if (!pRef) return;
 
-		if (!playerController.IsOwner)
+		if (!pRef.IsOwner)
 		{
 			GetComponent<Outline>().OutlineMode = Outline.Mode.OutlineVisible;
 			return;
@@ -36,22 +32,18 @@ public class BowScript : MonoBehaviour
 
 		hs = GetComponentInParent<HandsSmooth>();
 		anim = GetComponent<Animator>();
-
-		bowNetcode = playerController.GetComponent<BowNetCode>();
-		if (!bowNetcode)
-			Debug.LogError("BowNetcode missing on player root!");
 	}
 
 	private void Update()
 	{
-		if (!playerController || !playerController.IsOwner) return;
+		if (!pRef || !pRef.IsOwner) return;
 
-		if (!canShoot || !playerController.canMove) return;
+		if (!canShoot || !pRef.playerController.canMove) return;
 
-		if (Input.GetMouseButton(0)) LoadBow();
+		if (Input.GetKey(pInput.shootKey)) LoadBow();
 		else UnLoadBow();
 
-		if (Input.GetMouseButtonUp(0)) ShootBow();
+		if (Input.GetKeyUp(pInput.shootKey)) ShootBow();
 
 		AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
 		anim.speed = stateInfo.IsName("bow_loadIn") ? arrowDrawSpeed : 1f;
@@ -59,7 +51,7 @@ public class BowScript : MonoBehaviour
 
 	private void LoadBow()
 	{
-		playerAnimator.A_LoadBow();
+		pRef.playerAnimator.A_LoadBow();
 
 		anim.ResetTrigger("Shoot");
 		hs.UnassignMaxAmounts();
@@ -68,7 +60,7 @@ public class BowScript : MonoBehaviour
 
 	private void UnLoadBow()
 	{
-		playerAnimator.A_UnLoadBow();
+		pRef.playerAnimator.A_UnLoadBow();
 
 		hs.ReassignMaxAmounts();
 		anim.SetBool("Load", false);
@@ -76,7 +68,7 @@ public class BowScript : MonoBehaviour
 
 	private void ShootBow()
 	{
-		playerAnimator.A_ShootBow();
+		pRef.playerAnimator.A_ShootBow();
 
 		anim.SetTrigger("Shoot");
 		canShoot = false;
@@ -88,12 +80,10 @@ public class BowScript : MonoBehaviour
 	// Call this from your animation event at the moment the arrow should fire
 	public void InstantiateArrow()
 	{
-		if (!playerController || !playerController.IsOwner) return;
-		if (!bowNetcode) return;
+		if (!pRef || !pRef.IsOwner || !pRef.bowNetCode) return;
 
 		// Aim direction from the owner's camera
-		var cam = playerController.GetComponentInChildren<Camera>();
-		Vector3 shootDir = cam.transform.forward;
+		Vector3 shootDir = pRef.playerCam.transform.forward;
 
 		SpawnArrow(arrowFired, arrowTransform.position, arrowTransform.rotation, shootDir, arrowDamage, arrowSpeed, arrowSize);
 	}
@@ -111,8 +101,8 @@ public class BowScript : MonoBehaviour
 		var arrowObj = Instantiate(go, pos, rot);
 		var arrow = arrowObj.GetComponent<Arrow>();
 
-		arrow.Initialize(dmg, spd, size, shootDir, playerController.transform.position, shooterId, true, bowNetcode);
+		arrow.Initialize(dmg, spd, size, shootDir, pRef.playerController.transform.position, shooterId, true, pRef.bowNetCode);
 
-		bowNetcode.SpawnArrowVisualServerRpc(pos, rot, shootDir, dmg, spd, size, shooterId);
+		pRef.bowNetCode.SpawnArrowVisualServerRpc(pos, rot, shootDir, dmg, spd, size, shooterId);
 	}
 }

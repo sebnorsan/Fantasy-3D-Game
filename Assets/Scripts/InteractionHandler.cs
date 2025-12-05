@@ -3,17 +3,17 @@ using System.Linq;
 
 public class InteractionHandler : MonoBehaviour
 {
+	[SerializeField] private PlayerReferences pRef;
+	[SerializeField] private PlayerInputs pInput;
+
 	[Header("Raycast")]
 	[SerializeField] private float maxDistance = 3f;
 	[SerializeField] private float sphereRadius = 0.2f; // forgiving up close
 	[SerializeField] private LayerMask ignoreLayers;    // pick layers to ignore
 	[SerializeField] private string[] ignoreTags;       // tags to ignore (optional)
 
-	[Header("UI")]
-	[SerializeField] private Animator interactionKeyAnimator;
+	private Animator interactionKeyAnimator;
 
-	private PlayerController playerController;
-	private Camera cam;
 	private GameObject objectInteracting;
 	private NPC_Interactable npc;
 
@@ -22,10 +22,7 @@ public class InteractionHandler : MonoBehaviour
 
 	private void Start()
 	{
-		playerController = GetComponentInParent<PlayerController>(includeInactive: true);
-		if (!playerController.IsOwner) return;
-
-		cam = playerController.cam;
+		if (!pRef.playerController.IsOwner) return;
 
 		Invoke(nameof(StartChecks), 1f);
 	}
@@ -39,11 +36,11 @@ public class InteractionHandler : MonoBehaviour
 	Ray ray;
 	void Update()
 	{
-		if (playerController == null || !playerController.IsOwner || cam == null || interactionKeyAnimator == null) return;
+		if (pRef.playerController == null || !pRef.playerController.IsOwner || pRef.playerController.playerCamera == null || interactionKeyAnimator == null) return;
 
 		// Use camera-based ray; this matches what the player actually sees
-		var origin = cam.transform.position;
-		var dir = cam.transform.forward;
+		var origin = pRef.playerController.playerCamera.transform.position;
+		var dir = pRef.playerController.playerCamera.transform.forward;
 		Ray ray = new Ray(origin, dir);
 
 		// Visual state (compute once per frame)
@@ -54,7 +51,7 @@ public class InteractionHandler : MonoBehaviour
 			interactionKeyAnimator.SetBool("LookingAtInteractable", isLooking);
 
 		// Interact input
-		if (Input.GetKeyDown(KeyCode.E))
+		if (Input.GetKeyDown(pInput.interactionKey))
 		{
 			if (isTalking)
 			{
@@ -94,7 +91,7 @@ public class InteractionHandler : MonoBehaviour
 		// Sort by distance (RaycastAll/SphereCastAll are NOT guaranteed to be sorted)
 		System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
 
-		Transform playerRoot = playerController ? playerController.transform.root : null;
+		Transform playerRoot = pRef.playerController ? pRef.playerController.transform.root : null;
 
 		for (int i = 0; i < hits.Length; i++)
 		{
@@ -124,14 +121,14 @@ public class InteractionHandler : MonoBehaviour
 	{
 		npc = temp_npc;
 		isTalking = true;
-		if (playerController) playerController.canMove = false;
+		if (pRef.playerController) pRef.playerController.canMove = false;
 	}
 
 	public void ExitInteraction_NPC()
 	{
 		npc = null;
 		isTalking = false;
-		if (playerController) playerController.canMove = true;
+		if (pRef.playerController) pRef.playerController.canMove = true;
 	}
 
 	public void DisableInteractionKey()
@@ -147,10 +144,10 @@ public class InteractionHandler : MonoBehaviour
 
 	private void OnDrawGizmos()
 	{
-		if (!cam) return;
+		if (!pRef.playerController.playerCamera) return;
 
 		Gizmos.color = Color.yellow;
-		Gizmos.DrawRay(cam.transform.position, cam.transform.forward * maxDistance);
-		Gizmos.DrawWireSphere(cam.transform.position + cam.transform.forward * maxDistance, sphereRadius);
+		Gizmos.DrawRay(pRef.playerController.playerCamera.transform.position, pRef.playerController.playerCamera.transform.forward * maxDistance);
+		Gizmos.DrawWireSphere(pRef.playerController.playerCamera.transform.position + pRef.playerController.playerCamera.transform.forward * maxDistance, sphereRadius);
 	}
 }

@@ -3,14 +3,18 @@ using EZCameraShake;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem.iOS;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : NetworkBehaviour
 {
-	// Player Settings
+	#region Inspector: Player Settings
+
+	public PlayerReferences pRef;
+	public PlayerInputs pInput;
+
 	[Header("Player Settings")]
-	[SerializeField] private PlayerAnimator playerAnimator;
 	[SerializeField] public Transform playerCamera;
 	[Range(1, 10)] public float walkingSpeed = 3.0f;
 	[Range(0.1f, 5)] public float crouchSpeed = 1.0f;
@@ -19,27 +23,19 @@ public class PlayerController : NetworkBehaviour
 	[Range(0.5f, 10)] public float lookSpeed = 2.0f;
 	[Range(10, 120)] public float lookXLimit = 80.0f;
 
-	[Header("Knockback")]
-	[SerializeField] private float knockbackDecay = 5f;
-	private Vector3 knockbackVelocity = Vector3.zero;
-
-	[Header("Air detection")]
-	[SerializeField] private float minAirGap = 0.4f; // how far below feet before we consider it a real "in air"
-
 	[Header("Advanced")]
-	[SerializeField] float runningFOV = 65.0f;
-	[SerializeField] float fovTransitionSpeed = 4.0f;
-	[SerializeField] float crouchHeight = 1.0f;
-	[SerializeField] float gravity = 20.0f;
-	[SerializeField] float timeToRunning = 2.0f;
+	[SerializeField] private float runningFOV = 65.0f;
+	[SerializeField] private float fovTransitionSpeed = 4.0f;
+	[SerializeField] private float crouchHeight = 1.0f;
+	[SerializeField] private float gravity = 20.0f;
+	[SerializeField] private float timeToRunning = 2.0f;
 	[HideInInspector] public bool canMove = true;
 	[HideInInspector] public bool canRun = true;
 
 	[Header("Ground & Coyote Time")]
 	public Transform groundCheck;
 	public float checkRadius = 0.2f;
-	[Range(0, 1)]
-	public float coyoteTimeDuration = 0.2f;
+	[Range(0, 1)] public float coyoteTimeDuration = 0.2f;
 	public float maxFallSpeed = -15f;
 
 	[Header("CrouchCheck")]
@@ -47,57 +43,82 @@ public class PlayerController : NetworkBehaviour
 	public float headCheckRadius = 0.3f;
 
 	[Header("Input")]
-	[SerializeField] KeyCode crouchKey = KeyCode.LeftControl;
 	public bool runToggle = false;
 
-	[HideInInspector] public CharacterController characterController;
+	[Header("Knockback")]
+	[SerializeField] private float knockbackDecay = 5f;
+
+	[Header("Footsteps")]
+	[SerializeField] private float footstepStopThreshold = 0.05f;
+
+	#endregion
+
+	#region Components
+
+	private Footsteps footsteps;
+
+	#endregion
+
+	#region Movement State
+
 	[HideInInspector] public Vector3 moveDirection = Vector3.zero;
 	[HideInInspector] public bool isRunning = false;
-	[HideInInspector] public bool Moving = false;
-	[HideInInspector] public Camera cam;
-
-	// Private variables
-	float initialWalkingSpeed;
-	float runningValue;
-	[HideInInspector]
-	public float rotationX = 0f;
-	float initialCrouchHeight;
-	float initialFOV;
-	float initialRunningFOV;
-
-	bool isCrouching = false;
+	[HideInInspector] public bool isMoving = false;
+	[HideInInspector] public float rotationX = 0f;
 	[HideInInspector] public bool isGrounded;
-	bool isClimbing = false;
-
-	// Coyote time management
-	bool canCoyote = false;
-	bool coyoteActive = false;
-
-	// Rebound control for "stuck" state
-	bool rebound = false;
-	Vector3 prevFramePos = Vector3.zero;
-	bool resetVertical = false;
-
 	[HideInInspector] public float inputVertical;
 	[HideInInspector] public float inputHorizontal;
 
-	public bool dev = false;
-	private bool overrideDev = false;
+	private float initialWalkingSpeed;
+	private float runningValue;
+	private float initialCrouchHeight;
+	private float initialFOV;
+	private float runningFovMultiplier;
 
-	//private bool tooSteep = false;
-	//private bool sliding = false;
-	float runningFovMultiplier;
-	private Footsteps footsteps;
+	private bool isCrouching = false;
+	private bool isFlying = false;
+
+	private bool canCoyote = false;
+	private bool coyoteActive = false;
+
+	private bool rebound = false;
+	private Vector3 prevFramePos = Vector3.zero;
+	private bool resetVertical = false;
+
+	private float lastLeftGroundTime = -Mathf.Infinity;
+	private const float landThreshold = 0.25f;
+	private Vector3 initFall;
+
+	private float footstepStopRequestTime;
+	private bool footstepStopPending = false;
+
+	private Vector3 knockbackVelocity = Vector3.zero;
+
+	#endregion
+
+	#region Debug & Dev
+
+	[Header("Debugging")]
+
+	[SerializeField] private bool dev = false;
+	[SerializeField] private float flySpeed = 7f;
+	[SerializeField] private float flySpeedFast = 60f;
+	[SerializeField] private float flySpeedVertical = 5;
+	private float flySpeedToUse = 0f;
+	private bool overrideDev = false;
+	private Vector3 savePos = Vector3.zero;
+
+	#endregion
+
+	#region Networking & Events
+
 	public ulong MyId => NetworkObject.OwnerClientId;
 
-	private Vector3 spawnPos;
-	private Quaternion spawnRot;
+	#endregion
+	
 
-	//public void SetSpawnPoint(Vector3 pos, Quaternion rot)
-	//{
-	//	spawnPos = pos;
-	//	spawnRot = rot;
-	//}
+	#region Network Lifecycle
+
 	public override void OnNetworkSpawn()
 	{
 		if (!IsOwner)
@@ -110,7 +131,6 @@ public class PlayerController : NetworkBehaviour
 			foreach (var a in GetComponentsInChildren<AudioListener>(true))
 				a.enabled = false;
 
-			//DisableIfExists<BowScript>();
 			DisableIfExists<MovementEffects>();
 			DisableIfExists<HandsSmooth>();
 			DisableIfExists<HeadBob>();
@@ -119,34 +139,29 @@ public class PlayerController : NetworkBehaviour
 			DisableIfExists<EventAudioPlayer>();
 			DisableIfExists<CameraShaker>();
 		}
-		//else
-		//	TeleportToSpawnpoint();
 	}
-	//private void TeleportToSpawnpoint()
-	//{
-	//	if (IsSpawned && characterController && EventManager.instance != null)
-	//		EventManager.instance.TeleportPlayer(this, spawnPos + new Vector3(0,1.5f,0));
-	//	else
-	//		Invoke(nameof(TeleportToSpawnpoint), .1f);
-	//}
+
 	private void DisableIfExists<T>() where T : Behaviour
 	{
 		var comps = GetComponentsInChildren<T>(true);
 		foreach (var comp in comps)
 			comp.enabled = false;
 	}
-	void Start()
+
+	#endregion
+
+	#region Unity Lifecycle
+
+	private void Start()
 	{
-		cam = GetComponentInChildren<Camera>();
-		initialFOV = cam.fieldOfView;
+		initialFOV = pRef.playerCam.fieldOfView;
 		runningFovMultiplier = runningFOV / initialFOV;
 		footsteps = GetComponent<Footsteps>();
 
-		characterController = GetComponent<CharacterController>();
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
 
-		initialCrouchHeight = characterController.height;
+		initialCrouchHeight = pRef.playerCharacterController.height;
 
 		runningValue = runningSpeed;
 		initialWalkingSpeed = walkingSpeed;
@@ -154,87 +169,49 @@ public class PlayerController : NetworkBehaviour
 		if (Application.isEditor)
 			overrideDev = true;
 
-
 		if (IsOwner)
-			characterController.enabled = true;
-	}
-	public void ChangeFieldOfView(float newFov)
-	{
-		initialFOV = newFov;
-		cam.fieldOfView = newFov;
-		runningFOV = newFov * runningFovMultiplier;
+			pRef.playerCharacterController.enabled = true;
 	}
 
-	private bool isFlying = false;
-
-	private float lastLeftGroundTime = -Mathf.Infinity;
-	private const float landThreshold = 0.25f;
-
-	private Vector3 initFall;
-
-	//private float distForLanding = 0.2f;
-
-	private void init_LeavingGrounded()
-	{
-		initFall = transform.position;
-		lastLeftGroundTime = Time.time;
-
-		playerAnimator.A_Jump();
-	}
-
-
-	private void init_EnteringGrounded()
-	{
-		// new landing: reset the set of fired events
-		_eventsFiredThisLanding.Clear();
-
-		// check surfaces under feet for Event components that want collision activation
-		TriggerLandingEvents();
-
-		float dist = Vector3.Distance(new Vector3(transform.position.x, initFall.y, transform.position.z), transform.position);
-
-		if (Time.time - lastLeftGroundTime >= landThreshold)
-			footsteps.PlayOneOff();
-
-		//if (dist > distForLanding)
-		playerAnimator.A_Land();
-	}
-
-	private void PlayMovementSound(string clipName, float min, float max)
-	{
-		AudioManagement.instance.StopThisSound("Movement", clipName);
-		AudioManagement.instance.PlayThisSound("Movement", clipName, true, min, max);
-	}
-
-	[SerializeField] private float footstepStopThreshold = 0.05f;
-
-	// time at which we first noticed movement stopped
-	private float footstepStopRequestTime;
-
-	// whether a stop is currently pending
-	private bool footstepStopPending = false;
-
-	void Update()
+	private void Update()
 	{
 		if (!IsOwner) return;
 
-		if (dev || overrideDev)
+		HandleLookingAround();
+		HandleGrounded();
+		HandleInput();
+		HandleJumpingInput();   
+		HandleCrouchingInput(); 
+		HandleMovement();       
+		HandleKnockback();
+		HandleFootsteps();
+	}
+
+	private void HandleFlying()
+	{
+		flySpeedToUse = 0f;
+
+		if (isFlying && canMove)
 		{
-			if (Input.GetKeyDown(KeyCode.C)) SaveState();
-			if (Input.GetKeyDown(KeyCode.V)) LoadState();
-			if (Input.GetKeyDown(KeyCode.F))
-			{
-				moveDirection = Vector3.zero;
-				isFlying = !isFlying;
+			if (!dev && !overrideDev)
+				isFlying = false;
 
-				isGrounded = false;
-			}
+			flySpeedToUse = flySpeed;
+
+			if (Input.GetKey(pInput.runningKey))
+				flySpeedToUse = flySpeedFast;
+
+			if (Input.GetKey(pInput.jumpKey))
+				moveDirection.y = flySpeedVertical;
+			else if (Input.GetKey(pInput.crouchKey))
+				moveDirection.y = -flySpeedVertical;
+			else
+				moveDirection.y = 0f;
 		}
-
-		if (Application.isEditor)
-			if (Input.GetKeyDown(KeyCode.H)) overrideDev = !overrideDev;
-
-		if (Moving && isGrounded)
+	}
+	private void HandleFootsteps()
+	{
+		if (isMoving && isGrounded)
 		{
 			footsteps.PlayFootsteps();
 
@@ -253,14 +230,15 @@ public class PlayerController : NetworkBehaviour
 				footsteps.StopFootsteps();
 				footstepStopPending = false;
 			}
-			else if (!Moving)
+			else if (!isMoving)
 			{
 				footsteps.StopFootsteps();
 				footstepStopPending = false;
 			}
 		}
-
-		// Camera controls
+	}
+	private void HandleLookingAround()
+	{
 		if (Cursor.lockState == CursorLockMode.Locked && canMove)
 		{
 			float mouseY = -Input.GetAxis("Mouse Y");
@@ -271,45 +249,22 @@ public class PlayerController : NetworkBehaviour
 			playerCamera.localRotation = Quaternion.Euler(rotationX, 0, 0);
 			transform.Rotate(0, mouseX * lookSpeed, 0);
 
-			// Field of view adjustment
-			if (isRunning && Moving)
-				cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, runningFOV, fovTransitionSpeed * Time.deltaTime);
+			if (isRunning && isMoving)
+				pRef.playerCam.fieldOfView = Mathf.Lerp(pRef.playerCam.fieldOfView, runningFOV, fovTransitionSpeed * Time.deltaTime);
 			else
-				cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, initialFOV, fovTransitionSpeed * Time.deltaTime);
+				pRef.playerCam.fieldOfView = Mathf.Lerp(pRef.playerCam.fieldOfView, initialFOV, fovTransitionSpeed * Time.deltaTime);
 		}
+	}
+	private void HandleGrounded()
+	{
+		if (isFlying) return;
 
-		if (isFlying && canMove)
-		{
-			if (!dev && !overrideDev)
-				isFlying = false;
+		isGrounded = Physics.CheckSphere(
+			groundCheck.position,
+			checkRadius,
+			pRef.groundLayerMask
+		);
 
-			float flySpeed = 7f;
-			float vertical = 0f;
-
-			if (Input.GetKey(KeyCode.LeftShift))
-				flySpeed = 60f;
-
-			if (Input.GetKey(KeyCode.Space))
-			{
-				vertical = 1f;
-			}
-			else if (Input.GetKey(KeyCode.LeftControl))
-			{
-				vertical = -1f;
-			}
-
-			Vector3 direction = new Vector3(Input.GetAxis("Horizontal"), vertical, Input.GetAxis("Vertical"));
-			Vector3 move = transform.TransformDirection(direction) * flySpeed;
-
-			characterController.Move(move * Time.deltaTime);
-
-			return;
-		}
-
-		// Ground check
-		isGrounded = Physics.CheckSphere(groundCheck.position, checkRadius, LayerMask.GetMask("Ground", "MovingPlatform", "OtherGameController"));
-
-		// Handle vertical movement when not grounded
 		if (!isGrounded)
 		{
 			if (resetVertical)
@@ -319,24 +274,12 @@ public class PlayerController : NetworkBehaviour
 
 				init_LeavingGrounded();
 			}
+
 			transform.SetParent(null);
 
-			if (!isClimbing)
-			{
-				moveDirection.y -= gravity * Time.deltaTime;
-				if (moveDirection.y < maxFallSpeed)
-					moveDirection.y = maxFallSpeed;
-			}
-
-			if (Vector3.Distance(new Vector3(transform.position.x, prevFramePos.y, transform.position.z), transform.position) < 0.001f && !rebound)
-			{
-				rebound = true;
-				moveDirection.y = -1;
-				Invoke(nameof(ResetRebound), 0.1f);
-			}
-			prevFramePos = transform.position;
-
-			characterController.stepOffset = 0.1f;
+			HandleGravity();
+			
+			pRef.playerCharacterController.stepOffset = 0.1f;
 
 			if (canCoyote)
 			{
@@ -345,7 +288,7 @@ public class PlayerController : NetworkBehaviour
 				coyoteActive = true;
 			}
 		}
-		else // When grounded
+		else
 		{
 			moveDirection.y = 0;
 
@@ -354,59 +297,102 @@ public class PlayerController : NetworkBehaviour
 
 			resetVertical = true;
 
-			// Parent to a moving platform if available
-			Collider[] platformColliders = Physics.OverlapSphere(groundCheck.position, checkRadius,
-												LayerMask.GetMask("MovingPlatform"));
+			Collider[] platformColliders = Physics.OverlapSphere(
+				groundCheck.position,
+				checkRadius,
+				LayerMask.GetMask("MovingPlatform")
+			);
+
 			if (platformColliders.Length > 0)
 				transform.SetParent(platformColliders[0].transform);
 
 			if (!isCrouching)
-				characterController.stepOffset = 0.65f;
+				pRef.playerCharacterController.stepOffset = 0.65f;
+
 			canCoyote = true;
 			CancelInvoke(nameof(StopCoyote));
 			coyoteActive = false;
 		}
+	}
+	private void HandleGravity()
+	{
+		moveDirection.y -= gravity * Time.deltaTime; if (moveDirection.y < maxFallSpeed) moveDirection.y = maxFallSpeed;
 
-		// Handle movement input
+		if (Vector3.Distance(
+					new Vector3(transform.position.x, prevFramePos.y, transform.position.z),
+					transform.position) < 0.001f && !rebound)
+		{
+			rebound = true;
+			moveDirection.y = -1;
+			Invoke(nameof(ResetRebound), 0.1f);
+
+			prevFramePos = transform.position;
+		}
+	}
+	private void HandleKnockback()
+	{
+		knockbackVelocity = Vector3.Lerp(knockbackVelocity, Vector3.zero, knockbackDecay * Time.deltaTime);
+	}
+	private void HandleMovement()
+	{
+		HandleFlying();
+
 		Vector3 forward = transform.TransformDirection(Vector3.forward);
 		Vector3 right = transform.TransformDirection(Vector3.right);
-
-		bool shift = Input.GetKey(KeyCode.LeftShift);
-
-		bool runIntent = runToggle ? !shift : shift;
-
-		bool runAllowedByStance = !(isCrouching && isGrounded);
-		isRunning = runIntent && canRun && runAllowedByStance;
-
-
-		inputVertical = canMove ? Input.GetAxis("Vertical") : 0f;
-		inputHorizontal = canMove ? Input.GetAxis("Horizontal") : 0f;
 
 		float baseSpeed =
 			(isCrouching && isGrounded) ? crouchSpeed :
 			(isRunning ? runningValue : walkingSpeed);
 
-		// keep your ramp-up for running
 		if (isRunning)
 			runningValue = Mathf.Lerp(runningValue, runningSpeed, timeToRunning * Time.deltaTime);
 		else
 			runningValue = walkingSpeed;
 
-		Vector3 desiredMove = (transform.TransformDirection(Vector3.forward) * inputVertical) +
-					  (transform.TransformDirection(Vector3.right) * inputHorizontal);
-		if (desiredMove.sqrMagnitude > 1f) desiredMove.Normalize();
+		Vector3 desiredMove =
+			(transform.TransformDirection(Vector3.forward) * inputVertical) +
+			(transform.TransformDirection(Vector3.right) * inputHorizontal);
+
+		if (desiredMove.sqrMagnitude > 1f)
+			desiredMove.Normalize();
 
 		float verticalSpeed = moveDirection.y;
 
-		// add knockback on top of input
-		Vector3 horizontalMove = desiredMove * baseSpeed + knockbackVelocity;
+		Vector3 horizontalMove = desiredMove * (baseSpeed + flySpeedToUse) + knockbackVelocity;
 		moveDirection = new Vector3(horizontalMove.x, verticalSpeed, horizontalMove.z);
 
-		// decay knockback
-		knockbackVelocity = Vector3.Lerp(knockbackVelocity, Vector3.zero, knockbackDecay * Time.deltaTime);
+		pRef.playerCharacterController.Move(moveDirection * Time.deltaTime);
 
-		// Handle jumping
-		if (Input.GetButton("Jump") && canMove && (isGrounded || coyoteActive) && !isClimbing)
+		isMoving = Mathf.Abs(inputVertical) > 0 || Mathf.Abs(inputHorizontal) > 0;
+	}
+	private void HandleInput()
+	{
+		if (dev || overrideDev)
+		{
+			if (Input.GetKeyDown(KeyCode.C)) SaveState();
+			if (Input.GetKeyDown(KeyCode.V)) LoadState();
+			if (Input.GetKeyDown(KeyCode.F))
+			{
+				moveDirection = Vector3.zero;
+				isFlying = !isFlying;
+				isGrounded = false;
+			}
+		}
+
+		if (Application.isEditor)
+			if (Input.GetKeyDown(KeyCode.H)) overrideDev = !overrideDev;
+
+		bool shift = Input.GetKey(pInput.runningKey);
+		bool runIntent = runToggle ? !shift : shift;
+		bool runAllowedByStance = !(isCrouching && isGrounded);
+		isRunning = runIntent && canRun && runAllowedByStance;
+
+		inputVertical = canMove ? Input.GetAxis("Vertical") : 0f;
+		inputHorizontal = canMove ? Input.GetAxis("Horizontal") : 0f;
+	}
+	private void HandleJumpingInput()
+	{
+		if (Input.GetKey(pInput.jumpKey) && canMove && (isGrounded || coyoteActive))
 		{
 			if (coyoteActive)
 				StopCoyote();
@@ -417,21 +403,24 @@ public class PlayerController : NetworkBehaviour
 
 			footsteps.StopFootsteps();
 			footstepStopPending = false;
+
+			pRef.playerAnimator.A_Jump();
 		}
+	}
+	private void HandleCrouchingInput()
+	{
+		bool crouchSphere = Physics.CheckSphere(
+			headCheck.position,
+			headCheckRadius,
+			pRef.groundLayerMask
+		);
 
-		characterController.Move(moveDirection * Time.deltaTime);
-
-		Moving = Mathf.Abs(inputVertical) > 0 || Mathf.Abs(inputHorizontal) > 0;
-
-		bool crouchSphere = Physics.CheckSphere(headCheck.position, headCheckRadius, LayerMask.GetMask("Ground", "MovingPlatform", "OtherGameController"));
-
-		// Crouching
-		if (Input.GetKeyDown(crouchKey))
+		if (Input.GetKeyDown(pInput.crouchKey))
 			SetCrouchHeight(crouchHeight);
-		else if (Input.GetKeyUp(crouchKey) && !crouchSphere)
+		else if (Input.GetKeyUp(pInput.crouchKey) && !crouchSphere)
 			ResetSetCrouchHeight(initialCrouchHeight);
 
-		if (Input.GetKey(crouchKey))
+		if (Input.GetKey(pInput.crouchKey))
 		{
 			isCrouching = true;
 			if (isGrounded)
@@ -442,46 +431,59 @@ public class PlayerController : NetworkBehaviour
 			isCrouching = false;
 			walkingSpeed = Mathf.Lerp(walkingSpeed, initialWalkingSpeed, 4 * Time.deltaTime);
 
-			if (characterController.height == crouchHeight)
+			if (pRef.playerCharacterController.height == crouchHeight)
 				ResetSetCrouchHeight(initialCrouchHeight);
 		}
 	}
-	void ResetRebound() => rebound = false;
-	void StopCoyote() => coyoteActive = false;
 
+	#endregion
 
-	void SetCrouchHeight(float newHeight)
+	#region Camera
+
+	public void ChangeFieldOfView(float newFov)
 	{
-		characterController.stepOffset = 0.1f;
-
-		characterController.height = newHeight;
-
-		//transform.localScale = new Vector3(transform.localScale.x, newHeight, transform.localScale.z);
-		//characterController.enabled = false;
-		EventManager.instance.TeleportPlayer(this, new Vector3(transform.position.x, transform.position.y - ((initialCrouchHeight - newHeight) / 2), transform.position.z), false);
-		//characterController.enabled = true;
+		initialFOV = newFov;
+		pRef.playerCam.fieldOfView = newFov;
+		runningFOV = newFov * runningFovMultiplier;
 	}
 
-	void ResetSetCrouchHeight(float newHeight)
+	#endregion
+
+	#region Grounding & Landing
+
+	private void init_LeavingGrounded()
 	{
-		characterController.stepOffset = 0.65f;
-
-		characterController.height = newHeight;
-
-		//transform.localScale = new Vector3(transform.localScale.x, newHeight, transform.localScale.z);
-		//characterController.enabled = false;
-		EventManager.instance.TeleportPlayer(this, new Vector3(transform.position.x, transform.position.y + ((initialCrouchHeight - crouchHeight) / 2), transform.position.z), false);
-		//characterController.enabled = true;
+		initFall = transform.position;
+		lastLeftGroundTime = Time.time;
 	}
 
-	private readonly HashSet<global::AbstractEvent> _eventsFiredThisLanding = new HashSet<global::AbstractEvent>();
+	private readonly HashSet<global::AbstractEvent> _eventsFiredThisLanding =
+		new HashSet<global::AbstractEvent>();
+	private void init_EnteringGrounded()
+	{
+		_eventsFiredThisLanding.Clear();
+		TriggerLandingEvents();
+
+		float dist = Vector3.Distance(
+			new Vector3(transform.position.x, initFall.y, transform.position.z),
+			transform.position
+		);
+
+		if (Time.time - lastLeftGroundTime >= landThreshold)
+			footsteps.PlayOneOff();
+
+		pRef.playerAnimator.A_Land();
+	}
+
+	private void ResetRebound() => rebound = false;
+	private void StopCoyote() => coyoteActive = false;
+
 	private void TriggerLandingEvents()
 	{
-		// Grab everything around feet. We include triggers, since you might have trigger volumes.
 		Collider[] hits = Physics.OverlapSphere(
 			groundCheck.position,
 			checkRadius,
-			LayerMask.GetMask("Ground", "MovingPlatform", "OtherGameController"),
+			pRef.groundLayerMask,
 			QueryTriggerInteraction.Collide
 		);
 
@@ -490,27 +492,69 @@ public class PlayerController : NetworkBehaviour
 			var col = hits[i];
 			if (!col) continue;
 
-			// We search on this collider's object or up its parents,
-			// so it still works if the collider is on a child.
 			var evt = col.GetComponentInParent<global::AbstractEvent>();
 			if (evt == null) continue;
 
-			// If we've already fired this exact Event for this landing, skip
 			if (_eventsFiredThisLanding.Contains(evt))
 				continue;
 
-			// - only react to events that are intended to react to collision contact
-			//   (that's what you described as "they have collision bool activated")
-			if (evt.eventActivation != EventActivation.Collision 
-				|| evt.eventActivation == EventActivation.Trigger 
+			if (evt.eventActivation != EventActivation.Collision
+				|| evt.eventActivation == EventActivation.Trigger
 				|| evt.eventActivation == EventActivation.Remote)
 				continue;
 
-			// Looks valid. Fire it and remember so we don't spam.
 			_eventsFiredThisLanding.Add(evt);
 			evt.CallEvent();
 		}
 	}
+
+	#endregion
+
+	#region Crouch
+
+	private void SetCrouchHeight(float newHeight)
+	{
+		pRef.playerCharacterController.stepOffset = 0.1f;
+		pRef.playerCharacterController.height = newHeight;
+
+		EventManager.instance.TeleportPlayer(
+			this,
+			new Vector3(
+				transform.position.x,
+				transform.position.y - ((initialCrouchHeight - newHeight) / 2),
+				transform.position.z),
+			false
+		);
+	}
+
+	private void ResetSetCrouchHeight(float newHeight)
+	{
+		pRef.playerCharacterController.stepOffset = 0.65f;
+		pRef.playerCharacterController.height = newHeight;
+
+		EventManager.instance.TeleportPlayer(
+			this,
+			new Vector3(
+				transform.position.x,
+				transform.position.y + ((initialCrouchHeight - crouchHeight) / 2),
+				transform.position.z),
+			false
+		);
+	}
+
+	#endregion
+
+	#region Audio & Footsteps
+
+	private void PlayMovementSound(string clipName, float min, float max)
+	{
+		AudioManagement.instance.StopThisSound("Movement", clipName);
+		AudioManagement.instance.PlayThisSound("Movement", clipName, true, min, max);
+	}
+
+	#endregion
+
+	#region Knockback
 
 	public void AddKnockback(Vector3 force)
 	{
@@ -518,16 +562,29 @@ public class PlayerController : NetworkBehaviour
 		knockbackVelocity += force;
 	}
 
+	#endregion
 
-	void OnDrawGizmos()
-	{
-		Gizmos.color = Color.red;
-		Gizmos.DrawWireSphere(groundCheck.position, checkRadius);
-		Gizmos.DrawWireSphere(headCheck.position, headCheckRadius);
-	}
+	#region Dev Tools
 
-
-	private Vector3 savePos = Vector3.zero;
 	private void SaveState() => savePos = transform.position;
-	private void LoadState() => EventManager.instance.TeleportPlayer(this ,savePos);
+
+	private void LoadState() =>
+		EventManager.instance.TeleportPlayer(this, savePos);
+
+	#endregion
+
+	private void OnDrawGizmos()
+	{
+		if (groundCheck != null)
+		{
+			Gizmos.color = Color.red;
+			Gizmos.DrawWireSphere(groundCheck.position, checkRadius);
+		}
+
+		if (headCheck != null)
+		{
+			Gizmos.color = Color.red;
+			Gizmos.DrawWireSphere(headCheck.position, headCheckRadius);
+		}
+	}
 }

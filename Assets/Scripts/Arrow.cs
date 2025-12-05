@@ -92,7 +92,9 @@ public class Arrow : MonoBehaviour
 	{
 		if (!isAuthority) return;
 
-		EZCameraShake.CameraShaker.Instance.ShakeOnce(2f, 3f, .1f, .2f);
+		var c = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerReferences>().cameraShaker;
+
+		c.ShakeOnce(2f, 3f, .1f, .2f);
 	}
 
 	private void FixedUpdate()

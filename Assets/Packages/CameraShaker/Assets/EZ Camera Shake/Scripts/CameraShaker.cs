@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace EZCameraShake
 {
     [AddComponentMenu("EZ Camera Shake/Camera Shaker")]
     public class CameraShaker : MonoBehaviour
     {
+        [SerializeField] private PlayerReferences pRef;
+
         /// <summary>
         /// The single instance of the CameraShaker in the current scene. Do not use if you have multiple instances.
         /// </summary>
@@ -36,6 +39,8 @@ namespace EZCameraShake
 
         void Awake()
         {
+            if (!pRef.playerController.IsOwner) return;
+              
             Instance = this;
             if (!instanceList.ContainsKey(gameObject.name))
                 instanceList.Add(gameObject.name, this);

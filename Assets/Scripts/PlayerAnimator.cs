@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class PlayerAnimator : NetworkBehaviour
 {
+	[SerializeField] private PlayerReferences pRef;
+
 	[SerializeField] private Animator multiplayerBowAnim; // the world / 3rd-person one
 	[SerializeField] private Animator multiplayerCharacterAnim;
 
@@ -14,16 +16,7 @@ public class PlayerAnimator : NetworkBehaviour
 
 	[Space(10)]
 
-	[SerializeField] private PlayerController localPlayer;
-
-	private BowScript localBowScript;
-
 	private bool jumpBuffer = false;
-
-	private void Start()
-	{
-		localBowScript = localPlayer.GetComponentInChildren<BowScript>();
-	}
 
 	private void Update()
 	{
@@ -31,29 +24,16 @@ public class PlayerAnimator : NetworkBehaviour
 		if (!IsOwner) return;
 
 		A_WalkingChecker();
-		CheckForInAir();
 
 		AnimatorStateInfo bowStateInfo = multiplayerBowAnim.GetCurrentAnimatorStateInfo(0);
-		multiplayerBowAnim.speed = bowStateInfo.IsName("bow_loadIn") ? localBowScript.arrowDrawSpeed : 1f;
+		multiplayerBowAnim.speed = bowStateInfo.IsName("bow_loadIn") ? pRef.bowScript.arrowDrawSpeed : 1f;
 
 		AnimatorStateInfo charStateInfo = multiplayerCharacterAnim.GetCurrentAnimatorStateInfo(0);
 
-		if (charStateInfo.IsName("Walk") && localPlayer.isRunning)
+		if (charStateInfo.IsName("Walk") && pRef.playerController.isRunning)
 			multiplayerCharacterAnim.speed = runSpeedAnim;
 		else
 			multiplayerCharacterAnim.speed = walkSpeedAnim;
-	}
-
-	private void CheckForInAir()
-	{
-		//if (jumpBuffer) return;
-
-		//if (multiplayerCharacterAnim.GetBool("InAir"))
-		//	if (localPlayer.isGrounded)
-		//	{
-		//		A_Land();
-		//		SetInAir(false);
-		//	}
 	}
 
 	public void A_LoadBow()
@@ -82,7 +62,7 @@ public class PlayerAnimator : NetworkBehaviour
 	}
 	public void A_WalkingChecker()
 	{
-		multiplayerCharacterAnim.SetBool("Walking", localPlayer.Moving);
+		multiplayerCharacterAnim.SetBool("Walking", pRef.playerController.isMoving);
 	}
 	private float bufferTimer = .2f;
 	public void A_Jump() 

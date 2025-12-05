@@ -5,15 +5,21 @@ using Steamworks;
 
 public class PlayerGraphicVisuals : NetworkBehaviour
 {
-	private PlayerController localPlayer;
+	[SerializeField] private PlayerReferences pRef;
 	private Quaternion baseRot;
 
 	[SerializeField] private GameObject gfx;
+
+	[SerializeField] private bool checkMultiplayerGfx = false;
+
+	[Space(15)]
 
 	[SerializeField] private Renderer[] multiplayerGfx;
 	[SerializeField] private Renderer[] singlePlayerGfx;
 
 	[SerializeField] private GameObject playerCanvas;
+
+	[Space(15)]
 
 	[SerializeField] private TextMeshProUGUI textUsername;
 
@@ -26,7 +32,6 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 
 	public override void OnNetworkSpawn()
 	{
-		localPlayer = GetComponentInParent<PlayerController>();
 		baseRot = transform.localRotation;
 
 		if (IsOwner)
@@ -34,9 +39,10 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 			if (playerCanvas)
 				playerCanvas.SetActive(false);
 
-			if (multiplayerGfx != null && multiplayerGfx.Length > 0)
-				foreach (var go in multiplayerGfx)
-					go.enabled = false;
+			if (!checkMultiplayerGfx)
+				if (multiplayerGfx != null && multiplayerGfx.Length > 0)
+					foreach (var go in multiplayerGfx)
+						go.enabled = false;
 
 			// send our Steam name once when we spawn
 			SetNameServerRpc(SteamClient.Name);
@@ -76,10 +82,10 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 
 	private void Update()
 	{
-		if (localPlayer == null || gfx == null) return;
+		if (pRef.playerController == null || gfx == null) return;
 
-		float targetX = -localPlayer.inputVertical * maxForwardTilt;
-		float targetZ = -localPlayer.inputHorizontal * maxSideTilt;
+		float targetX = -pRef.playerController.inputVertical * maxForwardTilt;
+		float targetZ = -pRef.playerController.inputHorizontal * maxSideTilt;
 
 		Quaternion targetRot = baseRot * Quaternion.Euler(targetX, 0f, targetZ);
 		gfx.transform.localRotation = Quaternion.Lerp(

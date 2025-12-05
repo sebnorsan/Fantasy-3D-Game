@@ -78,9 +78,9 @@ public class EventManager : MonoBehaviour
 	#endregion
 	public void TeleportPlayer(PlayerController player, Vector3 tpPos, bool resetDir = true)
 	{
-		player.characterController.enabled = false;
+		player.pRef.playerCharacterController.enabled = false;
 		player.transform.position = tpPos;
-		player.characterController.enabled = true;
+		player.pRef.playerCharacterController.enabled = true;
 
 		if (resetDir)
 			player.moveDirection = Vector3.zero;

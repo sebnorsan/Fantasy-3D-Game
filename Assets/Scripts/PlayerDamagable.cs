@@ -7,12 +7,7 @@ using EZCameraShake;
 
 public class PlayerDamagable : NetworkBehaviour, IDamagable
 {
-
-	[SerializeField] CameraShaker camShaker;
-
-	[SerializeField] private PlayerAnimator animator;
-	[SerializeField] private PlayerController localPlayer;
-	[SerializeField] private PlayerAnimator playerAnimator;
+	[SerializeField] private PlayerReferences pRef;
 
 	[Space(15)]
 
@@ -134,8 +129,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 		if (IsOwner)
 		{
-			camShaker.ShakeOnce(7f, 3f, .1f, .4f);
-			playerAnimator.A_TakeDamage();
+			pRef.cameraShaker.ShakeOnce(7f, 3f, .1f, .4f);
+			pRef.playerAnimator.A_TakeDamage();
 		}
 	}
 	
@@ -160,8 +155,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	}
 	private void OnPlayDamageAnimation()
 	{
-		if (animator != null)
-			animator.A_TakeDamage();
+		if (pRef != null)
+			pRef.playerAnimator.A_TakeDamage();
 	}
 	private IEnumerator OnFlashMaterial()
 	{
@@ -202,8 +197,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	[Rpc(SendTo.Owner, InvokePermission = RpcInvokePermission.Server)]
 	private void ApplyKnockbackOwnerRpc(Vector3 force)
 	{
-		if (localPlayer != null)
-			localPlayer.AddKnockback(force);
+		if (pRef.playerController != null)
+			pRef.playerController.AddKnockback(force);
 	}
 
 
@@ -221,7 +216,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		SpawnDeathCamClientRpc(lastHitByClientId);
 
 		StartCoroutine(DeathFlowServer()); // teleports + heal etc on server
-		localPlayer.canMove = false;
+		pRef.playerController.canMove = false;
 	}
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
@@ -236,8 +231,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	{
 		var dCam = Instantiate(
 			deathCam,
-			localPlayer.cam.transform.position,
-			localPlayer.cam.transform.rotation);
+			pRef.playerCam.transform.position,
+			pRef.playerCam.transform.rotation);
 
 		if (NetworkManager.Singleton.ConnectedClients.TryGetValue(killerClientId, out var killerCc))
 		{
@@ -245,7 +240,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 			dCam.GetComponent<DeathCam>().playerWhoKilled = killerPc;
 		}
 
-		EventManager.instance.TeleportPlayer(localPlayer, deathPosition);
+		EventManager.instance.TeleportPlayer(pRef.playerController, deathPosition);
 
 		yield return new WaitForSeconds(deathTime-2);
 		ScreenSummoner.SummonScreen(Color.black, 1f, true);
@@ -254,10 +249,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		Destroy(dCam);
 
 		EventManager.instance.TeleportPlayer(
-			localPlayer,
+			pRef.playerController,
 			FindFirstObjectByType<GameSceneSpawnManager>().FindValidSpawnPoint());
-
-		
 	}
 
 	private IEnumerator DeathFlowServer()
@@ -289,26 +282,6 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		}
 	
 	}
-	//private IEnumerator DeathFlow()
-	//{
-	//	EventManager.instance.TeleportPlayer(localPlayer, deathPosition);
-
-	//	var dCam = Instantiate(deathCam, localPlayer.cam.transform.position, localPlayer.cam.transform.rotation);
-
-	//	if (NetworkManager.Singleton.ConnectedClients.TryGetValue(lastHitByClientId, out var killerCc))
-	//	{
-	//		var killerPc = killerCc.PlayerObject.GetComponent<PlayerController>();
-	//		dCam.GetComponent<DeathCam>().playerWhoKilled = killerPc;
-	//	}
-
-	//	yield return new WaitForSeconds(deathTime);
-
-	//	Destroy(dCam);
-
-	//	Heal(maxHealth); // direct, no RPC
-	//	EventManager.instance.TeleportPlayer(localPlayer, FindFirstObjectByType<GameSceneSpawnManager>().FindValidSpawnPoint());
-	//}
-
 	#endregion
 
 }

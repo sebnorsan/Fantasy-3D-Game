@@ -727,13 +727,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7611be708202c1d4da9d7bdb199bf95f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pRef: {fileID: 930708363686757887}
+  pInput: {fileID: 5742270511285517812}
   maxDistance: 30
   sphereRadius: 0.2
   ignoreLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 808
   ignoreTags: []
-  interactionKeyAnimator: {fileID: 0}
   isTalking: 0
 --- !u!1 &1778696884442115976
 GameObject:
@@ -811,6 +812,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55f3e68e3f5b39a4ebc4544678ece612, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pRef: {fileID: 930708363686757887}
+  pInput: {fileID: 5742270511285517812}
   arrowDamage: 1
   arrowSpeed: 150
   arrowDrawSpeed: 1
@@ -994,6 +997,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa2ce1e68189eb24ca30882f47951a22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pRef: {fileID: 930708363686757887}
   Enabled: 1
   Amount: 0.01
   Frequency: 13
@@ -1564,7 +1568,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93060db6f45c84f438a4f90dcc3b58b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: {fileID: 0}
+  pRef: {fileID: 930708363686757887}
   RotationAmount: 0.2
   RotationSmooth: 6
   CanMovementFX: 1
@@ -3196,11 +3200,13 @@ GameObject:
   - component: {fileID: 6778015122654442836}
   - component: {fileID: 6262575431432307872}
   - component: {fileID: 4808590262637696532}
-  - component: {fileID: 8365578267376534845}
-  - component: {fileID: 515831196404787215}
   - component: {fileID: 6813694573278187587}
   - component: {fileID: 994555372891957732}
   - component: {fileID: 147051769140427139}
+  - component: {fileID: 930708363686757887}
+  - component: {fileID: 5742270511285517812}
+  - component: {fileID: 8365578267376534845}
+  - component: {fileID: 515831196404787215}
   - component: {fileID: -4300034968420110970}
   - component: {fileID: 150086669983804623}
   m_Layer: 3
@@ -3323,7 +3329,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  playerAnimator: {fileID: 994555372891957732}
+  pRef: {fileID: 930708363686757887}
+  pInput: {fileID: 5742270511285517812}
   playerCamera: {fileID: 743770276343240314}
   walkingSpeed: 8
   crouchSpeed: 5
@@ -3331,8 +3338,6 @@ MonoBehaviour:
   jumpSpeed: 8
   lookSpeed: 2
   lookXLimit: 80
-  knockbackDecay: 5
-  minAirGap: 0.15
   runningFOV: 105
   fovTransitionSpeed: 4
   crouchHeight: 1.0692
@@ -3346,19 +3351,135 @@ MonoBehaviour:
   maxFallSpeed: -45
   headCheck: {fileID: 5675913063235240685}
   headCheckRadius: 0.3
-  crouchKey: 306
   runToggle: 0
-  characterController: {fileID: 0}
+  knockbackDecay: 5
+  footstepStopThreshold: 0.1
   moveDirection: {x: 0, y: 0, z: 0}
   isRunning: 0
-  Moving: 0
-  cam: {fileID: 0}
+  isMoving: 0
   rotationX: 0
   isGrounded: 0
   inputVertical: 0
   inputHorizontal: 0
   dev: 1
-  footstepStopThreshold: 0.1
+  flySpeed: 7
+  flySpeedFast: 60
+  flySpeedVertical: 20
+--- !u!114 &6813694573278187587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7758727492805073096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64955f54254f33e4ca4f0183e1438dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  pRef: {fileID: 930708363686757887}
+  maxHealth: 10
+  currentHealth: 10
+  deathTime: 6
+  deathCam: {fileID: 3697209131461708778, guid: ab6915eb62cd27142847f8cc4b7addc1, type: 3}
+  deathParticles: {fileID: 3548588485384254792, guid: 3a1bfe20f1684bc4ca15eb061cba3362, type: 3}
+  hitParticles: {fileID: 5024009746357069194, guid: 5540ed9c3d556b24d9f00eefefe68cc1, type: 3}
+  healthSlider: {fileID: 2622446098186953589}
+  sliderLerpSpeed: 10
+  knockbackStrength: 10
+--- !u!114 &994555372891957732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7758727492805073096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1de663ceaeca444e94939f1e7724702, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  pRef: {fileID: 930708363686757887}
+  multiplayerBowAnim: {fileID: 7790377399799966768}
+  multiplayerCharacterAnim: {fileID: 2021122553746785438}
+  walkSpeedAnim: 1
+  runSpeedAnim: 1.5
+--- !u!114 &147051769140427139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7758727492805073096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53ae7ab21de15654fa7e46301f23a2fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  pRef: {fileID: 930708363686757887}
+  gfx: {fileID: 8827951681074446768}
+  checkMultiplayerGfx: 0
+  multiplayerGfx:
+  - {fileID: 2403484915536638094}
+  - {fileID: 6803833735646330706}
+  - {fileID: 6687811885609288578}
+  - {fileID: 1307337018724288108}
+  - {fileID: 4865587274794707827}
+  - {fileID: 3419079707560980135}
+  - {fileID: 6685196923763311800}
+  singlePlayerGfx:
+  - {fileID: 4698612090648555707}
+  - {fileID: 2691332437555054812}
+  - {fileID: 3972146315545381423}
+  playerCanvas: {fileID: 1838311705572959035}
+  textUsername: {fileID: 7283792964927178359}
+  maxForwardTilt: 25
+  maxSideTilt: 18
+  tiltSpeed: 10
+--- !u!114 &930708363686757887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7758727492805073096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41f8af9f782b65d4c944ec21a694d980, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerController: {fileID: 4808590262637696532}
+  playerAnimator: {fileID: 994555372891957732}
+  playerGraphics: {fileID: 147051769140427139}
+  playerDamagable: {fileID: 6813694573278187587}
+  cameraShaker: {fileID: 7212588598366797314}
+  playerCharacterController: {fileID: 4702842973208242300}
+  playerCam: {fileID: 5855688573525650132}
+  bowScript: {fileID: 1227791032311695380}
+  bowNetCode: {fileID: 515831196404787215}
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 1216
+--- !u!114 &5742270511285517812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7758727492805073096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af43a290f1b622b4a9f8d719dd79809b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpKey: 32
+  runningKey: 304
+  crouchKey: 306
+  interactionKey: 101
+  shootKey: 323
 --- !u!114 &8365578267376534845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3412,81 +3533,6 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   localBowScript: {fileID: 1227791032311695380}
   arrowPrefab: {fileID: 5657210549004271310, guid: d6446b95a8d411843a8b5b5ce19c79f3, type: 3}
---- !u!114 &6813694573278187587
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7758727492805073096}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64955f54254f33e4ca4f0183e1438dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  camShaker: {fileID: 7212588598366797314}
-  animator: {fileID: 994555372891957732}
-  localPlayer: {fileID: 4808590262637696532}
-  playerAnimator: {fileID: 994555372891957732}
-  maxHealth: 10
-  currentHealth: 10
-  deathTime: 6
-  deathCam: {fileID: 3697209131461708778, guid: ab6915eb62cd27142847f8cc4b7addc1, type: 3}
-  deathParticles: {fileID: 3548588485384254792, guid: 3a1bfe20f1684bc4ca15eb061cba3362, type: 3}
-  hitParticles: {fileID: 5024009746357069194, guid: 5540ed9c3d556b24d9f00eefefe68cc1, type: 3}
-  healthSlider: {fileID: 2622446098186953589}
-  sliderLerpSpeed: 10
-  knockbackStrength: 10
---- !u!114 &994555372891957732
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7758727492805073096}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1de663ceaeca444e94939f1e7724702, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  multiplayerBowAnim: {fileID: 7790377399799966768}
-  multiplayerCharacterAnim: {fileID: 2021122553746785438}
-  walkSpeedAnim: 1
-  runSpeedAnim: 1.5
-  localPlayer: {fileID: 4808590262637696532}
---- !u!114 &147051769140427139
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7758727492805073096}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53ae7ab21de15654fa7e46301f23a2fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  gfx: {fileID: 8827951681074446768}
-  multiplayerGfx:
-  - {fileID: 2403484915536638094}
-  - {fileID: 6803833735646330706}
-  - {fileID: 6687811885609288578}
-  - {fileID: 1307337018724288108}
-  - {fileID: 4865587274794707827}
-  - {fileID: 3419079707560980135}
-  - {fileID: 6685196923763311800}
-  singlePlayerGfx:
-  - {fileID: 4698612090648555707}
-  - {fileID: 2691332437555054812}
-  - {fileID: 3972146315545381423}
-  playerCanvas: {fileID: 1838311705572959035}
-  textUsername: {fileID: 7283792964927178359}
-  maxForwardTilt: 25
-  maxSideTilt: 18
-  tiltSpeed: 10
 --- !u!114 &-4300034968420110970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3517,9 +3563,9 @@ MonoBehaviour:
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
+  SyncRotAngleX: 0
+  SyncRotAngleY: 0
+  SyncRotAngleZ: 0
   SyncScaleX: 0
   SyncScaleY: 1
   SyncScaleZ: 0
@@ -3740,7 +3786,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3273564066785457438}
   - component: {fileID: 7212588598366797314}
-  - component: {fileID: 5330099070029441228}
   m_Layer: 0
   m_Name: CameraShaker
   m_TagString: Untagged
@@ -3771,28 +3816,16 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8463654121262741178}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2ab8353b5ebd32545867da143199a814, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pRef: {fileID: 930708363686757887}
   DefaultPosInfluence: {x: 0.15, y: 0.15, z: 0.15}
   DefaultRotInfluence: {x: 1, y: 1, z: 1}
   RestPositionOffset: {x: 0, y: 0, z: 0}
   RestRotationOffset: {x: 0, y: 0, z: 0}
---- !u!114 &5330099070029441228
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8463654121262741178}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a72d8f7b49e2f5441afc64e4bad3e232, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scriptToEnable: {fileID: 7212588598366797314}
 --- !u!1 &8467149520740043404
 GameObject:
   m_ObjectHideFlags: 0

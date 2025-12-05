@@ -7,6 +7,8 @@ namespace EvolveGames
     [RequireComponent(typeof(Camera))]
     public class HeadBob : MonoBehaviour
     {
+        [SerializeField] private PlayerReferences pRef;
+
         [Header("HeadBob Effect")]
         [SerializeField] bool Enabled = true;
         [Space, Header("Main")]
@@ -22,10 +24,8 @@ namespace EvolveGames
         Vector3 StartPos;
         Vector3 StartRot;
         Vector3 FinalRot;
-        CharacterController player;
         private void Awake()
         {
-            player = GetComponentInParent<CharacterController>();
             StartPos = transform.localPosition;
             StartRot = transform.localRotation.eulerAngles;
         }
@@ -40,7 +40,7 @@ namespace EvolveGames
 
         private void CheckMotion()
         {
-            float speed = new Vector3(player.velocity.x, 0, player.velocity.z).magnitude;
+            float speed = new Vector3(pRef.playerCharacterController.velocity.x, 0, pRef.playerCharacterController.velocity.z).magnitude;
 
             if (speed < ToggleSpeed) return;
             if (!FindFirstObjectByType<PlayerController>().isGrounded) return;
