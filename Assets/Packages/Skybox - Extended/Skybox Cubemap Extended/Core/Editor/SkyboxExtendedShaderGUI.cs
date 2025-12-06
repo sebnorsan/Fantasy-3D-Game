@@ -2,6 +2,7 @@
 
 using UnityEngine;
 using UnityEditor;
+using Boxophobic.Utility;
 using System.Collections.Generic;
 
 namespace SkyboxExtended
@@ -25,8 +26,10 @@ namespace SkyboxExtended
             {
                 var prop = props[i];
 
-                if (prop.flags == MaterialProperty.PropFlags.HideInInspector)
+                if (BoxoUtils.IsShaderGUIPropertyHidden(prop))
+                {
                     continue;
+                }
 
                 customPropsList.Add(prop);
             }

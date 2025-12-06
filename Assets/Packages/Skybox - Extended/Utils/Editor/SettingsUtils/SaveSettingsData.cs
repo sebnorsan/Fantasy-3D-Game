@@ -4,7 +4,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace Boxophobic.Utils
+namespace Boxophobic.Utility
 {
     public partial class SettingsUtils
     {

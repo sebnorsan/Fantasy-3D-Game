@@ -2,7 +2,7 @@
 
 using UnityEngine;
 using UnityEditor;
-using Boxophobic.Constants;
+using Boxophobic.Utility;
 
 namespace Boxophobic.StyledGUI
 {

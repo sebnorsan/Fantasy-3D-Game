@@ -10,6 +10,7 @@ namespace Boxophobic.StyledGUI
         public float size;
         public float top;
         public float down;
+        public string tooltip = "";
 
         public StyledTextureDrawer()
         {
@@ -25,11 +26,27 @@ namespace Boxophobic.StyledGUI
             this.down = 0;
         }
 
+        public StyledTextureDrawer(float size, string tooltip)
+        {
+            this.size = size;
+            this.top = 0;
+            this.down = 0;
+            this.tooltip = tooltip;
+        }
+
         public StyledTextureDrawer(float size, float top, float down)
         {
             this.size = size;
             this.top = top;
             this.down = down;
+        }
+
+        public StyledTextureDrawer(float size, string tooltip, float top, float down)
+        {
+            this.size = size;
+            this.top = top;
+            this.down = down;
+            this.tooltip = tooltip;
         }
 
         public override void OnGUI(Rect position, MaterialProperty prop, string label, MaterialEditor materialEditor)
@@ -44,12 +61,12 @@ namespace Boxophobic.StyledGUI
 
             if (prop.textureDimension == UnityEngine.Rendering.TextureDimension.Tex2D)
             {
-                tex = (Texture2D)EditorGUILayout.ObjectField(prop.displayName, prop.textureValue, typeof(Texture2D), false, GUILayout.Height(50));
+                tex = (Texture2D)EditorGUILayout.ObjectField(new GUIContent(prop.displayName, tooltip), prop.textureValue, typeof(Texture2D), false, GUILayout.Height(50));
             }
 
             if (prop.textureDimension == UnityEngine.Rendering.TextureDimension.Cube)
             {
-                tex = (Cubemap)EditorGUILayout.ObjectField(prop.displayName, prop.textureValue, typeof(Cubemap), false, GUILayout.Height(50));
+                tex = (Cubemap)EditorGUILayout.ObjectField(new GUIContent(prop.displayName, tooltip), prop.textureValue, typeof(Cubemap), false, GUILayout.Height(50));
             }
 
             EditorGUI.showMixedValue = false;

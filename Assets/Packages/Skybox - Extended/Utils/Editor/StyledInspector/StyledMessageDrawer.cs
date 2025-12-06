@@ -21,26 +21,26 @@ namespace Boxophobic.StyledGUI
             {
                 a = (StyledMessage)attribute;
 
-                if (a.Type == "None")
+                if (a.type == "None")
                 {
                     messageType = MessageType.None;
                 }
-                else if (a.Type == "Info")
+                else if (a.type == "Info")
                 {
                     messageType = MessageType.Info;
                 }
-                else if (a.Type == "Warning")
+                else if (a.type == "Warning")
                 {
                     messageType = MessageType.Warning;
                 }
-                else if (a.Type == "Error")
+                else if (a.type == "Error")
                 {
                     messageType = MessageType.Error;
                 }
 
-                GUILayout.Space(a.Top);
-                EditorGUILayout.HelpBox(a.Message, messageType);
-                GUILayout.Space(a.Down);
+                GUILayout.Space(a.top);
+                EditorGUILayout.HelpBox(a.message, messageType);
+                GUILayout.Space(a.down);
             }
         }
 

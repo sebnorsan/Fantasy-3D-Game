@@ -3,7 +3,7 @@
 using System.Globalization;
 using UnityEditor;
 
-namespace Boxophobic.Utils
+namespace Boxophobic.Utility
 {
     public partial class SettingsUtils
     {

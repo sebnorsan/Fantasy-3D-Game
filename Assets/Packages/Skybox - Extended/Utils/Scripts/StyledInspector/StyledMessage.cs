@@ -6,25 +6,26 @@ namespace Boxophobic.StyledGUI
 {
     public class StyledMessage : PropertyAttribute
     {
-        public string Type;
-        public string Message;
-        public float Top;
-        public float Down;
+        public string type;
+        public string message;
 
-        public StyledMessage(string Type, string Message)
+        public float top;
+        public float down;
+
+        public StyledMessage(string type, string message)
         {
-            this.Type = Type;
-            this.Message = Message;
-            this.Top = 0;
-            this.Down = 0;
+            this.type = type;
+            this.message = message;
+            this.top = 0;
+            this.down = 0;
         }
 
-        public StyledMessage(string Type, string Message, float Top, float Down)
+        public StyledMessage(string type, string message, float top, float down)
         {
-            this.Type = Type;
-            this.Message = Message;
-            this.Top = Top;
-            this.Down = Down;
+            this.type = type;
+            this.message = message;
+            this.top = top;
+            this.down = down;
         }
     }
 }

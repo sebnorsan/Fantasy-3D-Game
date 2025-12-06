@@ -22,15 +22,15 @@ namespace Boxophobic.StyledGUI
             }
             else
             {
-                color = CONSTANT.ColorLightGray;
+                color = Constant.ColorLightGray;
             }
 
             EditorGUI.DrawRect(fillRect, color);
-            EditorGUI.DrawRect(lineRect, CONSTANT.LineColor);
+            EditorGUI.DrawRect(lineRect, Constant.LineColor);
 
-            Color guiColor = CONSTANT.ColorDarkGray;
+            Color guiColor = Constant.ColorDarkGray;
 
-            GUI.Label(fullRect, "<size=16><color=#" + ColorUtility.ToHtmlStringRGB(guiColor) + ">" + title + "</color></size>", CONSTANT.TitleStyle);
+            GUI.Label(fullRect, "<size=16><color=#" + ColorUtility.ToHtmlStringRGB(guiColor) + ">" + title + "</color></size>", Constant.TitleStyle);
 
             GUILayout.Space(15);
         }
@@ -48,19 +48,19 @@ namespace Boxophobic.StyledGUI
 
             if (EditorGUIUtility.isProSkin)
             {
-                color = CONSTANT.ColorDarkGray;
-                guiColor = CONSTANT.ColorLightGray;
+                color = Constant.ColorDarkGray;
+                guiColor = Constant.ColorLightGray;
             }
             else
             {
-                color = CONSTANT.ColorLightGray;
-                guiColor = CONSTANT.ColorDarkGray;
+                color = Constant.ColorLightGray;
+                guiColor = Constant.ColorDarkGray;
             }
 
             EditorGUI.DrawRect(fillRect, color);
-            EditorGUI.DrawRect(lineRect, CONSTANT.LineColor);
+            EditorGUI.DrawRect(lineRect, Constant.LineColor);
 
-            GUI.Label(fullRect, "<size=16><color=#" + ColorUtility.ToHtmlStringRGB(guiColor) + ">" + title + "</color></size>", CONSTANT.TitleStyle);
+            GUI.Label(fullRect, "<size=16><color=#" + ColorUtility.ToHtmlStringRGB(guiColor) + ">" + title + "</color></size>", Constant.TitleStyle);
 
             GUILayout.Space(15);
         }
@@ -83,7 +83,7 @@ namespace Boxophobic.StyledGUI
 
             var fullRect = GUILayoutUtility.GetRect(0, 0, 36, 0);
             var fillRect = new Rect(0, fullRect.y, fullRect.xMax + 10, 36);
-            var subRect = new Rect(0, fullRect.y, fullRect.xMax - 18, 36);
+            var subRect = new Rect(0, fullRect.y, fullRect.xMax - 14, 36);
             var lineRect = new Rect(0, fullRect.y, fullRect.xMax + 10, 1);
 
             if (EditorGUIUtility.isProSkin)
@@ -92,13 +92,13 @@ namespace Boxophobic.StyledGUI
             }
             else
             {
-                color = CONSTANT.ColorLightGray;
+                color = Constant.ColorLightGray;
             }
 
             EditorGUI.DrawRect(fillRect, color);
-            EditorGUI.DrawRect(lineRect, CONSTANT.LineColor);
+            EditorGUI.DrawRect(lineRect, Constant.LineColor);
 
-            Color guiColor = CONSTANT.ColorDarkGray;
+            Color guiColor = Constant.ColorDarkGray;
 
             GUI.Label(fullRect, "<size=16><color=#" + ColorUtility.ToHtmlStringRGB(guiColor) + ">" + title + "</color></size>", titleStyle);
             GUI.Label(subRect, "<b><size=11><color=#" + ColorUtility.ToHtmlStringRGB(guiColor) + ">" + subtitle + "</color></size></b>", subTitleStyle);
@@ -131,13 +131,13 @@ namespace Boxophobic.StyledGUI
 
             if (EditorGUIUtility.isProSkin)
             {
-                color = CONSTANT.ColorDarkGray;
-                guiColor = CONSTANT.ColorLightGray;
+                color = Constant.ColorDarkGray;
+                guiColor = Constant.ColorLightGray;
             }
             else
             {
-                color = CONSTANT.ColorLightGray;
-                guiColor = CONSTANT.ColorDarkGray;
+                color = Constant.ColorLightGray;
+                guiColor = Constant.ColorDarkGray;
             }
             EditorGUI.DrawRect(fillRect, color);
 

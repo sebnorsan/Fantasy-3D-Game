@@ -7,61 +7,58 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 {
-	private NavMeshAgent agent;
-	private Transform crystalPos;
-	private Animator anim;
+	[Header("References")]
+	[SerializeField] private NavMeshAgent agent;
+	[SerializeField] Animator anim;
+	private Transform targetPos;
+	private Vector3 targetDestination;
+	private EnemyTarget targetScript;
 
-	public int maxHealth = 100;
+	[Header("Enemy Stats")]
+	[SerializeField] private int maxHealth = 100;
 	private int currentHealth = 0;
 
-	public int damage = 1;
-	public float attackDelay = 3;
+	[SerializeField] private int damage = 1;
+	[SerializeField] private float attackDelay = 3;
 
-	public int xpDrop = 1;
-	public float speed = 3.5f;
+	[SerializeField] private int xpDrop = 1;
+	[SerializeField] private float speed = 3.5f;
 
-	[SerializeField] private GameObject fireEffect, iceEffect;
-	private List<(MeshRenderer renderer, Material[] originals)> affected =
-		new List<(MeshRenderer renderer, Material[] originals)>();
+	private Coroutine attackCoroutine;
 
-	private void Awake() => currentHealth = maxHealth;
+	[Header("Damage Effects")]
+	private Material flashMaterial;
+	private float flashDuration = .1f;
 
-	private void Start()
+	[SerializeField] private GameObject hitParticles;
+	[SerializeField] private GameObject deathParticles;
+
+	private Coroutine currKnockbackCoroutine, currFlashCoroutine;
+	private MeshRenderer[] allRenderers;
+
+	[Header("Knockback Settings")]
+	private float originalSpeed;
+	private float originalAcceleration;
+	[SerializeField] private float knockbackForce = 5f;
+	[SerializeField] private float knockbackDuration = .2f;
+
+	private void OnValidate()
 	{
-		agent = GetComponent<NavMeshAgent>();
-
-		if (GetComponent<Animator>())
-			anim = GetComponent<Animator>();
+		if (!Application.isEditor || Application.isPlaying) return;
 
 		originalSpeed = speed;
 		originalAcceleration = agent.acceleration;
+	}
+
+	private void Start()
+	{
+		allRenderers = GetComponentsInChildren<MeshRenderer>(includeInactive: true);
+
+		currentHealth = maxHealth;
 
 		flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
 
-		hitParticles = Resources.Load<GameObject>("PFX/HitFX");
-		deathParticles = Resources.Load<GameObject>("PFX/DeathFX");
-
 		InitializeEnemy();
-	}
-
-	private Coroutine attackCoroutine;
-	public void StartAttack()
-	{
-		attackCoroutine = StartCoroutine(AttackNumerator());
-	}
-
-	public void StopAttack()
-	{
-		if (attackCoroutine != null)
-			StopCoroutine(attackCoroutine);
-	}
-
-	protected virtual IEnumerator AttackNumerator()
-	{
-		anim.SetBool("Walking", false);
-		yield return new WaitForSeconds(attackDelay);
-		anim.SetTrigger("Attack");
-		attackCoroutine = StartCoroutine(AttackNumerator());
 	}
 
 	protected virtual void InitializeEnemy()
@@ -73,21 +70,47 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 
 		InitializeDestination();
 	}
+	/// <summary>
+	/// These are called from the EnemyTarget script itself,
+	/// when an enemy enters its trigger, it starts attacking
+	/// and when an enemy leaves its trigger, it stops.
+	/// </summary>
+	//------------------------
+	public void StartAttack()
+	{
+		attackCoroutine = StartCoroutine(AttackNumerator());
+	}
 
-	private Vector3 targetDestination;
+	public void StopAttack()
+	{
+		if (attackCoroutine != null)
+			StopCoroutine(attackCoroutine);
+	}
+	//------------------------
+	protected virtual IEnumerator AttackNumerator()
+	{
+		anim.SetBool("Walking", false);
+		yield return new WaitForSeconds(attackDelay);
+		anim.SetTrigger("Attack");
+		attackCoroutine = StartCoroutine(AttackNumerator());
+	}
+
 	protected virtual void InitializeDestination()
 	{
-		//crystalPos = FindFirstObjectByType<CrystalScript>().transform;
+		var enemyTargets = FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None);
+		int randomTarget = Random.Range(0, enemyTargets.Length);
+		targetScript = enemyTargets[randomTarget];
 
-		float radius = 2.5f;
-		Vector2 randomCircle = Random.insideUnitCircle.normalized * radius;
+		targetPos = targetScript.transform;
+
+		float destinationRadius = targetScript.GetColliderRadius();
+		Vector2 randomCircle = Random.insideUnitCircle.normalized * destinationRadius;
 		Vector3 offset = new Vector3(randomCircle.x, 0, randomCircle.y);
 
-		targetDestination = crystalPos.position + offset;
+		targetDestination = targetPos.position + offset;
 		agent.SetDestination(targetDestination);
 	}
 
-	Coroutine currKnockbackCoroutine, currFlashCoroutine;
 	public void DamageEffects(Vector3 hitPoint)
 	{
 		if (currKnockbackCoroutine != null)
@@ -101,17 +124,21 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 		OnPlayDamageAnimation();
 	}
 
-	[Header("Knockback Settings")]
-	private float originalSpeed;
-	private float originalAcceleration;
-	public float knockbackForce = 5f;
-	public float knockbackDuration = .2f;
-
 	protected virtual IEnumerator OnKnockback(Vector3 hitPoint)
 	{
-		yield return new WaitForSeconds(0.001f);
+		#region Init
+		yield return null;
+
 		if (anim != null)
 			anim.SetBool("Walking", false);
+		#endregion
+		#region SetKnockbackMovement
+
+		///<summary>
+		///Sets the agents destination to the knockback position
+		///which is calculated based on the position of where the player shot the enemy from
+		///afterwards we disable rotations so the agent doesent look at the knockback position while getting knocked back
+		/// </summary>
 
 		// Compute direction from hit point to this enemy
 		Vector3 dir = (transform.position - hitPoint).normalized;
@@ -137,6 +164,12 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 			agent.speed = Mathf.Lerp(knockbackForce, 0f, t);
 			yield return null;
 		}
+		#endregion
+		#region SetNormalMovement
+
+		///<summary>
+		///Resets, so normal destination and movement speed is reset
+		/// </summary>
 
 		agent.updateRotation = true;
 		agent.acceleration = originalAcceleration;
@@ -156,16 +189,14 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 		agent.SetDestination(targetDestination); // Resume behavior
 		if (anim != null)
 			anim.SetBool("Walking", true);
+		#endregion
 	}
 
-	private Material flashMaterial;
-	private float flashDuration = .1f;
-	protected virtual IEnumerator OnFlashMaterial()
+
+	private IEnumerator OnFlashMaterial()
 	{
 		if (flashMaterial == null)
 			flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
-
-		var allRenderers = GetComponentsInChildren<MeshRenderer>(includeInactive: true);
 
 		var affected = new List<(MeshRenderer renderer, Material[] originals)>(allRenderers.Length);
 		foreach (var rend in allRenderers)
@@ -187,8 +218,7 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 		currFlashCoroutine = null;
 	}
 
-	private GameObject hitParticles;
-	private GameObject deathParticles;
+	
 	protected virtual void OnSpawnDamagePFX()
 	{
 		if (hitParticles == null) return;
@@ -263,7 +293,7 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 
 	// ------------- Crystal attacks -------------
 
-	public void AttackCrystal()
+	public void AE_AttackCrystal()
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
@@ -276,66 +306,6 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 		//	TakeDamage(5, transform.position);
 		//if (crystalScript.deadly)
 		//	DieServer();
-	}
-
-	// ------------- Fire / Ice effects (still mostly local) -------------
-
-
-	public void IceEffect()
-	{
-		if (!NetworkManager.Singleton.IsServer) return;
-		IceEffectClientRpc();
-	}
-
-	public void FireEffect()
-	{
-		if (!NetworkManager.Singleton.IsServer) return;
-		FireEffectClientRpc();
-	}
-
-	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void IceEffectClientRpc()
-	{
-		if (iceEffect != null)
-			iceEffect.SetActive(true);
-
-		CancelInvoke(nameof(ResetIceEffect));
-		Invoke(nameof(ResetIceEffect), 6f);
-
-		// slowdown on all instances (same as before, but now visible everywhere)
-		if (agent != null)
-			agent.speed /= 2f;
-	}
-
-	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void FireEffectClientRpc()
-	{
-		if (fireEffect != null)
-			fireEffect.SetActive(true);
-
-		// periodic damage still only really applies on server because TakeDamage has an IsServer guard
-		InvokeRepeating(nameof(FireDamage), .5f, 10f);
-
-		CancelInvoke(nameof(ResetFireEffect));
-		Invoke(nameof(ResetFireEffect), .5f * 10f);
-	}
-
-	private void ResetIceEffect()
-	{
-		if (agent != null)
-			agent.speed = originalSpeed;
-	}
-
-	private void ResetFireEffect()
-	{
-		if (fireEffect != null)
-			fireEffect.SetActive(false);
-	}
-
-	private void FireDamage()
-	{
-		// this will only actually change HP on server due to guard in TakeDamage
-		TakeDamage(1, transform.position);
 	}
 }
 

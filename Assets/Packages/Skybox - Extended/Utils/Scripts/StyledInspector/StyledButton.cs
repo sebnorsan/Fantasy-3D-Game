@@ -6,22 +6,22 @@ namespace Boxophobic.StyledGUI
 {
     public class StyledButton : PropertyAttribute
     {
-        public string Text = "";
-        public float Top = 0;
-        public float Down = 0;
+        public string text = "";
+        public float top = 0;
+        public float down = 0;
 
-        public StyledButton(string Text)
+        public StyledButton(string text)
         {
-            this.Text = Text;
-            this.Top = 0;
-            this.Down = 0;
+            this.text = text;
+            this.top = 0;
+            this.down = 0;
         }
 
-        public StyledButton(string Text, float Top, float Down)
+        public StyledButton(string text, float top, float down)
         {
-            this.Text = Text;
-            this.Top = Top;
-            this.Down = Down;
+            this.text = text;
+            this.top = top;
+            this.down = down;
         }
     }
 }

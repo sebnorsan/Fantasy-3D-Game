@@ -17,10 +17,10 @@ namespace Boxophobic.StyledGUI
             var lineRect = new Rect(0, fullRect.y, fullRect.xMax + 10, 1);
             var titleRect = new Rect(fullRect.position.x + 4, fullRect.position.y, fullRect.width, 18);
 
-            EditorGUI.DrawRect(fillRect, CONSTANT.CategoryColor);
-            EditorGUI.DrawRect(lineRect, CONSTANT.LineColor);
+            EditorGUI.DrawRect(fillRect, Constant.CategoryColor);
+            EditorGUI.DrawRect(lineRect, Constant.LineColor);
 
-            GUI.Label(titleRect, bannerText, CONSTANT.HeaderStyle);
+            GUI.Label(titleRect, bannerText, Constant.HeaderStyle);
 
             GUI.color = Color.white;
         }
@@ -52,11 +52,11 @@ namespace Boxophobic.StyledGUI
 
             if (EditorGUIUtility.isProSkin)
             {
-                GUI.color = CONSTANT.ColorDarkGray;
+                GUI.color = Constant.ColorDarkGray;
             }
             else
             {
-                GUI.color = CONSTANT.ColorLightGray;
+                GUI.color = Constant.ColorLightGray;
             }
 
             if (colapsable)
@@ -67,10 +67,10 @@ namespace Boxophobic.StyledGUI
                 }
             }
 
-            EditorGUI.DrawRect(fillRect, CONSTANT.CategoryColor);
-            EditorGUI.DrawRect(lineRect, CONSTANT.LineColor);
+            EditorGUI.DrawRect(fillRect, Constant.CategoryColor);
+            EditorGUI.DrawRect(lineRect, Constant.LineColor);
 
-            GUI.Label(titleRect, bannerText, CONSTANT.HeaderStyle);
+            GUI.Label(titleRect, bannerText, Constant.HeaderStyle);
 
             if (colapsable)
             {

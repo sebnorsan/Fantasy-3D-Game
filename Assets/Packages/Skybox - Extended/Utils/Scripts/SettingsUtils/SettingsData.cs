@@ -3,7 +3,7 @@
 using UnityEngine;
 using Boxophobic.StyledGUI;
 
-namespace Boxophobic.Utils
+namespace Boxophobic.Utility
 {
     [CreateAssetMenu(fileName = "Data", menuName = "BOXOPHOBIC/Settings Data")]
     public class SettingsData : StyledScriptableObject
