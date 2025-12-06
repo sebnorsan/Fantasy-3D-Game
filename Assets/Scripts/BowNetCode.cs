@@ -1,5 +1,3 @@
-using System.Globalization;
-using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -26,13 +24,16 @@ public class BowNetCode : NetworkBehaviour
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
 	public void HitServerRpc(ulong targetNetId, int amount, Vector3 hitPoint, ulong shooterClientId)
 	{
-		Debug.Log(NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetNetId] + "Has been hit");
-
 		var target = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetNetId];
-		if (target.TryGetComponent<PlayerDamagable>(out var dmg))
+		if (target.TryGetComponent<PlayerDamagable>(out var playerDmg))
 		{
-			dmg.SetLastHitBy(shooterClientId);
-			dmg.TakeDamage(amount, hitPoint);
+			playerDmg.SetLastHitBy(shooterClientId);
+			playerDmg.TakeDamage(amount, hitPoint);
+		}
+		if (target.TryGetComponent<AbstractEnemy>(out var enemyDmg))
+		{
+			enemyDmg.SetLastHitBy(shooterClientId);
+			enemyDmg.TakeDamage(amount, hitPoint);
 		}
 	}
 }

@@ -10,7 +10,7 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 
 	[SerializeField] private GameObject gfx;
 
-	[SerializeField] private bool checkMultiplayerGfx = false;
+	[SerializeField] private bool ignoreMultiplayerGraphics = false;
 
 	[Space(15)]
 
@@ -39,7 +39,7 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 			if (playerCanvas)
 				playerCanvas.SetActive(false);
 
-			if (!checkMultiplayerGfx)
+			if (!ignoreMultiplayerGraphics)
 				if (multiplayerGfx != null && multiplayerGfx.Length > 0)
 					foreach (var go in multiplayerGfx)
 						go.enabled = false;

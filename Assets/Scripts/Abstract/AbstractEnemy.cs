@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,8 +9,9 @@ using UnityEngine.AI;
 public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 {
 	[Header("References")]
+	[SerializeField] private EnemyAnimatorLOD lod_anim;
 	[SerializeField] private NavMeshAgent agent;
-	[SerializeField] Animator anim;
+	[SerializeField] private Animator anim;
 	private Transform targetPos;
 	private Vector3 targetDestination;
 	private EnemyTarget targetScript;
@@ -37,21 +39,30 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 	private MeshRenderer[] allRenderers;
 
 	[Header("Knockback Settings")]
-	private float originalSpeed;
-	private float originalAcceleration;
 	[SerializeField] private float knockbackForce = 5f;
 	[SerializeField] private float knockbackDuration = .2f;
 
-	private void OnValidate()
-	{
-		if (!Application.isEditor || Application.isPlaying) return;
+	[Header("Path / Movement")]
+	[SerializeField] private float arriveThreshold = 0.1f;
+	private Vector3[] pathCorners;
+	private int pathIndex;
+	private bool isKnockedBack;
+	private float lastTickTime;
+	private NetworkTransform netTransform;
 
-		originalSpeed = speed;
-		originalAcceleration = agent.acceleration;
+	private void Awake()
+	{
+		if (!agent) agent = GetComponent<NavMeshAgent>();
+		netTransform = GetComponent<NetworkTransform>();
 	}
 
 	private void Start()
 	{
+		lastTickTime = Time.time;
+
+		EnemyLODManager.instance?.enemies.Add(lod_anim);
+		EnemyAIManager.Instance?.Register(this);
+
 		allRenderers = GetComponentsInChildren<MeshRenderer>(includeInactive: true);
 
 		currentHealth = maxHealth;
@@ -63,19 +74,108 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 
 	protected virtual void InitializeEnemy()
 	{
-		if (anim != null)
-			anim.SetBool("Walking", true);
-
-		agent.speed = speed;
-
+		anim?.SetBool("Walking", true);
 		InitializeDestination();
 	}
+
+	// ----------------- AI / path -----------------
+
+	protected virtual void InitializeDestination()
+	{
+		// pick a target
+		var enemyTargets = FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None);
+		int randomTarget = Random.Range(0, enemyTargets.Length);
+		targetScript = enemyTargets[randomTarget];
+
+		targetPos = targetScript.transform;
+
+		// random point around target radius
+		float destinationRadius = targetScript.GetColliderRadius();
+		Vector2 randomCircle = Random.insideUnitCircle.normalized * destinationRadius;
+		Vector3 offset = new Vector3(randomCircle.x, 0, randomCircle.y);
+
+		targetDestination = targetPos.position + offset;
+
+		// build navmesh path once, then follow it manually
+		NavMeshPath navPath = new NavMeshPath();
+		bool hasPath = false;
+
+		if (agent && agent.isOnNavMesh)
+		{
+			hasPath = agent.CalculatePath(targetDestination, navPath);
+		}
+		else
+		{
+			hasPath = NavMesh.CalculatePath(transform.position, targetDestination, NavMesh.AllAreas, navPath);
+		}
+
+		if (hasPath && navPath.corners.Length > 1)
+		{
+			pathCorners = navPath.corners;
+		}
+		else
+		{
+			// fallback: just go straight to destination
+			pathCorners = new Vector3[] { targetDestination };
+		}
+
+		pathIndex = 0;
+	}
+
 	/// <summary>
-	/// These are called from the EnemyTarget script itself,
-	/// when an enemy enters its trigger, it starts attacking
-	/// and when an enemy leaves its trigger, it stops.
+	/// Called by EnemyAIManager on the server.
 	/// </summary>
-	//------------------------
+	public void TickAI()
+	{
+		if (!IsServer) return;
+		if (isKnockedBack) return;
+		if (pathCorners == null || pathCorners.Length == 0) return;
+
+		float dt = Time.time - lastTickTime;
+		lastTickTime = Time.time;
+
+		Vector3 current = transform.position;
+		Vector3 target = pathCorners[pathIndex];
+		target.y = current.y;
+
+		Vector3 to = target - current;
+		float threshSqr = arriveThreshold * arriveThreshold;
+
+		if (to.sqrMagnitude <= threshSqr)
+		{
+			pathIndex++;
+			if (pathIndex >= pathCorners.Length)
+			{
+				OnReachedDestination();
+				return;
+			}
+
+			target = pathCorners[pathIndex];
+			target.y = current.y;
+			to = target - current;
+			if (to.sqrMagnitude < 0.0001f) return;
+		}
+
+		to.Normalize();
+		Vector3 delta = to * speed * dt;
+		transform.position += delta;
+
+		if (delta.sqrMagnitude > 0f)
+		{
+			Quaternion targetRot = Quaternion.LookRotation(to);
+			transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, dt * 10f);
+		}
+	}
+
+
+	protected virtual void OnReachedDestination()
+	{
+		// Reached final point – override in subclasses if you want special behaviour
+		// e.g. start attacking the crystal/base, stop moving, etc.
+	}
+
+	// ----------------- Attack -----------------
+
 	public void StartAttack()
 	{
 		attackCoroutine = StartCoroutine(AttackNumerator());
@@ -86,30 +186,16 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 		if (attackCoroutine != null)
 			StopCoroutine(attackCoroutine);
 	}
-	//------------------------
+
 	protected virtual IEnumerator AttackNumerator()
 	{
-		anim.SetBool("Walking", false);
+		anim?.SetBool("Walking", false);
 		yield return new WaitForSeconds(attackDelay);
-		anim.SetTrigger("Attack");
+		anim?.SetTrigger("Attack");
 		attackCoroutine = StartCoroutine(AttackNumerator());
 	}
 
-	protected virtual void InitializeDestination()
-	{
-		var enemyTargets = FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None);
-		int randomTarget = Random.Range(0, enemyTargets.Length);
-		targetScript = enemyTargets[randomTarget];
-
-		targetPos = targetScript.transform;
-
-		float destinationRadius = targetScript.GetColliderRadius();
-		Vector2 randomCircle = Random.insideUnitCircle.normalized * destinationRadius;
-		Vector3 offset = new Vector3(randomCircle.x, 0, randomCircle.y);
-
-		targetDestination = targetPos.position + offset;
-		agent.SetDestination(targetDestination);
-	}
+	// ----------------- Damage & Knockback -----------------
 
 	public void DamageEffects(Vector3 hitPoint)
 	{
@@ -126,70 +212,58 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 
 	protected virtual IEnumerator OnKnockback(Vector3 hitPoint)
 	{
-		#region Init
+		// movement is SERVER ONLY to avoid client vs server fights
+		if (!IsServer)
+			yield break;
+
 		yield return null;
 
-		if (anim != null)
-			anim.SetBool("Walking", false);
-		#endregion
-		#region SetKnockbackMovement
+		anim?.SetBool("Walking", false);
+		isKnockedBack = true;
 
-		///<summary>
-		///Sets the agents destination to the knockback position
-		///which is calculated based on the position of where the player shot the enemy from
-		///afterwards we disable rotations so the agent doesent look at the knockback position while getting knocked back
-		/// </summary>
+		Vector3 dir = (transform.position - hitPoint);
+		dir.y = 0f;
+		if (dir.sqrMagnitude < 0.0001f)
+		{
+			isKnockedBack = false;
+			yield break;
+		}
 
-		// Compute direction from hit point to this enemy
-		Vector3 dir = (transform.position - hitPoint).normalized;
+		dir.Normalize();
 
-		// Set a far destination in the knockback direction
-		Vector3 dest = transform.position + dir * 10f;
-		agent.SetDestination(dest);
-
-		// Apply high initial knockback speed
-		agent.speed = knockbackForce;
-
-		// Smoothly reduce speed to 0 over knockbackDuration
 		float elapsed = 0f;
-
-		agent.updateRotation = false;
-
-		agent.acceleration = 10000;
-
 		while (elapsed < knockbackDuration)
 		{
 			elapsed += Time.deltaTime;
-			float t = elapsed / knockbackDuration;
-			agent.speed = Mathf.Lerp(knockbackForce, 0f, t);
+			float t = 1f - Mathf.Clamp01(elapsed / knockbackDuration);
+			float currentForce = knockbackForce * t;
+
+			// move on server
+			transform.position += dir * currentForce * Time.deltaTime;
+
+			// during knockback: push precise state to clients every frame
+			if (netTransform != null)
+			{
+				netTransform.Teleport(transform.position,
+									  transform.rotation,
+									  transform.localScale);
+			}
+
 			yield return null;
 		}
-		#endregion
-		#region SetNormalMovement
 
-		///<summary>
-		///Resets, so normal destination and movement speed is reset
-		/// </summary>
+		isKnockedBack = false;
 
-		agent.updateRotation = true;
-		agent.acceleration = originalAcceleration;
-
-		// Agent is now knocked back and "staggered", fade back to original speed
-		elapsed = 0f;
-		float returnDuration = 0.3f;
-		while (elapsed < returnDuration)
+		// one last precise sync when done
+		if (netTransform != null)
 		{
-			elapsed += Time.deltaTime;
-			float t = elapsed / returnDuration;
-			agent.speed = Mathf.Lerp(0f, originalSpeed, t);
-			yield return null;
+			netTransform.Teleport(transform.position,
+								  transform.rotation,
+								  transform.localScale);
 		}
 
-		agent.speed = originalSpeed;
-		agent.SetDestination(targetDestination); // Resume behavior
-		if (anim != null)
-			anim.SetBool("Walking", true);
-		#endregion
+		InitializeDestination();        // rebuild path from new position
+		anim?.SetBool("Walking", true);
 	}
 
 
@@ -218,7 +292,6 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 		currFlashCoroutine = null;
 	}
 
-	
 	protected virtual void OnSpawnDamagePFX()
 	{
 		if (hitParticles == null) return;
@@ -229,11 +302,10 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 
 	protected virtual void OnPlayDamageAnimation()
 	{
-		if (anim != null)
-			anim.SetTrigger("Damage");
+		anim?.SetTrigger("Damage");
 	}
 
-	// ------------- IDamagable --------------
+	// ------------- IDamagable -------------
 
 	public void TakeDamage(int amount, Vector3 hitPoint)
 	{
@@ -259,11 +331,12 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 
 	private void DieServer()
 	{
+		EnemyAIManager.Instance?.Unregister(this);
+
 		DieClientRpc(xpDrop);
 
 		StopAllCoroutines();
 
-		// server despawns, clients will despawn automatically
 		if (TryGetComponent(out NetworkObject nwo) && nwo.IsSpawned)
 			nwo.Despawn(true);
 		else
@@ -279,6 +352,8 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void DieClientRpc(int xpAmount)
 	{
+		EnemyLODManager.instance?.enemies.Remove(lod_anim);
+
 		if (deathParticles != null)
 		{
 			var pfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
@@ -288,30 +363,29 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 			Destroy(pfx, 5);
 		}
 
-		GameManager.instance.AddXp(xpAmount);
+		GameManager.instance?.AddXp(xpAmount);
 	}
 
 	// ------------- Crystal attacks -------------
 
-	public void AE_AttackCrystal()
+	public void AE_AttackTarget()
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
-		//var crystalScript = FindFirstObjectByType<CrystalScript>();
-		//if (crystalScript == null) return;
+		if (targetScript == null) return;
 
-		//crystalScript.TakeDamage(damage);
+		targetScript.TakeDamage(damage);
+	}
 
-		//if (crystalScript.thorns)
-		//	TakeDamage(5, transform.position);
-		//if (crystalScript.deadly)
-		//	DieServer();
+	private ulong lastHitByClientId = ulong.MaxValue;
+	public void SetLastHitBy(ulong shooterClientId)
+	{
+		lastHitByClientId = shooterClientId;
 	}
 }
 
-
 public interface IDamagable
 {
-	public void TakeDamage(int amount, Vector3 hitPoint);
-	public void Heal(int amount);
+	void TakeDamage(int amount, Vector3 hitPoint);
+	void Heal(int amount);
 }

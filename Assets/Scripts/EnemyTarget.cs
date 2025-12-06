@@ -3,37 +3,41 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.AppUI.Navigation;
 
 public class EnemyTarget : NetworkBehaviour
 {
+	[Header("References")]
 	[SerializeField] private SphereCollider enemyEnterTrigger;
+	[SerializeField] private Animator anim;
 
-	[SerializeField] private GameObject crystalShield;
-	public int maxHealth = 1000;
-	public int currentHealth;
-	
-	public bool thorns, deadly;
+	[Header("Stats")]
+	[SerializeField] private int maxHealth = 1000;
+	private int currentHealth;
 
 	[Header("UI")]
-	[Tooltip("Slider showing health")]
-	public Slider healthSlider;
-	[Tooltip("Speed at which the slider value lerps")]
+	[SerializeField] private Slider healthSlider;
 	[SerializeField] private float sliderLerpSpeed = 5f;
 
-	public ParticleSystem explosionpfx;
-
-	[SerializeField] private AudioToPlay damageSound;
+	[Header("Effects")]
+	[SerializeField] private ParticleSystem deathParticles;
 	[SerializeField] private ParticleSystem damageParticles;
+	[SerializeField] private AudioToPlay damageSound;
+
+	private Material flashMaterial;
+	private float flashDuration = .1f;
 
 	[Space(15)]
 
 	[SerializeField] private MeshRenderer[] allRenderers;
 
-	private Material flashMaterial;
-	private float flashDuration = .1f;
-
 	private Coroutine currFlashCoroutine;
+
+	private void OnValidate()
+	{
+		if (!Application.isEditor || Application.isPlaying) return;
+
+		enemyEnterTrigger.isTrigger = true;
+	}
 
 	public override void OnNetworkSpawn()
 	{
@@ -67,7 +71,6 @@ public class EnemyTarget : NetworkBehaviour
 			);
 		}
 	}
-
 	
 
 	// -------- DAMAGE & DEATH (SERVER AUTHORITATIVE) --------
@@ -111,24 +114,26 @@ public class EnemyTarget : NetworkBehaviour
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void DieClientRpc()
 	{
-		if (explosionpfx != null)
+		if (deathParticles != null)
 		{
-			explosionpfx.Play();
-			var audio = explosionpfx.gameObject.GetComponent<AudioSource>();
-			if (audio != null)
-				audio.Play();
+			var deathPfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
+			Destroy(deathPfx, deathPfx.totalTime);
 		}
 	}
 
 	private void DamageEffects()
 	{
-		damageParticles.Play();
+		if (damageParticles != null)
+		{
+			var damagePfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
+			Destroy(damagePfx, damagePfx.totalTime);
+		}
+
 		AudioManagement.instance.PlayThisSound(damageSound, true, .6f, .9f);
 
 		if (currFlashCoroutine == null)
 			currFlashCoroutine = StartCoroutine(OnFlashMaterial());
 
-		var anim = GetComponent<Animator>();
 		if (anim != null)
 			anim.SetTrigger("TakeDamage");
 	}
@@ -137,7 +142,6 @@ public class EnemyTarget : NetworkBehaviour
 	{
 		if (flashMaterial == null)
 			flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
-
 
 		var affected = new List<(MeshRenderer renderer, Material[] originals)>(allRenderers.Length);
 		foreach (var rend in allRenderers)
@@ -200,11 +204,11 @@ public class EnemyTarget : NetworkBehaviour
 		Invoke(nameof(RegenerationTickServerRpc), .5f);
 	}
 
-	public float GetColliderRadius() => enemyEnterTrigger.radius;
+	public float GetColliderRadius() => enemyEnterTrigger.radius * transform.localScale.x;
 
 	private void OnDrawGizmos()
 	{
 		Gizmos.color = Color.green;
-		Gizmos.DrawWireSphere(transform.position, enemyEnterTrigger.radius);
+		Gizmos.DrawWireSphere(transform.position, enemyEnterTrigger.radius * transform.localScale.x);
 	}
 }
