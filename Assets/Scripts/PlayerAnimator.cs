@@ -117,4 +117,8 @@ public class PlayerAnimator : NetworkBehaviour
 		yield return new WaitForSeconds(timeSet);
 		landBuffer = false;
 	}
+	public void A_SetCrouch(bool crouching)
+	{
+		multiplayerCharacterAnim.SetBool("Crouching", crouching);
+	}
 }

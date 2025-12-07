@@ -514,6 +514,8 @@ public class PlayerController : NetworkBehaviour
 
 	private void SetCrouchHeight(float newHeight)
 	{
+		pRef.playerAnimator.A_SetCrouch(true);
+
 		pRef.playerCharacterController.stepOffset = 0.1f;
 		pRef.playerCharacterController.height = newHeight;
 
@@ -529,6 +531,8 @@ public class PlayerController : NetworkBehaviour
 
 	private void ResetSetCrouchHeight(float newHeight)
 	{
+		pRef.playerAnimator.A_SetCrouch(false);
+
 		pRef.playerCharacterController.stepOffset = 0.65f;
 		pRef.playerCharacterController.height = newHeight;
 
