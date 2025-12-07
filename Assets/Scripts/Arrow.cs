@@ -133,9 +133,16 @@ public class Arrow : MonoBehaviour
 			return;
 
 		clientsHit.Add(targetNetId);
+
+		if (go.TryGetComponent<AbstractEnemy>(out var enemy))
+		{
+			enemy.LocalPredictedDamage(
+				arrowDamage,
+				hitPoint,
+				shooterClientId
+			);
+		}
+
 		bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint, shooterClientId);
 	}
-
-	
-
 }

@@ -13,6 +13,7 @@ public class EnemyTarget : NetworkBehaviour
 	[Header("Stats")]
 	[SerializeField] private int maxHealth = 1000;
 	private int currentHealth;
+	[SerializeField] private float targetRadius = 10f;
 
 	[Header("UI")]
 	[SerializeField] private Slider healthSlider;
@@ -125,7 +126,7 @@ public class EnemyTarget : NetworkBehaviour
 	{
 		if (damageParticles != null)
 		{
-			var damagePfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
+			var damagePfx = Instantiate(damageParticles, transform.position, Quaternion.identity);
 			Destroy(damagePfx, damagePfx.totalTime);
 		}
 
@@ -204,11 +205,11 @@ public class EnemyTarget : NetworkBehaviour
 		Invoke(nameof(RegenerationTickServerRpc), .5f);
 	}
 
-	public float GetColliderRadius() => enemyEnterTrigger.radius * transform.localScale.x;
+	public float GetColliderRadius() => targetRadius;
 
 	private void OnDrawGizmos()
 	{
 		Gizmos.color = Color.green;
-		Gizmos.DrawWireSphere(transform.position, enemyEnterTrigger.radius * transform.localScale.x);
+		Gizmos.DrawWireSphere(transform.position, targetRadius);
 	}
 }

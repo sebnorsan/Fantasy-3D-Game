@@ -19,7 +19,7 @@ public class BowNetCode : NetworkBehaviour
 		var arrowObj = Instantiate(arrowPrefab, pos, rot);
 		var arrow = arrowObj.GetComponent<Arrow>();
 
-		arrow.Initialize(dmg, spd, size, dir, shooterPos: Vector3.zero, shooterClientId, false);
+		arrow.Initialize(dmg, spd, size, dir, shooterPos: Vector3.zero, shooterClientId, false, null);
 	}
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
 	public void HitServerRpc(ulong targetNetId, int amount, Vector3 hitPoint, ulong shooterClientId)

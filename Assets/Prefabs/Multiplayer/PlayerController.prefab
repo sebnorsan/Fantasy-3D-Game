@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 400449433659843676}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.8, z: 0}
+  m_LocalPosition: {x: 0, y: 0.975, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1701,7 +1701,7 @@ Transform:
   m_GameObject: {fileID: 3231570377046082669}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.6246, z: 0}
+  m_LocalPosition: {x: 0, y: -0.589, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3282,7 +3282,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 743770276343240314}
@@ -3402,11 +3402,11 @@ MonoBehaviour:
   canMove: 1
   canRun: 1
   groundCheck: {fileID: 2932484719103457868}
-  checkRadius: 0.295
+  checkRadius: 0.58
   coyoteTimeDuration: 0.18
   maxFallSpeed: -45
   headCheck: {fileID: 5675913063235240685}
-  headCheckRadius: 0.3
+  headCheckRadius: 0.48
   runToggle: 0
   knockbackDecay: 5
   footstepStopThreshold: 0.1
