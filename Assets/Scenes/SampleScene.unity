@@ -3414,11 +3414,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5219615711813225076, guid: 05039de0165692c45901cf73729054a7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.66
+      value: 2.57
       objectReference: {fileID: 0}
     - target: {fileID: 5219615711813225076, guid: 05039de0165692c45901cf73729054a7, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 4.3
       objectReference: {fileID: 0}
     - target: {fileID: 5219615711813225076, guid: 05039de0165692c45901cf73729054a7, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3456,17 +3456,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerController
       objectReference: {fileID: 0}
-    - target: {fileID: 7758727492805073096, guid: 05039de0165692c45901cf73729054a7, type: 3}
-      propertyPath: m_IsActive
+    - target: {fileID: 8023043136889959793, guid: 05039de0165692c45901cf73729054a7, type: 3}
+      propertyPath: m_AnchorMax.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8023043136889959793, guid: 05039de0165692c45901cf73729054a7, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8023043136889959793, guid: 05039de0165692c45901cf73729054a7, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

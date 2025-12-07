@@ -30,6 +30,11 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 	// store the name on the server so it can be re-sent
 	private string cachedName;
 
+	[Header("Particle FX")]
+	[SerializeField] ParticleSystem haloPfx;
+	[SerializeField] private ParticleSystem stripePfx;
+	[SerializeField] private ParticleSystem runPfx;
+
 	public override void OnNetworkSpawn()
 	{
 		baseRot = transform.localRotation;
@@ -94,4 +99,57 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 			Time.deltaTime * tiltSpeed
 		);
 	}
+
+	public void PlayParticle(PfxToPlay pfx, bool play = true)
+	{
+		PlayParticleFunctionality(pfx, play);
+		PlayParticleServerRpc(pfx, play);
+	}
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+	private void PlayParticleServerRpc(PfxToPlay pfx, bool play)
+	{
+		PlayParticleClientRpc(pfx, play);
+	}
+	[Rpc(SendTo.NotOwner, InvokePermission = RpcInvokePermission.Server)]
+	private void PlayParticleClientRpc(PfxToPlay pfx, bool play)
+	{
+		PlayParticleFunctionality(pfx, play);
+	}
+	private void PlayParticleFunctionality(PfxToPlay pfx, bool play)
+	{
+		ParticleSystem pfxToPlay = null;
+
+		switch (pfx)
+		{
+			case PfxToPlay.Halo:
+				pfxToPlay = haloPfx;
+				break;
+			case PfxToPlay.Stripe:
+				pfxToPlay = stripePfx;
+				break;
+			case PfxToPlay.Run:
+				pfxToPlay = runPfx;
+				break;
+		}
+
+		if (pfxToPlay == null) return;
+
+		if (play)
+		{
+			if (!pfxToPlay.isPlaying)
+				pfxToPlay.Play();
+		}
+		else
+		{
+			if (pfxToPlay.isPlaying)
+				pfxToPlay.Stop();
+		}
+	}
+
+}
+public enum PfxToPlay
+{
+	Halo,
+	Stripe,
+	Run
 }

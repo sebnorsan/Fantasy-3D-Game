@@ -360,6 +360,11 @@ public class PlayerController : NetworkBehaviour
 		pRef.playerCharacterController.Move(moveDirection * Time.deltaTime);
 
 		isMoving = Mathf.Abs(inputVertical) > 0 || Mathf.Abs(inputHorizontal) > 0;
+
+		if (isMoving && isGrounded)
+			pRef.playerGraphics.PlayParticle(PfxToPlay.Run, true);
+		else
+			pRef.playerGraphics.PlayParticle(PfxToPlay.Run, false);
 	}
 	private void HandleInput()
 	{
@@ -390,6 +395,9 @@ public class PlayerController : NetworkBehaviour
 	{
 		if (Input.GetKey(pInput.jumpKey) && canMove && (isGrounded || coyoteActive))
 		{
+			pRef.playerGraphics.PlayParticle(PfxToPlay.Halo);
+			pRef.playerGraphics.PlayParticle(PfxToPlay.Stripe);
+
 			if (coyoteActive)
 				StopCoyote();
 
@@ -463,6 +471,8 @@ public class PlayerController : NetworkBehaviour
 		new HashSet<global::AbstractEvent>();
 	private void init_EnteringGrounded()
 	{
+		pRef.playerGraphics.PlayParticle(PfxToPlay.Halo);
+
 		_eventsFiredThisLanding.Clear();
 		TriggerLandingEvents();
 
