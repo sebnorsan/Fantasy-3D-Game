@@ -10,31 +10,25 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	[SerializeField] private PlayerReferences pRef;
 
 	[Space(15)]
-
 	public int maxHealth = 100;
 	[SerializeField] private int currentHealth = 100;
 
 	[Space(15)]
-
 	[SerializeField] private float deathTime;
 	[SerializeField] private GameObject deathCam;
 
 	[Space(15)]
-
 	[SerializeField] private GameObject deathParticles;
 	[SerializeField] private GameObject hitParticles;
 
 	[Space(15)]
-
 	[Header("Health UI")]
 	[SerializeField] private Slider healthSlider;
 	[SerializeField] private float sliderLerpSpeed = 10f;
 
 	[Space(15)]
-
 	[Header("Knockback")]
 	[SerializeField] private float knockbackStrength = 10f;
-
 
 	private float displayedHealth;
 
@@ -60,6 +54,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 			healthSlider.value = currentHealth;
 		}
 	}
+
 	private void Update()
 	{
 		if (healthSlider == null) return;
@@ -80,7 +75,9 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		currentHealth = Mathf.Max(0, currentHealth - amount);
 
 		UpdateHealthClientRpc(currentHealth);
-		DamageEffectsClientRpc(hitPoint);
+
+		// now include shooter id so we can skip VFX on that client
+		DamageEffectsClientRpc(hitPoint, lastHitByClientId);
 
 		Vector3 dir = (transform.position - hitPoint);
 		dir.y = 0f;
@@ -122,30 +119,39 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	#region DamageEffects
 
-	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void DamageEffectsClientRpc(Vector3 hitPoint)
+	// NEW: local-only prediction entry point, no networking.
+	public void PlayPredictedHitFeedback(Vector3 hitPoint)
 	{
+		// only visual stuff, no health/knockback
 		DamageEffects(hitPoint);
+	}
 
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void DamageEffectsClientRpc(Vector3 hitPoint, ulong shooterClientId)
+	{
+		// everyone except the shooter spawns networked VFX
+		if (NetworkManager.Singleton.LocalClientId != shooterClientId)
+		{
+			DamageEffects(hitPoint);
+		}
+
+		// the *owner of the damaged player* gets camera shake + local anim
 		if (IsOwner)
 		{
 			pRef.cameraShaker.ShakeOnce(7f, 3f, .1f, .4f);
 			pRef.playerAnimator.A_TakeDamage();
 		}
 	}
-	
+
 	public void DamageEffects(Vector3 hitPoint)
 	{
-		//if (currKnockbackCoroutine != null)
-		//	StopCoroutine(currKnockbackCoroutine);
-		//currKnockbackCoroutine = StartCoroutine(OnKnockback(hitPoint));
-
 		if (currFlashCoroutine == null)
 			currFlashCoroutine = StartCoroutine(OnFlashMaterial());
 
 		OnSpawnDamagePFX();
 		OnPlayDamageAnimation();
 	}
+
 	private void OnSpawnDamagePFX()
 	{
 		if (hitParticles == null) return;
@@ -153,11 +159,13 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		var pfx = Instantiate(hitParticles, transform.position, Quaternion.identity);
 		Destroy(pfx, 5);
 	}
+
 	private void OnPlayDamageAnimation()
 	{
 		if (pRef != null)
 			pRef.playerAnimator.A_TakeDamage();
 	}
+
 	private IEnumerator OnFlashMaterial()
 	{
 		if (flashMaterial == null)
@@ -192,6 +200,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	}
 
 	#endregion
+
 	#region Knockback
 
 	[Rpc(SendTo.Owner, InvokePermission = RpcInvokePermission.Server)]
@@ -200,7 +209,6 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		if (pRef.playerController != null)
 			pRef.playerController.AddKnockback(force);
 	}
-
 
 	#endregion
 	#region Dying

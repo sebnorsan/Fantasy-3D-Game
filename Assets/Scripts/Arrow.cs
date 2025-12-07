@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Unity.Netcode;
 using Unity.VisualScripting;
@@ -134,6 +135,10 @@ public class Arrow : MonoBehaviour
 
 		clientsHit.Add(targetNetId);
 
+		if (go.TryGetComponent<PlayerDamagable>(out var player))
+		{
+			player.PlayPredictedHitFeedback(hitPoint);
+		}
 		if (go.TryGetComponent<AbstractEnemy>(out var enemy))
 		{
 			enemy.LocalPredictedDamage(

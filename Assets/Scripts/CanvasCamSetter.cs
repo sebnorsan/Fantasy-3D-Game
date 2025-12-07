@@ -15,7 +15,7 @@ public class CanvasCamSetter : MonoBehaviour
 				Invoke(nameof(InitializeAfterDelay), .5f);
 				return;
 			}
-
-		GetComponent<Canvas>().worldCamera = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerReferences>().playerCam;
+			else
+				GetComponent<Canvas>().worldCamera = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerReferences>().playerCam;
 	}
 }
