@@ -3344,7 +3344,7 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.21
-  m_Height: 1.6
+  m_Height: 1.62
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6262575431432307872
@@ -3359,7 +3359,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3951554482
+  GlobalObjectIdHash: 222003529
   InScenePlacedSourceGlobalObjectIdHash: 2771618475
   DeferredDespawnTick: 0
   Ownership: 1
@@ -3407,6 +3407,7 @@ MonoBehaviour:
   maxFallSpeed: -45
   headCheck: {fileID: 5675913063235240685}
   headCheckRadius: 0.48
+  playerDamageCollider: {fileID: 0}
   runToggle: 0
   knockbackDecay: 5
   footstepStopThreshold: 0.1

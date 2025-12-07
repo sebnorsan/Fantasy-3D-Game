@@ -41,6 +41,7 @@ public class PlayerController : NetworkBehaviour
 	[Header("CrouchCheck")]
 	public Transform headCheck;
 	public float headCheckRadius = 0.3f;
+	public CapsuleCollider playerDamageCollider;
 
 	[Header("Input")]
 	public bool runToggle = false;
@@ -58,7 +59,6 @@ public class PlayerController : NetworkBehaviour
 	private Footsteps footsteps;
 
 	#endregion
-
 	#region Movement State
 
 	[HideInInspector] public Vector3 moveDirection = Vector3.zero;
@@ -95,7 +95,6 @@ public class PlayerController : NetworkBehaviour
 	private Vector3 knockbackVelocity = Vector3.zero;
 
 	#endregion
-
 	#region Debug & Dev
 
 	[Header("Debugging")]
@@ -109,14 +108,11 @@ public class PlayerController : NetworkBehaviour
 	private Vector3 savePos = Vector3.zero;
 
 	#endregion
-
 	#region Networking & Events
 
 	public ulong MyId => NetworkObject.OwnerClientId;
 
 	#endregion
-	
-
 	#region Network Lifecycle
 
 	public override void OnNetworkSpawn()
@@ -416,9 +412,15 @@ public class PlayerController : NetworkBehaviour
 		);
 
 		if (Input.GetKeyDown(pInput.crouchKey))
-			SetCrouchHeight(crouchHeight);
+		{
+			SetCrouchHeight(crouchHeight);                // instant local
+			SetCrouchHeightRpc(crouchHeight);            // sync others
+		}
 		else if (Input.GetKeyUp(pInput.crouchKey) && !crouchSphere)
-			ResetSetCrouchHeight(initialCrouchHeight);
+		{
+			ResetSetCrouchHeight(initialCrouchHeight);   // instant local
+			ResetCrouchHeightRpc(initialCrouchHeight);   // sync others
+		}
 
 		if (Input.GetKey(pInput.crouchKey))
 		{
@@ -436,6 +438,7 @@ public class PlayerController : NetworkBehaviour
 		}
 	}
 
+
 	#endregion
 
 	#region Camera
@@ -448,7 +451,6 @@ public class PlayerController : NetworkBehaviour
 	}
 
 	#endregion
-
 	#region Grounding & Landing
 
 	private void init_LeavingGrounded()
@@ -509,11 +511,12 @@ public class PlayerController : NetworkBehaviour
 	}
 
 	#endregion
-
 	#region Crouch
 
 	private void SetCrouchHeight(float newHeight)
 	{
+		playerDamageCollider.height = newHeight;
+
 		pRef.playerAnimator.A_SetCrouch(true);
 
 		pRef.playerCharacterController.stepOffset = 0.1f;
@@ -531,6 +534,8 @@ public class PlayerController : NetworkBehaviour
 
 	private void ResetSetCrouchHeight(float newHeight)
 	{
+		playerDamageCollider.height = newHeight;
+
 		pRef.playerAnimator.A_SetCrouch(false);
 
 		pRef.playerCharacterController.stepOffset = 0.65f;
@@ -546,8 +551,35 @@ public class PlayerController : NetworkBehaviour
 		);
 	}
 
-	#endregion
+	// Owner -> Server
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+	private void SetCrouchHeightRpc(float newHeight)
+	{
+		// server forwards to all non-owner clients
+		SetCrouchHeightClientRpc(newHeight);
+	}
 
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+	private void ResetCrouchHeightRpc(float newHeight)
+	{
+		ResetCrouchHeightClientRpc(newHeight);
+	}
+
+	// Server -> all non-owner clients
+	[Rpc(SendTo.NotOwner)]
+	private void SetCrouchHeightClientRpc(float newHeight)
+	{
+		SetCrouchHeight(newHeight);
+	}
+
+	[Rpc(SendTo.NotOwner)]
+	private void ResetCrouchHeightClientRpc(float newHeight)
+	{
+		ResetSetCrouchHeight(newHeight);
+	}
+
+
+	#endregion
 	#region Audio & Footsteps
 
 	private void PlayMovementSound(string clipName, float min, float max)
@@ -557,7 +589,6 @@ public class PlayerController : NetworkBehaviour
 	}
 
 	#endregion
-
 	#region Knockback
 
 	public void AddKnockback(Vector3 force)
@@ -567,7 +598,6 @@ public class PlayerController : NetworkBehaviour
 	}
 
 	#endregion
-
 	#region Dev Tools
 
 	private void SaveState() => savePos = transform.position;
