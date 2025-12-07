@@ -2,6 +2,9 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using Steamworks;
+using Unity.Hierarchy;
+using UnityEngine.Rendering;
+using System.Collections;
 
 public class PlayerGraphicVisuals : NetworkBehaviour
 {
@@ -100,8 +103,14 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 		);
 	}
 
-	public void PlayParticle(PfxToPlay pfx, bool play = true)
+	public void PlayParticle(PfxToPlay pfx, bool play = true, float delay = 0f)
 	{
+		StartCoroutine(PlayParticleIE(pfx, play, delay));
+	}
+	private IEnumerator PlayParticleIE(PfxToPlay pfx, bool play = true, float delay = 0f)
+	{
+		yield return new WaitForSeconds(delay);
+
 		PlayParticleFunctionality(pfx, play);
 		PlayParticleServerRpc(pfx, play);
 	}

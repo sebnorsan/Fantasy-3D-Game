@@ -471,7 +471,8 @@ public class PlayerController : NetworkBehaviour
 		new HashSet<global::AbstractEvent>();
 	private void init_EnteringGrounded()
 	{
-		pRef.playerGraphics.PlayParticle(PfxToPlay.Halo);
+		//slight delay as enteringgrounded happens immediatly when groundCheck enters ground radius
+		pRef.playerGraphics.PlayParticle(PfxToPlay.Halo, true, .05f);
 
 		_eventsFiredThisLanding.Clear();
 		TriggerLandingEvents();
@@ -486,7 +487,6 @@ public class PlayerController : NetworkBehaviour
 
 		pRef.playerAnimator.A_Land();
 	}
-
 	private void ResetRebound() => rebound = false;
 	private void StopCoyote() => coyoteActive = false;
 
