@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
+using System.Net.NetworkInformation;
 
 public class GameNetworkManager : MonoBehaviour
 {

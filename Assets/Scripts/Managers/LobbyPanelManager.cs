@@ -24,6 +24,7 @@ public class LobbyPanelManager : MonoBehaviour
 	[Header("Buttons")]
 	[SerializeField] private Button leaveButton;
 	[SerializeField] private Button startGameButton; // host-only
+	[SerializeField] private TMP_InputField sceneInputField; // host-only
 	[SerializeField] private TMP_Text startGameButtonLabel; // optional if you want to set text
 
 	[Header("Members List")]
@@ -37,6 +38,7 @@ public class LobbyPanelManager : MonoBehaviour
 	{
 		if (leaveButton != null) leaveButton.onClick.AddListener(OnLeavePressed);
 		if (startGameButton != null) startGameButton.onClick.AddListener(OnStartPressed);
+		//if (sceneInputField != null) sceneInputField.onEndEdit.AddListener(); 
 	}
 
 	private void OnEnable()
@@ -97,6 +99,12 @@ public class LobbyPanelManager : MonoBehaviour
 
 		if (startGameButtonLabel != null && isHost)
 			startGameButtonLabel.text = "Start Game";
+
+		if (startGameButton != null)
+			sceneInputField.gameObject.SetActive(isHost);
+
+		if (sceneInputField != null && isHost)
+			sceneInputField.text = "SampleScene";
 	}
 
 	private async Task RebuildMembersUI(Lobby lobby)
@@ -137,7 +145,7 @@ public class LobbyPanelManager : MonoBehaviour
 
 		// Host-only: load your game scene via NGO
 		// Replace "GameScene" with your actual scene name.
-		NetworkManager.Singleton.SceneManager.LoadScene("SampleScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+		NetworkManager.Singleton.SceneManager.LoadScene(sceneInputField.text, UnityEngine.SceneManagement.LoadSceneMode.Single);
 	}
 
 	private async Task<Sprite> GetAvatarSpriteAsync(SteamId id)
