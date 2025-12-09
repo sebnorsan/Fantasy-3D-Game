@@ -13,6 +13,7 @@ public class PvPScoreboardRow : MonoBehaviour
 	[SerializeField] private TMP_Text deathsText;
 
 	private PlayerPvP playerPvP;
+	public PlayerPvP Player => playerPvP;
 
 	public void Init(PlayerPvP stats)
 	{

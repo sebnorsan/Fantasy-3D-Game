@@ -33,6 +33,10 @@ public class PlayerPvP : NetworkBehaviour
 	{
 		extraDamage.OnValueChanged += OnExtraDamageChanged;
 
+		Invoke(nameof(GetSteamInformation), .1f);
+	}
+	private void GetSteamInformation()
+	{
 		if (IsOwner && SteamClient.IsValid)
 		{
 			PlayerName.Value = SteamClient.Name;
@@ -40,9 +44,12 @@ public class PlayerPvP : NetworkBehaviour
 
 			if (PvPScoreboard.Instance != null)
 				PvPScoreboard.Instance.RegisterPlayer(this);
-		}
-	}
 
+			return;
+		}
+
+		Invoke(nameof(GetSteamInformation), .1f);
+	}
 
 	public override void OnNetworkDespawn()
 	{
