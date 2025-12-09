@@ -57,6 +57,8 @@ public class PvPScoreboard : MonoBehaviour
 				row.Init(p);
 				rows[key] = row;
 			}
+			else
+				rows[key].Init(p);
 		}
 
 		// 2) Remove rows whose players no longer exist
