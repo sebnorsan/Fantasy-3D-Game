@@ -307,7 +307,7 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 
 	// ------------- IDamagable --------------
 
-	public void TakeDamage(int amount, Vector3 hitPoint)
+	public void TakeDamage(int amount, Vector3 hitPoint, bool isHardHit = false)
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
@@ -442,6 +442,6 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 
 public interface IDamagable
 {
-	public void TakeDamage(int amount, Vector3 hitPoint);
+	public void TakeDamage(int amount, Vector3 hitPoint, bool isHardHit = false);
 	public void Heal(int amount);
 }
