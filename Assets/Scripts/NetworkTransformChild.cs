@@ -41,28 +41,7 @@ public class NetworkTransformChild : NetworkBehaviour
 		for (int i = 0; i < targets.Count; i++)
 		{
 			Transform t = targets[i];
-			_sendBuffer[i] = t ? t.localRotation : Quaternion.identity;
-		}
-
-		SendRotationsServerRpc(_sendBuffer);
-	}
-	private void LateUpdate()
-	{
-		if (!IsSpawned || targets == null || targets.Count == 0)
-			return;
-
-		// Only the owner sends rotations
-		if (!IsOwner)
-			return;
-
-		// Ensure buffer size matches target count
-		if (_sendBuffer == null || _sendBuffer.Length != targets.Count)
-			_sendBuffer = new Quaternion[targets.Count];
-
-		for (int i = 0; i < targets.Count; i++)
-		{
-			Transform t = targets[i];
-			_sendBuffer[i] = t ? t.localRotation : Quaternion.identity;
+			_sendBuffer[i] = t ? t.rotation : Quaternion.identity;
 		}
 
 		SendRotationsServerRpc(_sendBuffer);
@@ -94,13 +73,13 @@ public class NetworkTransformChild : NetworkBehaviour
 			if (!_hasInitialSync)
 			{
 				// First packet: snap exactly to host to avoid prefab / parent offset issues
-				t.localRotation = rots[i];
+				t.rotation = rots[i];
 			}
 			else
 			{
 				// After that, just smooth towards new data
-				t.localRotation = Quaternion.Slerp(
-					t.localRotation,
+				t.rotation = Quaternion.Slerp(
+					t.rotation,
 					rots[i],
 					Time.deltaTime * lerpSpeed
 				);
