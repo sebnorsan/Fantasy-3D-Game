@@ -1443,7 +1443,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2144038453246912609}
   serializedVersion: 8
-  lengthInSec: 0.2
+  lengthInSec: 0.4
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 0
@@ -6421,6 +6421,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 0
+--- !u!1 &2856566510458243507
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2556143203140004230}
+  m_Layer: 3
+  m_Name: CrouchCamPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2556143203140004230
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2856566510458243507}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5219615711813225076}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3157673122258401433
 GameObject:
   m_ObjectHideFlags: 0
@@ -17886,6 +17917,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 743770276343240314}
+  - {fileID: 2556143203140004230}
   - {fileID: 3562491346119374754}
   - {fileID: 2932484719103457868}
   - {fileID: 5675913063235240685}
@@ -17960,7 +17992,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4080386422
+  GlobalObjectIdHash: 2771618475
   InScenePlacedSourceGlobalObjectIdHash: 2771618475
   DeferredDespawnTick: 0
   Ownership: 1
@@ -18009,6 +18041,7 @@ MonoBehaviour:
   headCheck: {fileID: 5675913063235240685}
   headCheckRadius: 0.48
   playerDamageCollider: {fileID: 6778015122654442836}
+  crouchCamLerpSpeed: 8
   runToggle: 0
   knockbackDecay: 5
   footstepStopThreshold: 0.1
@@ -18079,7 +18112,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   pRef: {fileID: 930708363686757887}
   gfx: {fileID: 8827951681074446768}
-  ignoreMultiplayerGraphics: 0
+  ignoreMultiplayerGraphics: 1
   multiplayerGfx:
   - {fileID: 2403484915536638094}
   - {fileID: 6803833735646330706}
@@ -18112,6 +18145,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41f8af9f782b65d4c944ec21a694d980, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   playerController: {fileID: 4808590262637696532}
   playerAnimator: {fileID: 994555372891957732}
   playerGraphics: {fileID: 147051769140427139}
@@ -18119,6 +18153,7 @@ MonoBehaviour:
   cameraShaker: {fileID: 7212588598366797314}
   playerCharacterController: {fileID: 4702842973208242300}
   playerCam: {fileID: 5855688573525650132}
+  crouchCamPoint: {fileID: 2556143203140004230}
   bowScript: {fileID: 1227791032311695380}
   bowNetCode: {fileID: 515831196404787215}
   groundLayerMask:

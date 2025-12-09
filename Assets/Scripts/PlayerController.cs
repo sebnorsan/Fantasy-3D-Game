@@ -3,7 +3,6 @@ using EZCameraShake;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.InputSystem.iOS;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(CharacterController))]
@@ -42,6 +41,10 @@ public class PlayerController : NetworkBehaviour
 	public Transform headCheck;
 	public float headCheckRadius = 0.3f;
 	public CapsuleCollider playerDamageCollider;
+
+	private Vector3 standCamLocalPos;
+	[SerializeField] private float crouchCamLerpSpeed = 8f;
+
 
 	[Header("Input")]
 	public bool runToggle = false;
@@ -162,11 +165,11 @@ public class PlayerController : NetworkBehaviour
 		runningValue = runningSpeed;
 		initialWalkingSpeed = walkingSpeed;
 
+		if (pRef.playerCam != null)
+			standCamLocalPos = playerCamera.transform.localPosition;
+
 		if (Application.isEditor)
 			overrideDev = true;
-
-		if (IsOwner)
-			pRef.playerCharacterController.enabled = true;
 	}
 
 	private void Update()
@@ -177,7 +180,8 @@ public class PlayerController : NetworkBehaviour
 		HandleGrounded();
 		HandleInput();
 		HandleJumpingInput();   
-		HandleCrouchingInput(); 
+		HandleCrouchingInput();
+		HandleCrouchCamera();
 		HandleMovement();       
 		HandleKnockback();
 		HandleFootsteps();
@@ -357,7 +361,8 @@ public class PlayerController : NetworkBehaviour
 		Vector3 horizontalMove = desiredMove * (baseSpeed + flySpeedToUse) + knockbackVelocity;
 		moveDirection = new Vector3(horizontalMove.x, verticalSpeed, horizontalMove.z);
 
-		pRef.playerCharacterController.Move(moveDirection * Time.deltaTime);
+		if (pRef.playerCharacterController.enabled)
+			pRef.playerCharacterController?.Move(moveDirection * Time.deltaTime);
 
 		isMoving = Mathf.Abs(inputVertical) > 0 || Mathf.Abs(inputHorizontal) > 0;
 
@@ -441,12 +446,26 @@ public class PlayerController : NetworkBehaviour
 			isCrouching = false;
 			walkingSpeed = Mathf.Lerp(walkingSpeed, initialWalkingSpeed, 4 * Time.deltaTime);
 
-			if (pRef.playerCharacterController.height == crouchHeight)
+			if (pRef.playerCharacterController?.height == crouchHeight)
 				ResetSetCrouchHeight(initialCrouchHeight);
 		}
 	}
+	private void HandleCrouchCamera()
+	{
+		if (playerCamera == null || pRef.crouchCamPoint == null) return;
 
+		var camTransform = playerCamera.transform;
 
+		Vector3 targetPos = isCrouching
+			? pRef.crouchCamPoint.localPosition   // crouched anchor
+			: standCamLocalPos;                   // original stand pos
+
+		camTransform.localPosition = Vector3.Lerp(
+			camTransform.localPosition,
+			targetPos,
+			crouchCamLerpSpeed * Time.deltaTime
+		);
+	}
 	#endregion
 
 	#region Camera

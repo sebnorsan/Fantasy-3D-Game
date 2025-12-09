@@ -1,7 +1,8 @@
 using EZCameraShake;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerReferences : MonoBehaviour
+public class PlayerReferences : NetworkBehaviour
 {
 	public PlayerController playerController;
     public PlayerAnimator playerAnimator;
@@ -11,7 +12,10 @@ public class PlayerReferences : MonoBehaviour
     public CharacterController playerCharacterController;
 	public Camera playerCam;
 
-    [Space(10)]
+	[Space(10)]
+	public Transform crouchCamPoint;
+
+	[Space(10)]
 
     public BowScript bowScript;
     public BowNetCode bowNetCode;
@@ -20,5 +24,15 @@ public class PlayerReferences : MonoBehaviour
 
     public LayerMask groundLayerMask;
 
-    public bool IsOwner => playerController.IsOwner;
+	public override void OnNetworkSpawn()
+	{
+		if (IsOwner)
+			playerCharacterController.enabled = false;
+
+        Invoke(nameof(EnableCharacterController), 1f);
+	}
+    private void EnableCharacterController()
+    {
+		playerCharacterController.enabled = true;
+	}
 }

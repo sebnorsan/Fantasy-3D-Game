@@ -19,8 +19,8 @@ public class GameNetworkManager : MonoBehaviour
 	// host settings cached until OnLobbyCreated fires
 	private string pendingLobbyName = "Lobby";
 	private string pendingPwHash = "";
-	private int pendingMaxMembers = 10;
-	private bool pendingFriendsOnly = true;
+	private int pendingMaxMembers = 4;
+	private bool pendingFriendsOnly = false;
 
 	[SerializeField] private string gameVersion = "0.1"; // set this per build
 

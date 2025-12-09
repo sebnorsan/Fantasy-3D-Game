@@ -19,6 +19,8 @@ public class EnemyLODManager : MonoBehaviour
 	}
 	void Update()
 	{
+		if (!NetworkManager.Singleton) return;
+
 		if (player == null)
 		{
 			var localClient = NetworkManager.Singleton.LocalClient;
