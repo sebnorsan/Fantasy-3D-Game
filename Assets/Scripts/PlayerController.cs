@@ -137,6 +137,7 @@ public class PlayerController : NetworkBehaviour
 			DisableIfExists<HandsHolder>();
 			DisableIfExists<EventAudioPlayer>();
 			DisableIfExists<CameraShaker>();
+			DisableIfExists<CopyRotationOfObject>();
 		}
 	}
 
