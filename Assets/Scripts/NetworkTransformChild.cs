@@ -46,6 +46,27 @@ public class NetworkTransformChild : NetworkBehaviour
 
 		SendRotationsServerRpc(_sendBuffer);
 	}
+	private void LateUpdate()
+	{
+		if (!IsSpawned || targets == null || targets.Count == 0)
+			return;
+
+		// Only the owner sends rotations
+		if (!IsOwner)
+			return;
+
+		// Ensure buffer size matches target count
+		if (_sendBuffer == null || _sendBuffer.Length != targets.Count)
+			_sendBuffer = new Quaternion[targets.Count];
+
+		for (int i = 0; i < targets.Count; i++)
+		{
+			Transform t = targets[i];
+			_sendBuffer[i] = t ? t.localRotation : Quaternion.identity;
+		}
+
+		SendRotationsServerRpc(_sendBuffer);
+	}
 
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
 	private void SendRotationsServerRpc(Quaternion[] rots)
