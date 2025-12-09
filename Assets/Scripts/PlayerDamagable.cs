@@ -200,12 +200,10 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	private void OnSpawnDamagePFX()
 	{
-		var pfxToPlay = isHardHit ? hitHardParticles : hitParticles;
-
-		if (pfxToPlay == null) return;
+		GameObject pfxToPlay = isHardHit ? hitHardParticles.gameObject : hitParticles.gameObject;
 
 		var pfx = Instantiate(pfxToPlay, transform.position, Quaternion.identity);
-		Destroy(pfx, pfx.totalTime);
+		Destroy(pfx, 5f);
 	}
 
 	private void OnPlayDamageAnimation()

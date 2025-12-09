@@ -28,15 +28,18 @@ public class PlayerPvP : NetworkBehaviour
 
 		// apply initial state once spawned
 		OnExtraDamageChanged(false, extraDamage.Value);
+	}
 
+	private void Start()
+	{
 		if (IsOwner && SteamClient.IsValid)
 		{
 			PlayerName.Value = SteamClient.Name;
 			SteamId.Value = SteamClient.SteamId.Value;
-		}
 
-		if (PvPScoreboard.Instance != null)
-			PvPScoreboard.Instance.RegisterPlayer(this);
+			if (PvPScoreboard.Instance != null)
+				PvPScoreboard.Instance.RegisterPlayer(this);
+		}
 	}
 
 	public override void OnNetworkDespawn()

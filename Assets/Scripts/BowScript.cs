@@ -106,9 +106,6 @@ public class BowScript : MonoBehaviour
 
 		if (pRef.playerPvP.HasExtraDamage())
 		{
-			// consume buff
-			pRef.playerPvP.SetExtraDamage(false);
-
 			arrow.SetBigHit();   // mark arrow
 			dmg *= 3;            // more damage
 		}
@@ -117,9 +114,12 @@ public class BowScript : MonoBehaviour
 			pRef.playerController.transform.position,
 			shooterId,
 			true,
-			pRef.bowNetCode);
+			pRef.bowNetCode,
+			pRef.playerPvP.HasExtraDamage());
 
 		pRef.bowNetCode.SpawnArrowVisualServerRpc(pos, rot, shootDir, dmg, spd, size, shooterId);
+
+		pRef.playerPvP.SetExtraDamage(false);
 	}
 
 }

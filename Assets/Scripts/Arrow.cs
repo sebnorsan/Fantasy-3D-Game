@@ -56,9 +56,12 @@ public class Arrow : MonoBehaviour
 		Vector3 shooterPos,
 		ulong clientShooting,
 		bool isAuthority,
-		BowNetCode localNetCode = null
+		BowNetCode localNetCode = null,
+		bool biiiighiiiit = false
 	)
 	{
+		this.bigHit = biiiighiiiit;
+
 		pRef = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerReferences>();
 
 		this.isAuthority = isAuthority;

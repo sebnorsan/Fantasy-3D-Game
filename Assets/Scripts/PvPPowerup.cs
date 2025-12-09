@@ -24,24 +24,54 @@ public class PvPPowerup : NetworkBehaviour
 		if (!other.TryGetComponent(out PlayerReferences p))
 			return;
 
-		// client-side predicted FX (only on the player who picked it up)
-		if (p.IsOwner && NetHelper.instance != null && pfx != null)
+		// Only let the owning player trigger the pickup
+		if (!p.IsOwner) return;
+
+		// LOCAL predicted FX
+		if (NetHelper.instance != null && pfx != null)
 		{
-			NetHelper.instance.NetInstantiate(pfx.gameObject, transform.position, pfx.transform.rotation, pfx.GetComponent<ParticleSystem>().totalTime);
+			var ps = pfx.GetComponent<ParticleSystem>();
+			float life = ps != null
+				? ps.totalTime
+				: 2f;
+
+			NetHelper.instance.NetInstantiate(
+				pfx.gameObject,
+				transform.position,
+				pfx.transform.rotation,
+				life
+			);
 		}
 
-		if (!IsServer) return;
+		// Tell the SERVER to actually give the powerup + despawn
+		PickupServerRpc(p.OwnerClientId);
+	}
 
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+	private void PickupServerRpc(ulong playerClientId)
+	{
+		// already taken?
+		if (nwo != null && !nwo.IsSpawned)
+			return;
+
+		if (!NetworkManager.Singleton.ConnectedClients.TryGetValue(playerClientId, out var cc))
+			return;
+
+		var p = cc.PlayerObject.GetComponent<PlayerReferences>();
+		if (p == null) return;
+
+		// give buff on server
 		SetPowerUp(p);
 
 		spawner?.NotifyPowerupConsumed(this);
 
+		// despawn networked powerup so all clients lose it
 		if (nwo != null)
 			nwo.Despawn(true);
 		else
 			gameObject.SetActive(false);
 
-		Debug.Log("Hey guys");
+		Debug.Log($"Powerup picked up by client {playerClientId}");
 	}
 
 	private void SetPowerUp(PlayerReferences p)
@@ -49,7 +79,7 @@ public class PvPPowerup : NetworkBehaviour
 		switch (upType)
 		{
 			case PowerUpType.Damage:
-				p.playerPvP.SetExtraDamage(true);
+				p.playerPvP.SetExtraDamage(true); // SERVER write (WritePermission.Server)
 				break;
 		}
 	}
