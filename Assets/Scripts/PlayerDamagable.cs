@@ -252,6 +252,22 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 		StartCoroutine(DeathFlowServer()); // teleports + heal etc on server
 		pRef.playerController.canMove = false;
+
+		// --- PvP stats: add death to THIS player ---
+		pRef.playerPvP?.AddDeathServerRpc();
+
+		// --- PvP stats: add kill to LAST SHOOTER, if valid ---
+		if (lastHitByClientId != ulong.MaxValue &&
+			NetworkManager.Singleton.ConnectedClients.TryGetValue(lastHitByClientId, out var killerCc))
+		{
+			var killerRefs = killerCc.PlayerObject.GetComponent<PlayerReferences>();
+			if (killerRefs != null && killerRefs.playerPvP != null)
+			{
+				killerRefs.playerPvP.AddKillServerRpc();
+
+				lastHitByClientId = ulong.MaxValue;
+			}
+		}
 	}
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]

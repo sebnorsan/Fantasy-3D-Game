@@ -24,8 +24,6 @@ public class PlayerPvP : NetworkBehaviour
 
 	public override void OnNetworkSpawn()
 	{
-		Debug.Log($"PlayerPvP OnNetworkSpawn on {OwnerClientId}, IsOwner={IsOwner}, IsServer={IsServer}");
-
 		extraDamage.OnValueChanged += OnExtraDamageChanged;
 
 		// apply initial state once spawned
@@ -56,8 +54,6 @@ public class PlayerPvP : NetworkBehaviour
 	{
 		if (pRef != null && pRef.playerGraphics != null)
 			pRef.playerGraphics.PlayParticle(PfxToPlay.Fire, current);
-
-		Debug.Log("guys can i play");
 	}
 
 	public void SetExtraDamage(bool b)
@@ -65,8 +61,6 @@ public class PlayerPvP : NetworkBehaviour
 		if (!IsServer) return;          // server is authority for this buff
 		extraDamage.Value = b;          // this will trigger OnValueChanged on all
 	}
-
-
 
 	public bool HasExtraDamage()
 	{
