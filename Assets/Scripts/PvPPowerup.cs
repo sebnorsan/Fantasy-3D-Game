@@ -45,6 +45,8 @@ public class PvPPowerup : NetworkBehaviour
 
 		// Tell the SERVER to actually give the powerup + despawn
 		PickupServerRpc(p.OwnerClientId);
+
+		SetPowerUp(p);
 	}
 
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
@@ -61,7 +63,7 @@ public class PvPPowerup : NetworkBehaviour
 		if (p == null) return;
 
 		// give buff on server
-		SetPowerUp(p);
+		
 
 		spawner?.NotifyPowerupConsumed(this);
 
