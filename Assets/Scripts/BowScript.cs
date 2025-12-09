@@ -91,13 +91,13 @@ public class BowScript : MonoBehaviour
 		SpawnArrow(arrowFired, arrowTransform.position, arrowTransform.rotation, shootDir, arrowDamage, arrowSpeed, arrowSize);
 	}
 	private void SpawnArrow(
-		GameObject go,
-		Vector3 pos,
-		Quaternion rot,
-		Vector3 shootDir,
-		int dmg,
-		float spd,
-		float size)
+	GameObject go,
+	Vector3 pos,
+	Quaternion rot,
+	Vector3 shootDir,
+	int dmg,
+	float spd,
+	float size)
 	{
 		ulong shooterId = NetworkManager.Singleton.LocalClientId;
 
@@ -106,15 +106,20 @@ public class BowScript : MonoBehaviour
 
 		if (pRef.playerPvP.HasExtraDamage())
 		{
+			// consume buff
 			pRef.playerPvP.SetExtraDamage(false);
 
-			arrow.SetBigHit();
-
-			dmg *= 3;
+			arrow.SetBigHit();   // mark arrow
+			dmg *= 3;            // more damage
 		}
 
-		arrow.Initialize(dmg, spd, size, shootDir, pRef.playerController.transform.position, shooterId, true, pRef.bowNetCode);
+		arrow.Initialize(dmg, spd, size, shootDir,
+			pRef.playerController.transform.position,
+			shooterId,
+			true,
+			pRef.bowNetCode);
 
 		pRef.bowNetCode.SpawnArrowVisualServerRpc(pos, rot, shootDir, dmg, spd, size, shooterId);
 	}
+
 }

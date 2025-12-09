@@ -58,9 +58,12 @@ public class PlayerPvP : NetworkBehaviour
 
 	public void SetExtraDamage(bool b)
 	{
-		if (!IsServer) return;          // server is authority for this buff
-		extraDamage.Value = b;          // this will trigger OnValueChanged on all
+		// powerup (server) and local bow (owner) both allowed
+		if (!IsServer && !IsOwner) return;
+
+		extraDamage.Value = b;
 	}
+
 
 	public bool HasExtraDamage()
 	{

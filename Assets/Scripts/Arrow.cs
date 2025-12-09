@@ -150,21 +150,18 @@ public class Arrow : MonoBehaviour
 
 		if (go.TryGetComponent<PlayerDamagable>(out var player))
 		{
-			// NEW: pass shooterClientId so target can look up PvP
-			player.PlayPredictedHitFeedback(hitPoint, shooterClientId);
+			// tell client-side VFX if this hit is big
+			player.PlayPredictedHitFeedback(hitPoint, bigHit);
 		}
 
 		if (go.TryGetComponent<AbstractEnemy>(out var enemy))
 		{
-			enemy.LocalPredictedDamage(
-				arrowDamage,
-				hitPoint,
-				shooterClientId
-			);
+			enemy.LocalPredictedDamage(arrowDamage, hitPoint, shooterClientId);
 		}
 
-		// unchanged
+		// tell server if this arrow was big
 		bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint, shooterClientId, bigHit);
 	}
+
 
 }

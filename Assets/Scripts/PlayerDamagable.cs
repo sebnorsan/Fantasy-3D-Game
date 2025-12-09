@@ -75,7 +75,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	{
 		TakeDamage(currentHealth, transform.position);
 	}
-	public void TakeDamage(int amount, Vector3 hitPoint)
+	public void TakeDamage(int amount, Vector3 hitPoint, bool isHardHit = false)
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
@@ -83,8 +83,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 		UpdateHealthClientRpc(currentHealth);
 
-		// now include shooter id so we can skip VFX on that client
-		DamageEffectsClientRpc(hitPoint, lastHitByClientId);
+		// propagate to clients with hard-hit info
+		DamageEffectsClientRpc(hitPoint, lastHitByClientId, isHardHit);
 
 		Vector3 dir = (transform.position - hitPoint);
 		dir.y = 0f;
@@ -97,6 +97,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		if (currentHealth <= 0)
 			DieServer();
 	}
+
 
 	public void SetLastHitBy(ulong shooterClientId)
 	{
@@ -127,17 +128,17 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	#region DamageEffects
 
 	// NEW: local-only prediction entry point, no networking.
-	public void PlayPredictedHitFeedback(Vector3 hitPoint, ulong shooterClientId)
+	public void PlayPredictedHitFeedback(Vector3 hitPoint, bool isHardHit)
 	{
-		isHardHit = GetIsHardHit(shooterClientId);
-		// only visual stuff, no health/knockback
+		this.isHardHit = isHardHit;
 		DamageEffects(hitPoint);
 	}
 
+
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void DamageEffectsClientRpc(Vector3 hitPoint, ulong shooterClientId)
+	private void DamageEffectsClientRpc(Vector3 hitPoint, ulong shooterClientId, bool isHardHit)
 	{
-		isHardHit = GetIsHardHit(shooterClientId);
+		this.isHardHit = isHardHit;
 
 		// everyone except the shooter spawns networked VFX
 		if (NetworkManager.Singleton.LocalClientId != shooterClientId)
@@ -152,12 +153,9 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 			OwnerPlayerShake();
 		}
 
-		if (isHardHit)
-		{
-			isHardHit = false;
-			pRef.playerPvP.SetExtraDamage(false);
-		}
+		this.isHardHit = false;
 	}
+
 	private void OwnerPlayerShake()
 	{
 		if (isHardHit)
@@ -334,21 +332,4 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	
 	}
 	#endregion
-	#region PvP
-	private bool GetIsHardHit(ulong shooterClientId)
-	{
-		if (shooterClientId == ulong.MaxValue)
-			return false;
-
-		if (!NetworkManager.Singleton.ConnectedClients.TryGetValue(shooterClientId, out var cc))
-			return false;
-
-		var shooterRefs = cc.PlayerObject.GetComponent<PlayerReferences>();
-		if (shooterRefs == null || shooterRefs.playerPvP == null)
-			return false;
-
-		return shooterRefs.playerPvP.HasExtraDamage();
-	}
-	#endregion
-
 }
