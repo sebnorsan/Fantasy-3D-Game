@@ -142,6 +142,9 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 			case PfxToPlay.Run:
 				pfxToPlay = runPfx;
 				break;
+			case PfxToPlay.Fire:                 // <-- ADD THIS
+				pfxToPlay = onFirePfx;
+				break;
 		}
 
 		if (pfxToPlay == null) return;
@@ -157,6 +160,7 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 				pfxToPlay.Stop();
 		}
 	}
+
 
 }
 public enum PfxToPlay

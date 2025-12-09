@@ -32,6 +32,14 @@ public class Arrow : MonoBehaviour
 
 	private PlayerReferences pRef;
 
+	//Temporary PvP Settings
+
+	[HideInInspector] public bool bigHit = false;
+
+	public void SetBigHit()
+	{
+		bigHit = true;
+	}
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody>();
@@ -156,7 +164,7 @@ public class Arrow : MonoBehaviour
 		}
 
 		// unchanged
-		bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint, shooterClientId);
+		bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint, shooterClientId, bigHit);
 	}
 
 }

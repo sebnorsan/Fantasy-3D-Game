@@ -716,7 +716,7 @@ Transform:
   m_GameObject: {fileID: 1176349792202938911}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.464, z: 0}
+  m_LocalPosition: {x: 0, y: -0.63, z: 0.031}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -739,7 +739,7 @@ ParticleSystem:
   emitterVelocityMode: 0
   looping: 1
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
@@ -22952,7 +22952,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 222003529
+  GlobalObjectIdHash: 2771618475
   InScenePlacedSourceGlobalObjectIdHash: 2771618475
   DeferredDespawnTick: 0
   Ownership: 1
@@ -23096,7 +23096,7 @@ MonoBehaviour:
   haloPfx: {fileID: 4319503631612867037}
   stripePfx: {fileID: 8645871662389914758}
   runPfx: {fileID: 6841362980147527134}
-  onFirePfx: {fileID: 0}
+  onFirePfx: {fileID: 1176349792202938909}
 --- !u!114 &930708363686757887
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23117,7 +23117,7 @@ MonoBehaviour:
   cameraShaker: {fileID: 7212588598366797314}
   playerCharacterController: {fileID: 4702842973208242300}
   playerCam: {fileID: 5855688573525650132}
-  playerPvP: {fileID: 0}
+  playerPvP: {fileID: 4818609617636790534}
   crouchCamPoint: {fileID: 2556143203140004230}
   bowScript: {fileID: 1227791032311695380}
   bowNetCode: {fileID: 515831196404787215}
@@ -23272,6 +23272,83 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   ShowTopMostFoldoutHeaderGroup: 1
   pRef: {fileID: 930708363686757887}
+  Kills:
+    m_InternalValue: 0
+  Deaths:
+    m_InternalValue: 0
+  PlayerName:
+    m_InternalValue:
+      utf8LengthInBytes: 0
+      bytes:
+        offset0000:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0016:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        offset0032:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        byte0048: 0
+        byte0049: 0
+        byte0050: 0
+        byte0051: 0
+        byte0052: 0
+        byte0053: 0
+        byte0054: 0
+        byte0055: 0
+        byte0056: 0
+        byte0057: 0
+        byte0058: 0
+        byte0059: 0
+        byte0060: 0
+        byte0061: 0
+  SteamId:
+    m_InternalValue: 0
+  extraDamage:
+    m_InternalValue: 0
 --- !u!1 &7973304527205840717
 GameObject:
   m_ObjectHideFlags: 0

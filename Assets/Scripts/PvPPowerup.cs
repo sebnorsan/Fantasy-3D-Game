@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PvPPowerup : NetworkBehaviour
 {
-	[SerializeField] private ParticleSystem pfx;
+	[SerializeField] private GameObject pfx;
 	[SerializeField] private NetworkObject nwo;
 	[SerializeField] private PowerUpType upType;
 
@@ -27,7 +27,7 @@ public class PvPPowerup : NetworkBehaviour
 		// client-side predicted FX (only on the player who picked it up)
 		if (p.IsOwner && NetHelper.instance != null && pfx != null)
 		{
-			NetHelper.instance.NetInstantiate(pfx.gameObject, transform.position, Quaternion.identity, pfx.totalTime);
+			NetHelper.instance.NetInstantiate(pfx.gameObject, transform.position, pfx.transform.rotation, pfx.GetComponent<ParticleSystem>().totalTime);
 		}
 
 		if (!IsServer) return;
@@ -40,6 +40,8 @@ public class PvPPowerup : NetworkBehaviour
 			nwo.Despawn(true);
 		else
 			gameObject.SetActive(false);
+
+		Debug.Log("Hey guys");
 	}
 
 	private void SetPowerUp(PlayerReferences p)

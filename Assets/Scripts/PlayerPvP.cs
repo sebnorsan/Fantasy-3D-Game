@@ -16,14 +16,16 @@ public class PlayerPvP : NetworkBehaviour
 	public NetworkVariable<ulong> SteamId =
 		new NetworkVariable<ulong>();
 
-	private NetworkVariable<bool> extraDamage =
+	public NetworkVariable<bool> extraDamage =
 		new NetworkVariable<bool>(
 			false,
 			NetworkVariableReadPermission.Everyone,
-			NetworkVariableWritePermission.Owner);
+			NetworkVariableWritePermission.Server);
 
 	public override void OnNetworkSpawn()
 	{
+		Debug.Log($"PlayerPvP OnNetworkSpawn on {OwnerClientId}, IsOwner={IsOwner}, IsServer={IsServer}");
+
 		extraDamage.OnValueChanged += OnExtraDamageChanged;
 
 		// apply initial state once spawned
@@ -38,6 +40,7 @@ public class PlayerPvP : NetworkBehaviour
 		if (PvPScoreboard.Instance != null)
 			PvPScoreboard.Instance.RegisterPlayer(this);
 	}
+
 	public override void OnNetworkDespawn()
 	{
 		if (PvPScoreboard.Instance != null)
@@ -53,14 +56,17 @@ public class PlayerPvP : NetworkBehaviour
 	{
 		if (pRef != null && pRef.playerGraphics != null)
 			pRef.playerGraphics.PlayParticle(PfxToPlay.Fire, current);
+
+		Debug.Log("guys can i play");
 	}
 
 	public void SetExtraDamage(bool b)
 	{
-		if (!IsOwner) return; // owner-driven buff
-
-		extraDamage.Value = b; // this propagates to server + all clients
+		if (!IsServer) return;          // server is authority for this buff
+		extraDamage.Value = b;          // this will trigger OnValueChanged on all
 	}
+
+
 
 	public bool HasExtraDamage()
 	{
