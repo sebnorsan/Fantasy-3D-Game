@@ -34,7 +34,6 @@ public class PlayerPvP : NetworkBehaviour
 		extraDamage.OnValueChanged += OnExtraDamageChanged;
 
 		// apply initial state once spawned
-		OnExtraDamageChanged(false, extraDamage.Value);
 
 		if (IsOwner && SteamClient.IsValid)
 		{
