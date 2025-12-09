@@ -7272,7 +7272,7 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
+  m_ForceMeshLod: 0
   m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
@@ -17327,7 +17327,7 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
+  m_ForceMeshLod: 0
   m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
@@ -17417,7 +17417,7 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
+  m_ForceMeshLod: 0
   m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
@@ -17644,7 +17644,7 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
+  m_ForceMeshLod: 0
   m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
@@ -17992,7 +17992,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 222003529
+  GlobalObjectIdHash: 2771618475
   InScenePlacedSourceGlobalObjectIdHash: 2771618475
   DeferredDespawnTick: 0
   Ownership: 1
@@ -18644,9 +18644,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e216d133c439784bae340f6a1e50544, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pRef: {fileID: 930708363686757887}
   target: {fileID: 743770276343240314}
   followCamTransform: 1
   camTransform: {fileID: 743770276343240314}
+  reduceByExtra: -0.3
   minX: -45
   maxX: 45
 --- !u!1 &8827951681074446768

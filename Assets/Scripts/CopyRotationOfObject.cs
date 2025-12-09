@@ -3,11 +3,13 @@ using UnityEngine;
 
 public class CopyRotationOfObject : MonoBehaviour
 {
+	[SerializeField] private PlayerReferences pRef;
 	[SerializeField] private Transform target;
 
 	[Space(10)]
 	[SerializeField] private bool followCamTransform;
 	[SerializeField] private Transform camTransform;
+	[SerializeField] private float reduceByExtra = -.3f;
 
 	// For following camera height
 	private Vector3 initialLocalPos;
@@ -48,8 +50,8 @@ public class CopyRotationOfObject : MonoBehaviour
 		{
 			float camDeltaY = camTransform.localPosition.y - initialCamLocalY;
 
-			if (camTransform.localPosition.y != initialCamLocalY)
-				camDeltaY -= .4f;
+			if (pRef.playerController.isCrouching)
+				camDeltaY -= reduceByExtra;
 
 			Vector3 lp = transform.localPosition;
 			lp.y = initialLocalPos.y + camDeltaY;
