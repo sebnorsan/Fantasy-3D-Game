@@ -25,7 +25,7 @@ public class NetworkTransformChild : NetworkBehaviour
 		_hasInitialSync = false;
 	}
 
-	private void LateUpdate()
+	private void Update()
 	{
 		if (!IsSpawned || targets == null || targets.Count == 0)
 			return;

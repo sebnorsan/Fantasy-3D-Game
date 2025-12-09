@@ -1,8 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Globalization;
+using Unity.Netcode;
+using UnityEngine;
 
-public class CopyRotationOfObject : MonoBehaviour
+public class CopyRotationOfObject : NetworkBehaviour
 {
 	[SerializeField] private Transform target;
+	[SerializeField] private Transform targetToRotate;
 
 	[Header("Clamp (degrees)")]
 	[SerializeField] private float minX = -75f;
@@ -10,6 +13,7 @@ public class CopyRotationOfObject : MonoBehaviour
 
 	private void Update()
 	{
+		if (!IsOwner) return;
 		if (!target) return;
 
 		// Get target's world euler
@@ -23,7 +27,7 @@ public class CopyRotationOfObject : MonoBehaviour
 		x = Mathf.Clamp(x, minX, maxX);
 
 		// Apply clamped X, keep current Y/Z
-		Vector3 myEuler = transform.localRotation.eulerAngles;
-		transform.localRotation = Quaternion.Euler(x, myEuler.y, myEuler.z);
+		Vector3 myEuler = targetToRotate.localRotation.eulerAngles;
+		targetToRotate.localRotation = Quaternion.Euler(x, myEuler.y, myEuler.z);
 	}
 }

@@ -17896,6 +17896,7 @@ GameObject:
   - component: {fileID: 515831196404787215}
   - component: {fileID: -4300034968420110970}
   - component: {fileID: 150086669983804623}
+  - component: {fileID: 3718597100809155466}
   m_Layer: 3
   m_Name: PlayerController
   m_TagString: GameController
@@ -18292,6 +18293,23 @@ MonoBehaviour:
   - {fileID: 3562491346119374754}
   - {fileID: 1393641704035168311}
   lerpSpeed: 10
+--- !u!114 &3718597100809155466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7758727492805073096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e216d133c439784bae340f6a1e50544, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  target: {fileID: 743770276343240314}
+  targetToRotate: {fileID: 1393641704035168311}
+  minX: -45
+  maxX: 45
 --- !u!1 &7973304527205840717
 GameObject:
   m_ObjectHideFlags: 0
@@ -18606,7 +18624,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1393641704035168311}
-  - component: {fileID: 1767634756153001537}
   m_Layer: 0
   m_Name: BowPivot
   m_TagString: Untagged
@@ -18630,21 +18647,6 @@ Transform:
   - {fileID: 6413949758991837382}
   m_Father: {fileID: 3562491346119374754}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1767634756153001537
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8588383917548274506}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e216d133c439784bae340f6a1e50544, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 743770276343240314}
-  minX: -45
-  maxX: 45
 --- !u!1 &8827951681074446768
 GameObject:
   m_ObjectHideFlags: 0
