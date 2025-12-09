@@ -48,6 +48,9 @@ public class CopyRotationOfObject : MonoBehaviour
 		{
 			float camDeltaY = camTransform.localPosition.y - initialCamLocalY;
 
+			if (camTransform.localPosition.y != initialCamLocalY)
+				camDeltaY -= .4f;
+
 			Vector3 lp = transform.localPosition;
 			lp.y = initialLocalPos.y + camDeltaY;
 			transform.localPosition = lp;
