@@ -20,7 +20,7 @@ public class PlayerPvP : NetworkBehaviour
 		new NetworkVariable<bool>(
 			false,
 			NetworkVariableReadPermission.Everyone,
-			NetworkVariableWritePermission.Server);
+			NetworkVariableWritePermission.Owner);
 
 	public override void OnNetworkSpawn()
 	{
@@ -28,10 +28,7 @@ public class PlayerPvP : NetworkBehaviour
 
 		// apply initial state once spawned
 		OnExtraDamageChanged(false, extraDamage.Value);
-	}
 
-	private void Start()
-	{
 		if (IsOwner && SteamClient.IsValid)
 		{
 			PlayerName.Value = SteamClient.Name;
