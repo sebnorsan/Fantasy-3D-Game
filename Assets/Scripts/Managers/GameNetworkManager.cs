@@ -7,6 +7,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
 
 public class GameNetworkManager : MonoBehaviour
 {
@@ -26,6 +27,9 @@ public class GameNetworkManager : MonoBehaviour
 
 	public event Action<Lobby> OnLobbyReady;
 	public event Action<Lobby> OnLobbyMembersChanged;
+
+	[SerializeField] private string mainMenuSceneName = "LobbyScene"; // set in inspector
+	public static string LastNetworkErrorMessage { get; private set; }
 
 	private void Awake()
 	{
@@ -171,8 +175,15 @@ public class GameNetworkManager : MonoBehaviour
 	{
 		Debug.Log($"Client disconnected, clientId={clientId}");
 
-		NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnectedCallback;
-		NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnectCallback;
+		// If we're a client (not server/host) and *we* got disconnected -> back to menu
+		if (!NetworkManager.Singleton.IsServer &&
+			clientId == NetworkManager.Singleton.LocalClientId)
+		{
+			LastNetworkErrorMessage = "Disconnected from host.";
+			SceneManager.LoadScene(mainMenuSceneName);
+		}
+
+		// server-side you can still log this; no need to unsubscribe here
 	}
 
 	// ------------------ Steam callbacks ------------------
@@ -246,4 +257,17 @@ public class GameNetworkManager : MonoBehaviour
 		foreach (var b in bytes) sb.Append(b.ToString("x2"));
 		return sb.ToString();
 	}
+	public void LeaveGameAndReturnToMenu()
+	{
+		// Called by both host and client when pressing the "Leave" button
+
+		LastNetworkErrorMessage = null; // optional, or set a friendly message
+
+		// If we’re host or client, cleanly shut down
+		Disconnect();
+
+		// Load menu locally
+		SceneManager.LoadScene(mainMenuSceneName);
+	}
+
 }

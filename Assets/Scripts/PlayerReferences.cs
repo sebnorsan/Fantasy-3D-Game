@@ -28,11 +28,25 @@ public class PlayerReferences : NetworkBehaviour
 	{
 		if (IsOwner)
 			playerCharacterController.enabled = false;
-
-        Invoke(nameof(EnableCharacterController), 1f);
 	}
-    private void EnableCharacterController()
-    {
+
+	#region InitialPlayerCheck
+	private PlayerController playerCheck = null;
+	private void Update()
+	{
+		if (playerCheck == null)
+		{
+			var localClient = NetworkManager.Singleton.LocalClient;
+			if (localClient != null && localClient.PlayerObject != null)
+			{
+				playerCheck = localClient.PlayerObject.GetComponent<PlayerReferences>().playerController;
+				OnPlayerFound();
+			}
+		}
+	}
+	private void OnPlayerFound()
+	{
 		playerCharacterController.enabled = true;
 	}
+	#endregion;
 }

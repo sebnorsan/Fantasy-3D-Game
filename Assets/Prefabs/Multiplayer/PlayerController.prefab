@@ -17992,7 +17992,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2771618475
+  GlobalObjectIdHash: 222003529
   InScenePlacedSourceGlobalObjectIdHash: 2771618475
   DeferredDespawnTick: 0
   Ownership: 1
@@ -18112,7 +18112,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   pRef: {fileID: 930708363686757887}
   gfx: {fileID: 8827951681074446768}
-  ignoreMultiplayerGraphics: 1
+  ignoreMultiplayerGraphics: 0
   multiplayerGfx:
   - {fileID: 2403484915536638094}
   - {fileID: 6803833735646330706}

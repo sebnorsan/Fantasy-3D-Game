@@ -41,10 +41,18 @@ public class HandsSmooth : MonoBehaviour
 	}
 	private void Update()
 	{
+
 		float InputX = -Input.GetAxis("Mouse X");
 		float InputY = -Input.GetAxis("Mouse Y");
 		float horizontal = -Input.GetAxis("Horizontal");
 		float vertical = Input.GetAxis("Vertical");
+
+		if (!EventManager.instance.IsCameraPlayerMode())
+		{
+			InputX = 0;
+			InputY = 0;
+		}
+
 
 		float moveX = Mathf.Clamp(InputX * amount, -maxAmount, maxAmount);
 		float moveY = Mathf.Clamp(InputY * amount, -maxAmount, maxAmount);
@@ -52,8 +60,6 @@ public class HandsSmooth : MonoBehaviour
 		Vector3 finalPosition = new Vector3(moveX, moveY + -CharakterC.velocity.y / 60, 0);
 
 		transform.localPosition = Vector3.Lerp(transform.localPosition, finalPosition + InstallPosition, Time.deltaTime * smooth);
-
-
 
 		float TiltX = Mathf.Clamp(InputX * RotationAmount, -MaxRotationAmount, MaxRotationAmount);
 		float TiltY = Mathf.Clamp(InputY * RotationSmooth, -MaxRotationAmount, MaxRotationAmount);

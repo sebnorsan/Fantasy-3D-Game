@@ -76,6 +76,21 @@ public class EventManager : MonoBehaviour
 		if (Camera.main) Camera.main.clearFlags = CameraClearFlags.Skybox;
 	}
 	#endregion
+	public bool IsCameraPlayerMode()
+	{
+		if (Cursor.lockState == CursorLockMode.Locked)
+			return true;
+		else return false;
+	}
+	public void ToggleCameraMode()
+	{
+		Cursor.visible = !Cursor.visible;
+
+		if (Cursor.lockState == CursorLockMode.Confined)
+			Cursor.lockState = CursorLockMode.Locked;
+		else
+			Cursor.lockState = CursorLockMode.Confined;
+	}
 	public void TeleportPlayer(PlayerController player, Vector3 tpPos, bool resetDir = true)
 	{
 		player.pRef.playerCharacterController.enabled = false;
