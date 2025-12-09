@@ -47,11 +47,12 @@ public class HandsSmooth : MonoBehaviour
 		float horizontal = -Input.GetAxis("Horizontal");
 		float vertical = Input.GetAxis("Vertical");
 
-		if (!EventManager.instance.IsCameraPlayerMode())
-		{
-			InputX = 0;
-			InputY = 0;
-		}
+		if (EventManager.instance)
+			if (!EventManager.instance.IsCameraPlayerMode())
+			{
+				InputX = 0;
+				InputY = 0;
+			}
 
 
 		float moveX = Mathf.Clamp(InputX * amount, -maxAmount, maxAmount);

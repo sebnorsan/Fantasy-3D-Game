@@ -36,6 +36,7 @@ public class BowScript : MonoBehaviour
 
 	private void Update()
 	{
+		if (!EventManager.instance) return;
 		if (!EventManager.instance.IsCameraPlayerMode()) return;
 
 		if (!pRef || !pRef.IsOwner) return;
