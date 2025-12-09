@@ -5,7 +5,7 @@ public class PvPScoreboard : MonoBehaviour
 {
 	public static PvPScoreboard Instance { get; private set; }
 
-	[SerializeField] private Transform contentRoot;     // parent with VerticalLayoutGroup
+	[SerializeField] private Transform contentRoot;
 	[SerializeField] private PvPScoreboardRow rowPrefab;
 
 	private readonly Dictionary<ulong, PvPScoreboardRow> rows =
@@ -14,6 +14,10 @@ public class PvPScoreboard : MonoBehaviour
 	private void Awake()
 	{
 		Instance = this;
+
+		// Register any already spawned players
+		foreach (var stats in FindObjectsByType<PlayerPvP>(FindObjectsSortMode.None))
+			RegisterPlayer(stats);
 	}
 
 	private void OnDestroy()

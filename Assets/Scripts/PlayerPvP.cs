@@ -33,8 +33,6 @@ public class PlayerPvP : NetworkBehaviour
 	{
 		extraDamage.OnValueChanged += OnExtraDamageChanged;
 
-		// apply initial state once spawned
-
 		if (IsOwner && SteamClient.IsValid)
 		{
 			PlayerName.Value = SteamClient.Name;
@@ -44,6 +42,7 @@ public class PlayerPvP : NetworkBehaviour
 				PvPScoreboard.Instance.RegisterPlayer(this);
 		}
 	}
+
 
 	public override void OnNetworkDespawn()
 	{
