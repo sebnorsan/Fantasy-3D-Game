@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class BowNetCode : NetworkBehaviour
 {
+	[SerializeField] private PlayerReferences pRef;
 	[SerializeField] private BowScript localBowScript;
 	[SerializeField] private GameObject arrowPrefab;
 

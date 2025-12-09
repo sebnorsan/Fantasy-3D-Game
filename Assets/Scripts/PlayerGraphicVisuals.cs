@@ -34,9 +34,12 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 	private string cachedName;
 
 	[Header("Particle FX")]
-	[SerializeField] ParticleSystem haloPfx;
+	[SerializeField] private ParticleSystem haloPfx;
 	[SerializeField] private ParticleSystem stripePfx;
 	[SerializeField] private ParticleSystem runPfx;
+
+	[Header("PvP")]
+	[SerializeField] private ParticleSystem onFirePfx;
 
 	public override void OnNetworkSpawn()
 	{
@@ -160,5 +163,6 @@ public enum PfxToPlay
 {
 	Halo,
 	Stripe,
-	Run
+	Run,
+	Fire
 }

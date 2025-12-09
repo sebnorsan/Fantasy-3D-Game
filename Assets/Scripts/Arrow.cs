@@ -6,6 +6,7 @@ using System.Linq;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem.iOS;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Arrow : MonoBehaviour
@@ -29,6 +30,8 @@ public class Arrow : MonoBehaviour
 
 	private BowNetCode bowNetCode;
 
+	private PlayerReferences pRef;
+
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody>();
@@ -48,6 +51,8 @@ public class Arrow : MonoBehaviour
 		BowNetCode localNetCode = null
 	)
 	{
+		pRef = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerReferences>();
+
 		this.isAuthority = isAuthority;
 		bowNetCode = localNetCode;
 
@@ -93,7 +98,7 @@ public class Arrow : MonoBehaviour
 	{
 		if (!isAuthority) return;
 
-		var c = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerReferences>().cameraShaker;
+		var c = pRef.cameraShaker;
 
 		c.ShakeOnce(2f, 3f, .1f, .2f);
 	}
@@ -137,8 +142,10 @@ public class Arrow : MonoBehaviour
 
 		if (go.TryGetComponent<PlayerDamagable>(out var player))
 		{
-			player.PlayPredictedHitFeedback(hitPoint);
+			// NEW: pass shooterClientId so target can look up PvP
+			player.PlayPredictedHitFeedback(hitPoint, shooterClientId);
 		}
+
 		if (go.TryGetComponent<AbstractEnemy>(out var enemy))
 		{
 			enemy.LocalPredictedDamage(
@@ -148,6 +155,8 @@ public class Arrow : MonoBehaviour
 			);
 		}
 
+		// unchanged
 		bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint, shooterClientId);
 	}
+
 }

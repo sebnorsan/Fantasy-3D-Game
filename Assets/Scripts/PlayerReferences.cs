@@ -11,6 +11,7 @@ public class PlayerReferences : NetworkBehaviour
 	public EZCameraShake.CameraShaker cameraShaker;
     public CharacterController playerCharacterController;
 	public Camera playerCam;
+	public PlayerPvP playerPvP;
 
 	[Space(10)]
 	public Transform crouchCamPoint;

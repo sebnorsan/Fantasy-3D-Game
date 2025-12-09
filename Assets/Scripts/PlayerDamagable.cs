@@ -18,8 +18,9 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	[SerializeField] private GameObject deathCam;
 
 	[Space(15)]
-	[SerializeField] private GameObject deathParticles;
-	[SerializeField] private GameObject hitParticles;
+	[SerializeField] private ParticleSystem deathParticles;
+	[SerializeField] private ParticleSystem hitParticles;
+	[SerializeField] private ParticleSystem hitHardParticles;
 
 	[Space(15)]
 	[Header("Health UI")]
@@ -29,6 +30,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	[Space(15)]
 	[Header("Knockback")]
 	[SerializeField] private float knockbackStrength = 10f;
+
+	private bool isHardHit = false;
 
 	private float displayedHealth;
 
@@ -68,6 +71,10 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		healthSlider.value = displayedHealth;
 	}
 
+	public void KillPlayer()
+	{
+		TakeDamage(currentHealth, transform.position);
+	}
 	public void TakeDamage(int amount, Vector3 hitPoint)
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
@@ -120,8 +127,9 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	#region DamageEffects
 
 	// NEW: local-only prediction entry point, no networking.
-	public void PlayPredictedHitFeedback(Vector3 hitPoint)
+	public void PlayPredictedHitFeedback(Vector3 hitPoint, ulong shooterClientId)
 	{
+		isHardHit = GetIsHardHit(shooterClientId);
 		// only visual stuff, no health/knockback
 		DamageEffects(hitPoint);
 	}
@@ -129,20 +137,37 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void DamageEffectsClientRpc(Vector3 hitPoint, ulong shooterClientId)
 	{
+		isHardHit = GetIsHardHit(shooterClientId);
+
 		// everyone except the shooter spawns networked VFX
 		if (NetworkManager.Singleton.LocalClientId != shooterClientId)
 		{
 			DamageEffects(hitPoint);
+			pRef.playerAnimator.A_TakeDamage();
 		}
 
 		// the *owner of the damaged player* gets camera shake + local anim
 		if (IsOwner)
 		{
-			pRef.cameraShaker.ShakeOnce(7f, 3f, .1f, .4f);
-			pRef.playerAnimator.A_TakeDamage();
+			OwnerPlayerShake();
+		}
+
+		if (isHardHit)
+		{
+			isHardHit = false;
+			pRef.playerPvP.SetExtraDamage(false);
 		}
 	}
+	private void OwnerPlayerShake()
+	{
+		if (isHardHit)
+		{
+			pRef.cameraShaker.ShakeOnce(13f, 3f, .1f, .8f);
+			return;
+		}
 
+		pRef.cameraShaker.ShakeOnce(7f, 3f, .1f, .4f);
+	}
 	public void DamageEffects(Vector3 hitPoint)
 	{
 		if (currFlashCoroutine == null)
@@ -154,10 +179,12 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	private void OnSpawnDamagePFX()
 	{
-		if (hitParticles == null) return;
+		var pfxToPlay = isHardHit ? hitHardParticles : hitParticles;
+		
+		if (pfxToPlay == null) return;
 
-		var pfx = Instantiate(hitParticles, transform.position, Quaternion.identity);
-		Destroy(pfx, 5);
+		var pfx = Instantiate(pfxToPlay, transform.position, Quaternion.identity);
+		Destroy(pfx, pfx.totalTime);
 	}
 
 	private void OnPlayDamageAnimation()
@@ -289,6 +316,22 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 			Destroy(pfx, 5);
 		}
 	
+	}
+	#endregion
+	#region PvP
+	private bool GetIsHardHit(ulong shooterClientId)
+	{
+		if (shooterClientId == ulong.MaxValue)
+			return false;
+
+		if (!NetworkManager.Singleton.ConnectedClients.TryGetValue(shooterClientId, out var cc))
+			return false;
+
+		var shooterRefs = cc.PlayerObject.GetComponent<PlayerReferences>();
+		if (shooterRefs == null || shooterRefs.playerPvP == null)
+			return false;
+
+		return shooterRefs.playerPvP.HasExtraDamage();
 	}
 	#endregion
 
