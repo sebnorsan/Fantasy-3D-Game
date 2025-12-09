@@ -67,6 +67,8 @@ public class PlayerController : NetworkBehaviour
 	[HideInInspector] public Vector3 moveDirection = Vector3.zero;
 	[HideInInspector] public bool isRunning = false;
 	[HideInInspector] public bool isMoving = false;
+	[HideInInspector] public bool isCrouching = false;
+	[HideInInspector] public bool isFlying = false;
 	[HideInInspector] public float rotationX = 0f;
 	[HideInInspector] public bool isGrounded;
 	[HideInInspector] public float inputVertical;
@@ -77,9 +79,6 @@ public class PlayerController : NetworkBehaviour
 	private float initialCrouchHeight;
 	private float initialFOV;
 	private float runningFovMultiplier;
-
-	private bool isCrouching = false;
-	private bool isFlying = false;
 
 	private bool canCoyote = false;
 	private bool coyoteActive = false;

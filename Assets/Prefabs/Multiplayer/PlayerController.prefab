@@ -7204,7 +7204,7 @@ Transform:
   m_GameObject: {fileID: 4999930391125440042}
   serializedVersion: 2
   m_LocalRotation: {x: -0.0073523945, y: 0.005643313, z: -0.00004149371, w: -0.999957}
-  m_LocalPosition: {x: 7.8094163, y: 0.2675894, z: -5.8182664}
+  m_LocalPosition: {x: 0.183, y: -1.074, z: 0.385}
   m_LocalScale: {x: 0.5178344, y: 0.5178344, z: 0.5178344}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -17992,7 +17992,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2771618475
+  GlobalObjectIdHash: 222003529
   InScenePlacedSourceGlobalObjectIdHash: 2771618475
   DeferredDespawnTick: 0
   Ownership: 1
@@ -18048,6 +18048,8 @@ MonoBehaviour:
   moveDirection: {x: 0, y: 0, z: 0}
   isRunning: 0
   isMoving: 0
+  isCrouching: 0
+  isFlying: 0
   rotationX: 0
   isGrounded: 0
   inputVertical: 0
