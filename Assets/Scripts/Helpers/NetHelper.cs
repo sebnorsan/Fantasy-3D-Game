@@ -8,10 +8,7 @@ public class NetHelper : NetworkBehaviour
 	public GameObject[] netGameObjects;
 	private void Awake()
 	{
-		if (instance != null)
-			Destroy(gameObject);
-		else
-			instance = this;
+		instance = this;
 	}
 	public void NetInstantiate(GameObject go, Vector3 pos, Quaternion rot, float destroyAfter = 0f)
 	{

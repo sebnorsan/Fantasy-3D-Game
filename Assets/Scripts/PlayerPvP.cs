@@ -11,10 +11,17 @@ public class PlayerPvP : NetworkBehaviour
 	public NetworkVariable<int> Deaths = new NetworkVariable<int>();
 
 	public NetworkVariable<FixedString64Bytes> PlayerName =
-		new NetworkVariable<FixedString64Bytes>();
+	new NetworkVariable<FixedString64Bytes>(
+		default,
+		NetworkVariableReadPermission.Everyone,
+		NetworkVariableWritePermission.Owner);
 
 	public NetworkVariable<ulong> SteamId =
-		new NetworkVariable<ulong>();
+		new NetworkVariable<ulong>(
+			0,
+			NetworkVariableReadPermission.Everyone,
+			NetworkVariableWritePermission.Owner);
+
 
 	public NetworkVariable<bool> extraDamage =
 		new NetworkVariable<bool>(
@@ -58,9 +65,12 @@ public class PlayerPvP : NetworkBehaviour
 
 	public void SetExtraDamage(bool b)
 	{
-		// powerup (server) and local bow (owner) both allowed
+		// allow either server OR owner to set it
+		if (!IsServer && !IsOwner) return;
+
 		extraDamage.Value = b;
 	}
+
 
 
 	public bool HasExtraDamage()
