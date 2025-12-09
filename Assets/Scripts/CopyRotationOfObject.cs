@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Netcode;
+using UnityEngine;
 
 public class CopyRotationOfObject : MonoBehaviour
 {
@@ -27,6 +28,8 @@ public class CopyRotationOfObject : MonoBehaviour
 
 	private void LateUpdate()
 	{
+		if (!GetComponentInParent<NetworkObject>().IsOwner) return;
+
 		if (!target) return;
 
 		// --- rotation clamp ---

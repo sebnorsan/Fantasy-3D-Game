@@ -18645,8 +18645,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 743770276343240314}
-  pRef: {fileID: 930708363686757887}
-  localYPosToGo: 0
+  followCamTransform: 1
+  camTransform: {fileID: 743770276343240314}
   minX: -45
   maxX: 45
 --- !u!1 &8827951681074446768
