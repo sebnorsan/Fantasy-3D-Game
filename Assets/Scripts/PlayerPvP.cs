@@ -59,8 +59,6 @@ public class PlayerPvP : NetworkBehaviour
 	public void SetExtraDamage(bool b)
 	{
 		// powerup (server) and local bow (owner) both allowed
-		if (!IsServer && !IsOwner) return;
-
 		extraDamage.Value = b;
 	}
 

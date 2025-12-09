@@ -23,9 +23,12 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	[SerializeField] private ParticleSystem hitHardParticles;
 
 	[Space(15)]
-	[Header("Health UI")]
+	[Header("Health UI (world / multiplayer)")]
 	[SerializeField] private Slider healthSlider;
 	[SerializeField] private float sliderLerpSpeed = 10f;
+
+	[Header("Health UI (local HUD)")]
+	[SerializeField] private Slider localHealthSlider;   // NEW: local-only bar
 
 	[Space(15)]
 	[Header("Knockback")]
@@ -44,6 +47,13 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	private Vector3 deathPosition = new Vector3(9999, 9999, 9999);
 
+	public override void OnNetworkSpawn()
+	{
+		// local HUD: only the owning client should see/use this slider
+		if (!IsOwner && localHealthSlider != null)
+			localHealthSlider.gameObject.SetActive(false);
+	}
+
 	private void Start()
 	{
 		ScreenSummoner.SummonScreen(Color.black, 1f, false);
@@ -51,16 +61,26 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
 
 		displayedHealth = currentHealth;
+
+		// existing multiplayer slider init
 		if (healthSlider != null)
 		{
 			healthSlider.maxValue = maxHealth;
 			healthSlider.value = currentHealth;
 		}
+
+		// local HUD slider init (owner only)
+		if (IsOwner && localHealthSlider != null)
+		{
+			localHealthSlider.maxValue = maxHealth;
+			localHealthSlider.value = currentHealth;
+		}
 	}
 
 	private void Update()
 	{
-		if (healthSlider == null) return;
+		// if neither slider exists, nothing to do
+		if (healthSlider == null && localHealthSlider == null) return;
 
 		displayedHealth = Mathf.Lerp(
 			displayedHealth,
@@ -68,13 +88,20 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 			Time.deltaTime * sliderLerpSpeed
 		);
 
-		healthSlider.value = displayedHealth;
+		// keep old multiplayer/world bar behaviour
+		if (healthSlider != null)
+			healthSlider.value = displayedHealth;
+
+		// local HUD bar only for owner
+		if (IsOwner && localHealthSlider != null)
+			localHealthSlider.value = displayedHealth;
 	}
 
 	public void KillPlayer()
 	{
 		TakeDamage(currentHealth, transform.position);
 	}
+
 	public void TakeDamage(int amount, Vector3 hitPoint, bool isHardHit = false)
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
@@ -97,7 +124,6 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		if (currentHealth <= 0)
 			DieServer();
 	}
-
 
 	public void SetLastHitBy(ulong shooterClientId)
 	{
@@ -127,27 +153,23 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	#region DamageEffects
 
-	// NEW: local-only prediction entry point, no networking.
 	public void PlayPredictedHitFeedback(Vector3 hitPoint, bool isHardHit)
 	{
 		this.isHardHit = isHardHit;
 		DamageEffects(hitPoint);
 	}
 
-
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void DamageEffectsClientRpc(Vector3 hitPoint, ulong shooterClientId, bool isHardHit)
 	{
 		this.isHardHit = isHardHit;
 
-		// everyone except the shooter spawns networked VFX
 		if (NetworkManager.Singleton.LocalClientId != shooterClientId)
 		{
 			DamageEffects(hitPoint);
 			pRef.playerAnimator.A_TakeDamage();
 		}
 
-		// the *owner of the damaged player* gets camera shake + local anim
 		if (IsOwner)
 		{
 			OwnerPlayerShake();
@@ -166,6 +188,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 		pRef.cameraShaker.ShakeOnce(7f, 3f, .1f, .4f);
 	}
+
 	public void DamageEffects(Vector3 hitPoint)
 	{
 		if (currFlashCoroutine == null)
@@ -178,7 +201,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	private void OnSpawnDamagePFX()
 	{
 		var pfxToPlay = isHardHit ? hitHardParticles : hitParticles;
-		
+
 		if (pfxToPlay == null) return;
 
 		var pfx = Instantiate(pfxToPlay, transform.position, Quaternion.identity);
