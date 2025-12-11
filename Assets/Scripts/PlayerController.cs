@@ -1,9 +1,9 @@
 ﻿using EvolveGames;
 using EZCameraShake;
 using System.Collections.Generic;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : NetworkBehaviour
@@ -419,10 +419,11 @@ public class PlayerController : NetworkBehaviour
 	{
 		// Check what is above the head
 		Collider[] hits = Physics.OverlapSphere(
-			headCheck.position,
-			headCheckRadius,
-			pRef.groundLayerMask
+		headCheck.position,
+		headCheckRadius,
+		~0   // everything
 		);
+
 
 		bool hasWorldBlock = false;
 		PlayerController playerOnTop = null;
@@ -501,13 +502,31 @@ public class PlayerController : NetworkBehaviour
 	}
 
 	// Server -> that player's owner: do the actual super jump
+	private Coroutine launchCoroutine;
 	[Rpc(SendTo.Owner)]
 	private void LaunchUpRpc()
 	{
 		if (!IsOwner) return;
 
 		// tweak multiplier to taste
-		moveDirection.y = jumpSpeed * 3.0f;
+		if (launchCoroutine == null)
+			launchCoroutine = StartCoroutine(LaunchUp());
+	}
+
+	private IEnumerator LaunchUp()
+	{
+		float savedRadius = checkRadius;
+
+		checkRadius = 0;
+		footstepStopPending = false;
+		pRef.playerAnimator.A_Jump();
+
+		moveDirection.y = 40f;
+
+		yield return new WaitForSeconds(1f);
+		checkRadius = savedRadius;
+
+		launchCoroutine = null;
 	}
 
 	private void HandleCrouchCamera()
