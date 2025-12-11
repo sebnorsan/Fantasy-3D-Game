@@ -30,6 +30,9 @@ public class BowEffects : NetworkBehaviour
 
         if (GetBigHit())
 		    SetBigHit(false);
+
+		foreach (var fx in pRef.arrowParticles)
+			fx.UnApplyArrowEffects();
 	}
 
 	public void SetBigHit(bool b)
@@ -66,6 +69,9 @@ public class BowEffects : NetworkBehaviour
             activeArrowEffects.Value.Add(effect);
         else
 			activeArrowEffects.Value.Remove(effect);
+
+        foreach (var fx in pRef.arrowParticles)
+            fx.ApplyArrowEffects();
 	}
 	#endregion
 }

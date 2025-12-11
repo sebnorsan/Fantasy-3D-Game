@@ -172,6 +172,11 @@ public class AudioToPlay
 	[Range(0, 500)] public float minDistance = 1f;
 	[Range(0, 500)] public float maxDistance = 500f;
 
+	[Space(15)]
+	public bool randomPitch = false;
+	[Range(-3, 3)] public float minPitch = .9f;
+	[Range(-3, 3)] public float maxPitch = 1.1f;
+
 	[Space(15)] public bool subtitlesEnabled = false;
 	public Subtitle[] subtitles;
 
