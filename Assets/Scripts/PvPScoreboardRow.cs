@@ -84,8 +84,13 @@ public class PvPScoreboardRow : MonoBehaviour
 	public void CaptureStartPos()
 	{
 		if (rt == null) rt = GetComponent<RectTransform>();
+
+		// cancel any old animation so it doesn't fight the new one
+		animating = false;
+
 		startPos = rt.anchoredPosition;
 	}
+
 
 	public void SetTargetToCurrentPos()
 	{
@@ -102,13 +107,16 @@ public class PvPScoreboardRow : MonoBehaviour
 		animTime += Time.unscaledDeltaTime;
 		float t = Mathf.Clamp01(animTime / moveDuration);
 
-		// smoothstep-ish curve: ease in & out
+		// your easing, for example:
 		float smoothT = t * t * (3f - 2f * t);
 
 		rt.anchoredPosition = Vector2.LerpUnclamped(startPos, targetPos, smoothT);
 
-
 		if (t >= 1f)
+		{
+			// make 100% sure we end exactly at the GridLayout target
+			rt.anchoredPosition = targetPos;
 			animating = false;
+		}
 	}
 }
