@@ -104,17 +104,16 @@ public class PvPScoreboard : MonoBehaviour
 
 	private IEnumerator SortRowsLerped()
 	{
-		// Copy rows into a list
 		var list = new List<PvPScoreboardRow>(rows.Values);
 
-		// 1) capture current positions BEFORE we change siblings
+		// 1) capture where visuals are NOW
 		foreach (var r in list)
 		{
 			if (r != null)
 				r.CaptureStartPos();
 		}
 
-		// 2) sort list like before
+		// 2) sort
 		list.Sort((a, b) =>
 		{
 			if (a == null || a.Player == null) return 1;
@@ -129,36 +128,26 @@ public class PvPScoreboard : MonoBehaviour
 			return a.Player.NetworkObjectId.CompareTo(b.Player.NetworkObjectId);
 		});
 
-		// 3) apply sibling order (this is what the GridLayout will use)
+		// 3) apply sibling index – GridLayoutGroup will place them
 		for (int i = 0; i < list.Count; i++)
 		{
 			if (list[i] != null)
 				list[i].transform.SetSiblingIndex(i);
 		}
 
-		// 4) let GridLayoutGroup compute final positions ONCE
-		if (gridLayoutGroup != null)
-		{
-			gridLayoutGroup.enabled = true;
-			LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)contentRoot);
-		}
+		// wait one layout pass
+		yield return new WaitForEndOfFrame();
 
-		// (optional) one frame just to be super safe
-		yield return null;
-
-		// 5) now read those as targets and start lerping
+		// 4) tell each row to slide its visuals from old -> new
 		foreach (var r in list)
 		{
 			if (r != null)
 				r.SetTargetToCurrentPos();
 		}
 
-		// 6) disable layout so it stops fighting the animation
-		if (gridLayoutGroup != null)
-			gridLayoutGroup.enabled = false;
-
 		sortRoutine = null;
 	}
+
 
 
 

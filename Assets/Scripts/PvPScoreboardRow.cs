@@ -12,13 +12,17 @@ public class PvPScoreboardRow : MonoBehaviour
 	[SerializeField] private TMP_Text killsText;
 	[SerializeField] private TMP_Text deathsText;
 
+	// NEW: the inner rect we slide around
+	[SerializeField] private RectTransform visualRoot;
+
 	private PlayerPvP playerPvP;
 	public PlayerPvP Player => playerPvP;
 
+	private RectTransform rt;          // root (grid child)
+
 	// ---- LERP FIELDS ----
-	private RectTransform rt;
-	private Vector2 startPos;
-	private Vector2 targetPos;
+	private Vector3 startWorld;
+	private Vector3 targetWorld;
 	private float animTime;
 	private bool animating;
 	[SerializeField] private float moveDuration = 0.2f;
@@ -66,7 +70,7 @@ public class PvPScoreboardRow : MonoBehaviour
 		if (!SteamClient.IsValid) return;
 
 		var friend = new Friend((SteamId)playerPvP.SteamId.Value);
-		var img = await friend.GetLargeAvatarAsync();  // Facepunch API
+		var img = await friend.GetLargeAvatarAsync();
 		if (!img.HasValue) return;
 
 		var tex = img.Value.Convert();
@@ -81,21 +85,20 @@ public class PvPScoreboardRow : MonoBehaviour
 
 	// ----- LERP API CALLED BY SCOREBOARD -----
 
+	// called BEFORE sort/layout, remember where visuals are now
 	public void CaptureStartPos()
 	{
-		if (rt == null) rt = GetComponent<RectTransform>();
-
-		// cancel any old animation so it doesn't fight the new one
-		animating = false;
-
-		startPos = rt.anchoredPosition;
+		if (visualRoot == null) return;
+		startWorld = visualRoot.position;
 	}
 
-
+	// called AFTER layout, when root is in its final grid slot
 	public void SetTargetToCurrentPos()
 	{
-		if (rt == null) rt = GetComponent<RectTransform>();
-		targetPos = rt.anchoredPosition;
+		if (visualRoot == null) return;
+
+		targetWorld = rt.position;         // where the row *should* be
+		visualRoot.position = startWorld;  // keep visuals where they were
 		animTime = 0f;
 		animating = true;
 	}
@@ -106,22 +109,14 @@ public class PvPScoreboardRow : MonoBehaviour
 
 		animTime += Time.unscaledDeltaTime;
 		float t = Mathf.Clamp01(animTime / moveDuration);
-
-		// easing
 		float smoothT = t * t * (3f - 2f * t);
 
-		// only animate vertical movement (Y)
-		float newY = Mathf.Lerp(startPos.y, targetPos.y, smoothT);
-
-		// X is always "whatever the layout decided"
-		rt.anchoredPosition = new Vector2(targetPos.x, newY);
+		visualRoot.position = Vector3.Lerp(startWorld, targetWorld, smoothT);
 
 		if (t >= 1f)
 		{
-			// hard snap to be 100% sure
-			rt.anchoredPosition = targetPos;
+			visualRoot.position = targetWorld;
 			animating = false;
 		}
 	}
-
 }
