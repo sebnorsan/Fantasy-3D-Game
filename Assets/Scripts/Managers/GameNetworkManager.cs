@@ -176,16 +176,20 @@ public class GameNetworkManager : MonoBehaviour
 	{
 		Debug.Log($"Client disconnected, clientId={clientId}");
 
-		// If we're a client (not server/host) and *we* got disconnected -> back to menu
+		// If we're a client (not server/host) and *we* got disconnected -> leave lobby + back to menu
 		if (!NetworkManager.Singleton.IsServer &&
 			clientId == NetworkManager.Singleton.LocalClientId)
 		{
 			LastNetworkErrorMessage = "Disconnected from host.";
+
+			// Leave Steam lobby + shut down NGO
+			Disconnect();   // this already does currLobby?.Leave() and NetworkManager.Singleton.Shutdown()
+
+			// Load menu locally
 			SceneManager.LoadScene(mainMenuSceneName);
 		}
-
-		// server-side you can still log this; no need to unsubscribe here
 	}
+
 
 	// ------------------ Steam callbacks ------------------
 

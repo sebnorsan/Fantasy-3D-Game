@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Prototype-ICy
+  m_Name: Prototype-Icy
   m_Shader: {fileID: -6465566751694194690, guid: bd3cfc66251d1db41bc93e3d21170477, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0

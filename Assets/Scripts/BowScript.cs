@@ -77,6 +77,8 @@ public class BowScript : MonoBehaviour
 		anim.SetTrigger("Shoot");
 		canShoot = false;
 		Invoke(nameof(ResetShot), .35f);
+
+		pRef.arrowParticles.UnApplyArrowEffects();
 	}
 
 	private void ResetShot() => canShoot = true;
