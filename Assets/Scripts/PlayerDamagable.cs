@@ -114,7 +114,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		UpdateHealthClientRpc(currentHealth);
 
 		// propagate to clients with hard-hit info
-		DamageEffectsClientRpc(hitPoint, lastHitByClientId);
+		DamageEffectsClientRpc(hitPoint, lastHitByClientId, arrowEffects);
 
 		Vector3 dir = (transform.position - hitPoint);
 		dir.y = 0f;
@@ -164,8 +164,10 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	}
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void DamageEffectsClientRpc(Vector3 hitPoint, ulong shooterClientId)
+	private void DamageEffectsClientRpc(Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
 	{
+		ApplyCurrentEffects(arrowEffects);
+
 		if (NetworkManager.Singleton.LocalClientId != shooterClientId)
 		{
 			DamageEffects(hitPoint);
@@ -190,7 +192,6 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	private void OnSpawnDamagePFX()
 	{
 		ParticleSystem pfxToPlay = HitParticlesToPlay();
-
 
 		var pfx = Instantiate(pfxToPlay, transform.position, Quaternion.identity);
 		Destroy(pfx, 5f);
@@ -351,34 +352,42 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	}
 	private void OwnerPlayerShake()
 	{
-		foreach (var effect in currentAppliedEffects)
+		if (currentAppliedEffects != null)
 		{
-			switch (effect)
+			foreach (var effect in currentAppliedEffects)
 			{
-				case ArrowEffect.BigHit:
-					pRef.cameraShaker.ShakeOnce(18f, 5f, .1f, 1.5f);
-					return;
-				default:
-					break;
+				switch (effect)
+				{
+					case ArrowEffect.BigHit:
+						pRef.cameraShaker.ShakeOnce(18f, 5f, .1f, 1.5f);
+						return;
+				}
 			}
 		}
 
+		// default shake
 		pRef.cameraShaker.ShakeOnce(7f, 3f, .1f, .4f);
 	}
+
 	private ParticleSystem HitParticlesToPlay()
 	{
-		foreach (var effect in currentAppliedEffects)
+		if (currentAppliedEffects != null)
 		{
-			switch (effect)
+			foreach (var effect in currentAppliedEffects)
 			{
-				case ArrowEffect.BigHit:
-					return hitHardParticles;
-				default:
-					return hitParticles;
+				switch (effect)
+				{
+					case ArrowEffect.BigHit:
+						return hitHardParticles;
+					default:
+						return hitParticles;
+				}
 			}
 		}
 
+		// no effects? default to normal hit
 		return hitParticles;
 	}
+
 	#endregion
 }

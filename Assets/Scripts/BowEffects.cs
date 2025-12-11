@@ -17,19 +17,6 @@ public class BowEffects : NetworkBehaviour
 	{
 		pRef.arrowParticles.UnApplyArrowEffects();
 
-		//List<ArrowEffect> effectsToDisable = new List<ArrowEffect>();
-
-		//foreach (var effect in activeArrowEffects.Value)
-		//{
-		//    switch (effect)
-		//    {
-		//        case ArrowEffect.BigHit:
-		//            break;
-		//        default:
-		//            break;
-		//    }
-		//}
-
 		if (GetBigHit())
 			SetBigHit(false);
 	}
