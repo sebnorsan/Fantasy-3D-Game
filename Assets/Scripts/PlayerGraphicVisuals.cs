@@ -106,11 +106,11 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 		);
 	}
 
-	public void PlayParticle(PfxToPlay pfx, bool play = true, float delay = 0f)
+	public void PlayParticle(PlayerPfxToPlay pfx, bool play = true, float delay = 0f)
 	{
 		StartCoroutine(PlayParticleIE(pfx, play, delay));
 	}
-	private IEnumerator PlayParticleIE(PfxToPlay pfx, bool play = true, float delay = 0f)
+	private IEnumerator PlayParticleIE(PlayerPfxToPlay pfx, bool play = true, float delay = 0f)
 	{
 		yield return new WaitForSeconds(delay);
 
@@ -118,31 +118,31 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 		PlayParticleServerRpc(pfx, play);
 	}
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-	private void PlayParticleServerRpc(PfxToPlay pfx, bool play)
+	private void PlayParticleServerRpc(PlayerPfxToPlay pfx, bool play)
 	{
 		PlayParticleClientRpc(pfx, play);
 	}
 	[Rpc(SendTo.NotOwner, InvokePermission = RpcInvokePermission.Server)]
-	private void PlayParticleClientRpc(PfxToPlay pfx, bool play)
+	private void PlayParticleClientRpc(PlayerPfxToPlay pfx, bool play)
 	{
 		PlayParticleFunctionality(pfx, play);
 	}
-	private void PlayParticleFunctionality(PfxToPlay pfx, bool play)
+	private void PlayParticleFunctionality(PlayerPfxToPlay pfx, bool play)
 	{
 		ParticleSystem pfxToPlay = null;
 
 		switch (pfx)
 		{
-			case PfxToPlay.Halo:
+			case PlayerPfxToPlay.Halo:
 				pfxToPlay = haloPfx;
 				break;
-			case PfxToPlay.Stripe:
+			case PlayerPfxToPlay.Stripe:
 				pfxToPlay = stripePfx;
 				break;
-			case PfxToPlay.Run:
+			case PlayerPfxToPlay.Run:
 				pfxToPlay = runPfx;
 				break;
-			case PfxToPlay.Fire:                 // <-- ADD THIS
+			case PlayerPfxToPlay.Fire:                 // <-- ADD THIS
 				pfxToPlay = onFirePfx;
 				break;
 		}
@@ -160,10 +160,8 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 				pfxToPlay.Stop();
 		}
 	}
-
-
 }
-public enum PfxToPlay
+public enum PlayerPfxToPlay
 {
 	Halo,
 	Stripe,

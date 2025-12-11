@@ -1,4 +1,7 @@
+using Unity.Netcode;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Collections;
 
 public class ArrowParticles : MonoBehaviour
 {
@@ -6,7 +9,7 @@ public class ArrowParticles : MonoBehaviour
 
     [Header("Particles")]
 
-    [SerializeField] private ParticleSystem ArrowFirePfx;
+    [SerializeField] private ParticleSystem arrowFirePfx;
 
 	public void ApplyArrowEffects()
 	{
@@ -15,7 +18,7 @@ public class ArrowParticles : MonoBehaviour
 			switch (effect)
 			{
 				case ArrowEffect.BigHit:
-					EffectHelper(ArrowFirePfx, true);
+					EffectHelper(arrowFirePfx, true);
 					break;
 				default:
 					break;
@@ -29,7 +32,7 @@ public class ArrowParticles : MonoBehaviour
 			switch (effect)
 			{
 				case ArrowEffect.BigHit:
-					EffectHelper(ArrowFirePfx, false);
+					EffectHelper(arrowFirePfx, false);
 					break;
 				default:
 					break;
@@ -51,4 +54,61 @@ public class ArrowParticles : MonoBehaviour
 			pfx.Stop();
 		}
 	}
+	public void PlayParticle(ArrowPfxToPlay pfx, bool play = true, float delay = 0f)
+	{
+		StartCoroutine(PlayParticleIE(pfx, play, delay));
+	}
+	private IEnumerator PlayParticleIE(ArrowPfxToPlay pfx, bool play = true, float delay = 0f)
+	{
+		yield return new WaitForSeconds(delay);
+
+		PlayParticleFunctionality(pfx, play);
+		PlayParticleServerRpc(pfx, play);
+	}
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+	private void PlayParticleServerRpc(ArrowPfxToPlay pfx, bool play)
+	{
+		PlayParticleClientRpc(pfx, play);
+	}
+	[Rpc(SendTo.NotOwner, InvokePermission = RpcInvokePermission.Server)]
+	private void PlayParticleClientRpc(ArrowPfxToPlay pfx, bool play)
+	{
+		PlayParticleFunctionality(pfx, play);
+	}
+	private void PlayParticleFunctionality(ArrowPfxToPlay pfx, bool play)
+	{
+		ParticleSystem pfxToPlay = null;
+
+		switch (pfx)
+		{
+			case ArrowPfxToPlay.Fire:                 // <-- ADD THIS
+				pfxToPlay = arrowFirePfx;
+				break;
+		}
+
+		if (pfxToPlay == null) return;
+
+		var main = pfxToPlay.main;
+
+		if (play)
+		{
+			if (!pfxToPlay.isPlaying)
+			{
+				main.playOnAwake = true;
+				pfxToPlay.Play();
+			}
+		}
+		else
+		{
+			if (pfxToPlay.isPlaying)
+			{
+				main.playOnAwake = false;
+				pfxToPlay.Stop();
+			}
+		}
+	}
+}
+public enum ArrowPfxToPlay
+{
+	Fire
 }

@@ -43,7 +43,7 @@ public class BowEffects : NetworkBehaviour
             if (GetBigHit()) return;
 
 		SetHelper(b, ArrowEffect.BigHit);
-		pRef.playerGraphics.PlayParticle(PfxToPlay.Fire, b);
+		pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Fire, b);
 	}
 	public bool GetBigHit()
 	{

@@ -367,9 +367,9 @@ public class PlayerController : NetworkBehaviour
 		isMoving = Mathf.Abs(inputVertical) > 0 || Mathf.Abs(inputHorizontal) > 0;
 
 		if (isMoving && isGrounded)
-			pRef.playerGraphics.PlayParticle(PfxToPlay.Run, true);
+			pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Run, true);
 		else
-			pRef.playerGraphics.PlayParticle(PfxToPlay.Run, false);
+			pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Run, false);
 	}
 	private void HandleInput()
 	{
@@ -400,8 +400,8 @@ public class PlayerController : NetworkBehaviour
 	{
 		if (Input.GetKey(pInput.jumpKey) && canMove && (isGrounded || coyoteActive))
 		{
-			pRef.playerGraphics.PlayParticle(PfxToPlay.Halo);
-			pRef.playerGraphics.PlayParticle(PfxToPlay.Stripe);
+			pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Halo);
+			pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Stripe);
 
 			if (coyoteActive)
 				StopCoyote();
@@ -491,7 +491,7 @@ public class PlayerController : NetworkBehaviour
 	private void init_EnteringGrounded()
 	{
 		//slight delay as enteringgrounded happens immediatly when groundCheck enters ground radius
-		pRef.playerGraphics.PlayParticle(PfxToPlay.Halo, true, .05f);
+		pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Halo, true, .05f);
 
 		_eventsFiredThisLanding.Clear();
 		TriggerLandingEvents();
