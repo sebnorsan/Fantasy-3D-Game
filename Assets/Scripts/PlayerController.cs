@@ -41,6 +41,7 @@ public class PlayerController : NetworkBehaviour
 	public Transform headCheck;
 	public float headCheckRadius = 0.3f;
 	public CapsuleCollider playerDamageCollider;
+	public LayerMask headCheckMask;
 
 	private Vector3 standCamLocalPos;
 	[SerializeField] private float crouchCamLerpSpeed = 8f;
@@ -421,9 +422,8 @@ public class PlayerController : NetworkBehaviour
 		Collider[] hits = Physics.OverlapSphere(
 		headCheck.position,
 		headCheckRadius,
-		~0   // everything
+		headCheckMask   // everything
 		);
-
 
 		bool hasWorldBlock = false;
 		PlayerController playerOnTop = null;

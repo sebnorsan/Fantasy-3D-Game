@@ -23639,8 +23639,11 @@ MonoBehaviour:
   coyoteTimeDuration: 0.18
   maxFallSpeed: -45
   headCheck: {fileID: 5675913063235240685}
-  headCheckRadius: 0.69
+  headCheckRadius: 0.79
   playerDamageCollider: {fileID: 6778015122654442836}
+  headCheckMask:
+    serializedVersion: 2
+    m_Bits: 1216
   crouchCamLerpSpeed: 8
   runToggle: 0
   knockbackDecay: 5
