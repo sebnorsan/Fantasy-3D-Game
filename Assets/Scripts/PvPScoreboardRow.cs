@@ -107,16 +107,21 @@ public class PvPScoreboardRow : MonoBehaviour
 		animTime += Time.unscaledDeltaTime;
 		float t = Mathf.Clamp01(animTime / moveDuration);
 
-		// your easing, for example:
+		// easing
 		float smoothT = t * t * (3f - 2f * t);
 
-		rt.anchoredPosition = Vector2.LerpUnclamped(startPos, targetPos, smoothT);
+		// only animate vertical movement (Y)
+		float newY = Mathf.Lerp(startPos.y, targetPos.y, smoothT);
+
+		// X is always "whatever the layout decided"
+		rt.anchoredPosition = new Vector2(targetPos.x, newY);
 
 		if (t >= 1f)
 		{
-			// make 100% sure we end exactly at the GridLayout target
+			// hard snap to be 100% sure
 			rt.anchoredPosition = targetPos;
 			animating = false;
 		}
 	}
+
 }
