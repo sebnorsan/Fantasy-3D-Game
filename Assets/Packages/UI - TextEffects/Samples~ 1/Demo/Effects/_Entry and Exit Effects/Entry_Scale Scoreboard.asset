@@ -17,8 +17,8 @@ MonoBehaviour:
   charLength: 0
   animationType: 3
   fixedDuration: 0
-  durationPerChar: 0.3
-  timeBetweenChars: 0.02
+  durationPerChar: 1
+  timeBetweenChars: 0.2
   noDelayForChars: 0
   reverseCharOrder: 0
   easingCurve:
@@ -36,11 +36,11 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 0
-      outSlope: 0
+      inSlope: -2.8009999
+      outSlope: -2.8009999
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.03333336
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
