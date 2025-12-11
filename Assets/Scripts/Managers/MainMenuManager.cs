@@ -4,9 +4,23 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Threading.Tasks;
+using Unity.Netcode;
+using UnityEngine.SceneManagement;
 
 public class MainMenuManager : MonoBehaviour
 {
+	[Header("Main Menu Settings")]
+	[SerializeField] private GameObject optionsPanel;      // panel with OptionsManager on it
+	[SerializeField] private Button openOptionsButton;     // "Settings" button in main menu
+	[SerializeField] private Button optionsBackButton;     // "Back" button on options panel
+
+	[Header("Top Level Menu")]
+	[SerializeField] private GameObject topLevelPanel;         // Single / Multi / Settings / Quit
+	[SerializeField] private Button singleplayerButton;
+	[SerializeField] private Button multiplayerButton;
+	[SerializeField] private Button topSettingsButton;
+	[SerializeField] private Button topQuitButton;
+
 	[Header("Panels")]
 	[SerializeField] private GameObject mainPanel;
 	[SerializeField] private GameObject hostPanel;
@@ -16,6 +30,8 @@ public class MainMenuManager : MonoBehaviour
 	[Header("Main Buttons")]
 	[SerializeField] private Button hostButton;
 	[SerializeField] private Button joinButton;
+	[SerializeField] private Button mainBackButton; // NEW
+
 
 	[Header("Host UI")]
 	[SerializeField] private TMP_InputField lobbyNameInput;
@@ -47,6 +63,9 @@ public class MainMenuManager : MonoBehaviour
 		hostButton.onClick.AddListener(OpenHostPanel);
 		joinButton.onClick.AddListener(OpenBrowserPanel);
 
+		if (mainBackButton != null)
+			mainBackButton.onClick.AddListener(ShowTopLevelMenu);
+
 		startHostButton.onClick.AddListener(OnStartHostClicked);
 		hostBackButton.onClick.AddListener(BackToMain);
 
@@ -56,11 +75,80 @@ public class MainMenuManager : MonoBehaviour
 		passwordJoinButton.onClick.AddListener(() => _ = ConfirmPasswordJoin());
 		passwordCancelButton.onClick.AddListener(ClosePasswordPanel);
 
-		BackToMain();
+		if (singleplayerButton != null)
+			singleplayerButton.onClick.AddListener(OnSingleplayerClicked);
+
+		if (multiplayerButton != null)
+			multiplayerButton.onClick.AddListener(OpenMultiplayerMain);
+
+		// TOP LEVEL "Settings" button
+		if (topSettingsButton != null)
+			topSettingsButton.onClick.AddListener(OpenOptionsPanel);
+
+		if (topQuitButton != null)
+			topQuitButton.onClick.AddListener(OnTopQuitClicked);
+
+		// GLOBAL COG button
+		if (optionsPanel != null)
+			optionsPanel.SetActive(false);
+
+		if (openOptionsButton != null)
+			openOptionsButton.onClick.AddListener(OpenOptionsPanel);
+
+		if (optionsBackButton != null)
+			optionsBackButton.onClick.AddListener(CloseOptionsPanel);
+
+		ShowTopLevelMenu();
+	}
+	private void ShowTopLevelMenu()
+	{
+		if (topLevelPanel != null)
+			topLevelPanel.SetActive(true);
+
+		mainPanel.SetActive(false);
+		hostPanel.SetActive(false);
+		browserPanel.SetActive(false);
+		passwordPanel.SetActive(false);
+	}
+	private void OpenMultiplayerMain()
+	{
+		if (topLevelPanel != null)
+			topLevelPanel.SetActive(false);
+
+		mainPanel.SetActive(true);
+		hostPanel.SetActive(false);
+		browserPanel.SetActive(false);
+		passwordPanel.SetActive(false);
+	}
+	private void OpenOptionsPanel()
+	{
+		if (optionsPanel != null)
+			optionsPanel.SetActive(true);
+
+		// hide other menu panels while in settings
+		if (topLevelPanel != null)
+			topLevelPanel.SetActive(false);
+
+		mainPanel.SetActive(false);
+		hostPanel.SetActive(false);
+		browserPanel.SetActive(false);
+		passwordPanel.SetActive(false);
+	}
+
+	private void CloseOptionsPanel()
+	{
+		if (optionsPanel != null)
+			optionsPanel.SetActive(false);
+
+		// back to main top-level (Single / Multi / Settings / Quit)
+		ShowTopLevelMenu();
 	}
 
 	public void BackToMain()
 	{
+		if (topLevelPanel != null)
+			topLevelPanel.SetActive(false);
+
 		mainPanel.SetActive(true);
 		hostPanel.SetActive(false);
 		browserPanel.SetActive(false);
@@ -90,6 +178,38 @@ public class MainMenuManager : MonoBehaviour
 		hostPanel.SetActive(false);
 		browserPanel.SetActive(false);
 		passwordPanel.SetActive(false);
+	}
+	private void OnSingleplayerClicked()
+	{
+		if (NetworkManager.Singleton == null)
+		{
+			Debug.LogError("No NetworkManager in scene for Singleplayer.");
+			return;
+		}
+
+		// Make sure host is started once
+		if (!NetworkManager.Singleton.IsListening)
+		{
+			bool ok = NetworkManager.Singleton.StartHost();
+			if (!ok)
+			{
+				Debug.LogError("Failed to start singleplayer host.");
+				return;
+			}
+		}
+
+		// IMPORTANT: use NGO scene manager so NetworkBehaviours (like GameSceneSpawnManager)
+		// get their OnNetworkSpawn called
+		NetworkManager.Singleton.SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
+	}
+
+	private void OnTopQuitClicked()
+	{
+#if UNITY_EDITOR
+		UnityEditor.EditorApplication.isPlaying = false;
+#else
+	Application.Quit();
+#endif
 	}
 
 	private void OnStartHostClicked()

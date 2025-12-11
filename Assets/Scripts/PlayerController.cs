@@ -417,21 +417,54 @@ public class PlayerController : NetworkBehaviour
 	}
 	private void HandleCrouchingInput()
 	{
-		bool crouchSphere = Physics.CheckSphere(
+		// Check what is above the head
+		Collider[] hits = Physics.OverlapSphere(
 			headCheck.position,
 			headCheckRadius,
 			pRef.groundLayerMask
 		);
 
+		bool hasWorldBlock = false;
+		PlayerController playerOnTop = null;
+
+		for (int i = 0; i < hits.Length; i++)
+		{
+			var col = hits[i];
+			if (!col) continue;
+
+			var otherPc = col.GetComponentInParent<PlayerController>();
+
+			if (otherPc != null && otherPc != this)
+			{
+				// another player is standing on us
+				playerOnTop = otherPc;
+			}
+			else
+			{
+				// anything else (ceiling, level geo, etc.)
+				hasWorldBlock = true;
+			}
+		}
+
 		if (Input.GetKeyDown(pInput.crouchKey))
 		{
-			SetCrouchHeight(crouchHeight);                // instant local
-			SetCrouchHeightRpc(crouchHeight);            // sync others
+			SetCrouchHeight(crouchHeight);         // local
+			SetCrouchHeightRpc(crouchHeight);     // others
 		}
-		else if (Input.GetKeyUp(pInput.crouchKey) && !crouchSphere)
+		else if (Input.GetKeyUp(pInput.crouchKey))
 		{
-			ResetSetCrouchHeight(initialCrouchHeight);   // instant local
-			ResetCrouchHeightRpc(initialCrouchHeight);   // sync others
+			// Only blocked by world? Then we stay crouched.
+			if (!hasWorldBlock)
+			{
+				ResetSetCrouchHeight(initialCrouchHeight);
+				ResetCrouchHeightRpc(initialCrouchHeight);
+			}
+
+			// If a player is on our head, launch them
+			if (playerOnTop != null)
+			{
+				RequestLaunchPlayerRpc(playerOnTop.NetworkObjectId);
+			}
 		}
 
 		if (Input.GetKey(pInput.crouchKey))
@@ -440,7 +473,7 @@ public class PlayerController : NetworkBehaviour
 			if (isGrounded)
 				walkingSpeed = Mathf.Lerp(walkingSpeed, crouchSpeed, 6 * Time.deltaTime);
 		}
-		else if (!crouchSphere)
+		else if (!hasWorldBlock)        // <- use world only, players don't block auto-stand
 		{
 			isCrouching = false;
 			walkingSpeed = Mathf.Lerp(walkingSpeed, initialWalkingSpeed, 4 * Time.deltaTime);
@@ -449,6 +482,34 @@ public class PlayerController : NetworkBehaviour
 				ResetSetCrouchHeight(initialCrouchHeight);
 		}
 	}
+
+	// Crouching player -> Server: ask to launch the player on our head
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+	private void RequestLaunchPlayerRpc(ulong targetNetworkObjectId)
+	{
+		if (NetworkManager.Singleton == null) return;
+
+		if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects
+				.TryGetValue(targetNetworkObjectId, out var nwo))
+			return;
+
+		var targetPc = nwo.GetComponent<PlayerController>();
+		if (targetPc == null) return;
+
+		// this will only go to that player's owner
+		targetPc.LaunchUpRpc();
+	}
+
+	// Server -> that player's owner: do the actual super jump
+	[Rpc(SendTo.Owner)]
+	private void LaunchUpRpc()
+	{
+		if (!IsOwner) return;
+
+		// tweak multiplier to taste
+		moveDirection.y = jumpSpeed * 3.0f;
+	}
+
 	private void HandleCrouchCamera()
 	{
 		if (playerCamera == null || pRef.crouchCamPoint == null) return;

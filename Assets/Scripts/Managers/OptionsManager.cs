@@ -8,19 +8,6 @@ public class OptionsManager : MonoBehaviour
 {
 	public static OptionsManager instance;
 
-	[SerializeField] private KeyCode toggleKey = KeyCode.Escape;
-
-	[Header("Panels")]
-	[SerializeField] private GameObject pauseRootPanel;  // whole pause/options menu
-	[SerializeField] private GameObject settingsPanel;   // settings submenu only
-
-	[Header("Buttons")]
-	[SerializeField] private Button resumeButton;
-	[SerializeField] private Button settingsButton;
-	[SerializeField] private Button quitToLobbyButton;
-	[SerializeField] private Button quitGameButton;
-	[SerializeField] private Button settingsCloseButton;
-
 	#region OptionVariables
 	[Space(10)]
 	public float sensitivity = 2f;
@@ -54,7 +41,6 @@ public class OptionsManager : MonoBehaviour
 	[SerializeField] private Toggle run_toggle;
 	#endregion
 
-	private bool isOpen = false;
 	private PlayerController player;
 
 	private void OnValidate()
@@ -72,11 +58,14 @@ public class OptionsManager : MonoBehaviour
 		}
 		instance = this;
 
-		
+		InitialApplies();  // always init UI + prefs, even in main menu
 	}
+
 	private void Update()
 	{
-		if (!NetworkManager.Singleton) return;
+		// In menu scenes without NGO, just skip the player lookup,
+		// but the UI + prefs still work.
+		if (NetworkManager.Singleton == null) return;
 
 		if (player == null)
 		{
@@ -87,53 +76,13 @@ public class OptionsManager : MonoBehaviour
 				PlayerObjectFound();
 			}
 		}
-
-		// Open / close pause menu with key
-		if (Input.GetKeyDown(toggleKey))
-		{
-			if (isOpen) ToggleClose();
-			else ToggleOpen();
-		}
 	}
 
-	// --------- MENU BUTTON HANDLERS ---------
-
-	private void ToggleSettingsSubmenu()
-	{
-		if (settingsPanel == null) return;
-		// Just flip its activeSelf; we never touch it when closing the whole menu,
-		// so its "open/closed" state is remembered.
-		settingsPanel.SetActive(!settingsPanel.activeSelf);
-	}
-
-	private void QuitToLobby()
-	{
-		// Clean disconnect + back to lobby/main menu
-		if (GameNetworkManager.instance != null)
-			GameNetworkManager.instance.LeaveGameAndReturnToMenu();
-	}
-
-	public void ResumeGame()
-	{
-		if (isOpen)
-			ToggleClose();
-	}
-
-	public void QuitGame()
-	{
-#if UNITY_EDITOR
-		UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
-	}
-
-	// --------- OPTIONS INIT / APPLY (unchanged logic) ---------
+	// --------- OPTIONS INIT / APPLY ---------
 	#region InitialVariableApplies
 	private void InitialApplies()
 	{
 		ApplySettingsSubscribes();
-		ApplyButtonSubscribes();
 		SetMinMaxValues();
 
 		if (!OptionsPrefs.Has(K_sensitivity))
@@ -145,56 +94,46 @@ public class OptionsManager : MonoBehaviour
 
 		ApplyOptionValues();
 	}
-	private void ApplyButtonSubscribes()
-	{
-		// Pause menu closed by default
-		if (pauseRootPanel != null)
-			pauseRootPanel.SetActive(false);
-		// Optional: start with settings submenu closed
-		if (settingsPanel != null)
-			settingsPanel.SetActive(false);
 
-		// Wire up buttons like MainMenuManager
-		if (resumeButton != null)
-			resumeButton.onClick.AddListener(ResumeGame);
-
-		if (settingsButton != null)
-			settingsButton.onClick.AddListener(ToggleSettingsSubmenu);
-
-		if (settingsCloseButton != null)
-			settingsCloseButton.onClick.AddListener(ToggleSettingsSubmenu);
-
-		if (quitToLobbyButton != null)
-			quitToLobbyButton.onClick.AddListener(QuitToLobby);
-
-		if (quitGameButton != null)
-			quitGameButton.onClick.AddListener(QuitGame);
-	}
 	private void ApplySettingsSubscribes()
 	{
-		sens_slider.onValueChanged.AddListener(ChangeSensitivitySlider);
-		sens_inputField.onEndEdit.AddListener(ChangeSensitivityInputField);
+		if (sens_slider != null)
+			sens_slider.onValueChanged.AddListener(ChangeSensitivitySlider);
+		if (sens_inputField != null)
+			sens_inputField.onEndEdit.AddListener(ChangeSensitivityInputField);
 
-		fov_slider.onValueChanged.AddListener(ChangeFovSlider);
-		fov_inputField.onEndEdit.AddListener(ChangFovInputField);
+		if (fov_slider != null)
+			fov_slider.onValueChanged.AddListener(ChangeFovSlider);
+		if (fov_inputField != null)
+			fov_inputField.onEndEdit.AddListener(ChangFovInputField);
 
-		run_toggle.onValueChanged.AddListener(ToggleRun);
+		if (run_toggle != null)
+			run_toggle.onValueChanged.AddListener(ToggleRun);
 	}
+
 	private void SetMinMaxValues()
 	{
-		sens_slider.minValue = minSensitivity;
-		sens_slider.maxValue = maxSensitivity;
+		if (sens_slider != null)
+		{
+			sens_slider.minValue = minSensitivity;
+			sens_slider.maxValue = maxSensitivity;
+		}
 
-		fov_slider.minValue = minFov;
-		fov_slider.maxValue = maxFov;
+		if (fov_slider != null)
+		{
+			fov_slider.minValue = minFov;
+			fov_slider.maxValue = maxFov;
+		}
 	}
 	#endregion
 
 	#region PlayerApplies
 	private void PlayerObjectFound()
 	{
-		InitialApplies();
+		// player just appeared (game scene) -> apply current prefs to them
+		ApplyToPlayer();
 	}
+
 	public void ApplyOptionValues()
 	{
 		sensitivity = OptionsPrefs.GetFloat(K_sensitivity);
@@ -207,6 +146,8 @@ public class OptionsManager : MonoBehaviour
 
 	public void ApplyToPlayer()
 	{
+		if (player == null) return;
+
 		ApplySens();
 		ApplyFOV();
 		ApplyRunToggle();
@@ -223,17 +164,20 @@ public class OptionsManager : MonoBehaviour
 		OptionsPrefs.SetFloat(K_sensitivity, value);
 		ApplyOptionValues();
 	}
+
 	public void ChangeSensitivityInputField(string text)
 	{
 		if (!float.TryParse(text, out float value))
 		{
-			sens_inputField.SetTextWithoutNotify($"{sensitivity}");
+			if (sens_inputField != null)
+				sens_inputField.SetTextWithoutNotify($"{sensitivity}");
 			return;
 		}
 
 		OptionsPrefs.SetFloat(K_sensitivity, CheckSensValue(value));
 		ApplyOptionValues();
 	}
+
 	private float CheckSensValue(float value) => Mathf.Clamp(value, minSensitivity, maxSensitivity);
 
 	public void ChangeFovSlider(float value)
@@ -241,17 +185,20 @@ public class OptionsManager : MonoBehaviour
 		OptionsPrefs.SetFloat(K_fov, value);
 		ApplyOptionValues();
 	}
+
 	public void ChangFovInputField(string text)
 	{
 		if (!float.TryParse(text, out float value))
 		{
-			fov_inputField.SetTextWithoutNotify($"{fov}");
+			if (fov_inputField != null)
+				fov_inputField.SetTextWithoutNotify($"{fov}");
 			return;
 		}
 
 		OptionsPrefs.SetFloat(K_fov, CheckFovValue(value));
 		ApplyOptionValues();
 	}
+
 	private float CheckFovValue(float value) => Mathf.Clamp(value, minFov, maxFov);
 
 	public void ToggleRun(bool isOn)
@@ -268,50 +215,32 @@ public class OptionsManager : MonoBehaviour
 		FovVisual();
 		ToggleRunVisual();
 	}
+
 	private void SensitivityVisual()
 	{
-		sens_inputField.SetTextWithoutNotify(sensitivity.ToString("F2"));
-		sens_slider.value = sensitivity;
+		if (sens_inputField != null)
+			sens_inputField.SetTextWithoutNotify(sensitivity.ToString("F2"));
+		if (sens_slider != null)
+			sens_slider.value = sensitivity;
 	}
+
 	private void FovVisual()
 	{
-		fov_inputField.SetTextWithoutNotify(fov.ToString("F0"));
-		fov_slider.value = fov;
+		if (fov_inputField != null)
+			fov_inputField.SetTextWithoutNotify(fov.ToString("F0"));
+		if (fov_slider != null)
+			fov_slider.value = fov;
 	}
+
 	private void ToggleRunVisual()
 	{
-		run_toggle.SetIsOnWithoutNotify(toggleRun);
-	}
-	#endregion
-
-	#region Open/Close/Toggle
-	private void ToggleOpen()
-	{
-		isOpen = true;
-
-		if (pauseRootPanel != null)
-			pauseRootPanel.SetActive(true);
-
-		// We do NOT touch settingsPanel here -> it remembers its last activeSelf state
-
-		if (EventManager.instance.IsCameraPlayerMode())
-			EventManager.instance.ToggleCameraMode();
-	}
-
-	private void ToggleClose()
-	{
-		isOpen = false;
-
-		if (pauseRootPanel != null)
-			pauseRootPanel.SetActive(false);
-
-		// Still don't touch settingsPanel.activeSelf
-
-		if (!EventManager.instance.IsCameraPlayerMode())
-			EventManager.instance.ToggleCameraMode();
+		if (run_toggle != null)
+			run_toggle.SetIsOnWithoutNotify(toggleRun);
 	}
 	#endregion
 }
+
+
 
 
 public static class OptionsPrefs
