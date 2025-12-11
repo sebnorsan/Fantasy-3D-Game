@@ -193,7 +193,6 @@ public class OptionsManager : MonoBehaviour
 	#region PlayerApplies
 	private void PlayerObjectFound()
 	{
-		ApplyOptionValues();
 		InitialApplies();
 	}
 	public void ApplyOptionValues()
