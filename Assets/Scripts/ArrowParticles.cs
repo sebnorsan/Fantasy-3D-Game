@@ -2,6 +2,7 @@ using Unity.Netcode;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using UnityEngine.Rendering;
 
 public class ArrowParticles : MonoBehaviour
 {
@@ -27,7 +28,7 @@ public class ArrowParticles : MonoBehaviour
 			switch (effect)
 			{
 				case ArrowEffect.BigHit:
-					EffectHelper(arrowFirePfx, true);
+					PlayParticle(ArrowPfxToPlay.Fire, true);
 					break;
 				default:
 					break;
@@ -41,27 +42,11 @@ public class ArrowParticles : MonoBehaviour
 			switch (effect)
 			{
 				case ArrowEffect.BigHit:
-					EffectHelper(arrowFirePfx, false);
+					PlayParticle(ArrowPfxToPlay.Fire, false);
 					break;
 				default:
 					break;
 			}
-		}
-	}
-	private void EffectHelper(ParticleSystem pfx, bool play)
-	{
-		var main = pfx.main;
-
-		if (play)
-		{
-			main.playOnAwake = true;
-			pfx.Play();
-		}
-		else
-		{
-			main.playOnAwake = false;
-			pfx.Stop();
-			pfx.Clear();
 		}
 	}
 	public void PlayParticle(ArrowPfxToPlay pfx, bool play = true, float delay = 0f)
