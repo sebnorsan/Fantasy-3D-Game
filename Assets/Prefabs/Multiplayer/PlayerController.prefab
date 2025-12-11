@@ -24105,6 +24105,10 @@ PrefabInstance:
       propertyPath: pRef
       value: 
       objectReference: {fileID: 930708363686757887}
+    - target: {fileID: 305372450132810552, guid: c2bb90ba3bb412a4c8d5c522e7f43655, type: 3}
+      propertyPath: arrowFirePfx
+      value: 
+      objectReference: {fileID: 8249430700243438875}
     - target: {fileID: 3294737484878999579, guid: c2bb90ba3bb412a4c8d5c522e7f43655, type: 3}
       propertyPath: m_Name
       value: Arrow
@@ -24179,6 +24183,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a663bec14972beb49af154a7bafb65e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+--- !u!198 &8249430700243438875 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 4393346441790808694, guid: c2bb90ba3bb412a4c8d5c522e7f43655, type: 3}
+  m_PrefabInstance: {fileID: 5657524764384472941}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8452235931458941087
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24191,6 +24200,10 @@ PrefabInstance:
       propertyPath: pRef
       value: 
       objectReference: {fileID: 930708363686757887}
+    - target: {fileID: 305372450132810552, guid: c2bb90ba3bb412a4c8d5c522e7f43655, type: 3}
+      propertyPath: arrowFirePfx
+      value: 
+      objectReference: {fileID: 5310890218357641961}
     - target: {fileID: 3294737484878999579, guid: c2bb90ba3bb412a4c8d5c522e7f43655, type: 3}
       propertyPath: m_Name
       value: Arrow
@@ -24248,6 +24261,11 @@ Transform:
 --- !u!23 &3972146315545381423 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 4779367912870951600, guid: c2bb90ba3bb412a4c8d5c522e7f43655, type: 3}
+  m_PrefabInstance: {fileID: 8452235931458941087}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &5310890218357641961 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 4393346441790808694, guid: c2bb90ba3bb412a4c8d5c522e7f43655, type: 3}
   m_PrefabInstance: {fileID: 8452235931458941087}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &8174237197759441831 stripped
