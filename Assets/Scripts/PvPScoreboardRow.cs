@@ -102,7 +102,11 @@ public class PvPScoreboardRow : MonoBehaviour
 		animTime += Time.unscaledDeltaTime;
 		float t = Mathf.Clamp01(animTime / moveDuration);
 
-		rt.anchoredPosition = Vector2.Lerp(startPos, targetPos, t);
+		// smoothstep-ish curve: ease in & out
+		float smoothT = t * t * (3f - 2f * t);
+
+		rt.anchoredPosition = Vector2.LerpUnclamped(startPos, targetPos, smoothT);
+
 
 		if (t >= 1f)
 			animating = false;

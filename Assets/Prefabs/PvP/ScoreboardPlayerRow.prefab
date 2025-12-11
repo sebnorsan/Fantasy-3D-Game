@@ -101,7 +101,7 @@ RectTransform:
   m_GameObject: {fileID: 304087252259542499}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.014139459, y: 0.01413946, z: 0.014139459}
+  m_LocalScale: {x: 0.01413946, y: 0.01413946, z: 0.01413946}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1390491316247623602}
@@ -1150,6 +1150,7 @@ MonoBehaviour:
   nameText: {fileID: 4173365468306899735}
   killsText: {fileID: 5191127931657857231}
   deathsText: {fileID: 3556233905252514373}
+  moveDuration: 0.2
 --- !u!95 &1499828512566899316
 Animator:
   serializedVersion: 7

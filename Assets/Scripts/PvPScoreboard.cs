@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections;
+using static UnityEngine.Rendering.DebugUI.Table;
+using UnityEngine.InputSystem;
 
 public class PvPScoreboard : MonoBehaviour
 {
@@ -158,12 +160,26 @@ public class PvPScoreboard : MonoBehaviour
 
 	public void UnregisterPlayer(PlayerPvP stats)
 	{
-		if (stats == null) return;
+		StartCoroutine(UnregisterIE(stats));
+	}
+	private IEnumerator UnregisterIE(PlayerPvP stats)
+	{
+		if (stats == null) yield return null;
 
 		ulong key = stats.NetworkObjectId;
-		if (!rows.TryGetValue(key, out var row)) return;
+		if (!rows.TryGetValue(key, out var row)) yield return null;
 
-		Destroy(row.gameObject);
+		if (row != null)
+			row.GetComponent<Animator>().SetTrigger("Outro");
+		
+		yield return new WaitForSeconds(.3f);
+
+		if (row != null)
+			Destroy(row.gameObject);
+
 		rows.Remove(key);
+
+		// make sure the remaining rows re-evaluate who is on top
+		SortRows();
 	}
 }
