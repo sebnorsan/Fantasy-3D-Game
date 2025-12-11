@@ -517,11 +517,11 @@ public class PlayerController : NetworkBehaviour
 	{
 		float savedRadius = checkRadius;
 
-		Vector3 posToAdd = new Vector3(0, 1, 0);
+		Vector3 posToAdd = new Vector3(0, 2, 0);
 
 		EventManager.instance.TeleportPlayer(this, transform.position + posToAdd);
 
-		yield return new WaitForSeconds(.1f);
+		yield return new WaitForSeconds(.2f);
 
 		checkRadius = 0;
 		footstepStopPending = false;
