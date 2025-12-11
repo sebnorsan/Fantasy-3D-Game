@@ -162,13 +162,12 @@ public class Arrow : MonoBehaviour
 
 		if (go.TryGetComponent<PlayerDamagable>(out var player))
 		{
-			// tell client-side VFX if this hit is big
-			player.PlayPredictedHitFeedback(hitPoint);
+			player.PlayPredictedHitFeedback(hitPoint, arrowEffects);
 		}
 
 		if (go.TryGetComponent<AbstractEnemy>(out var enemy))
 		{
-			enemy.LocalPredictedDamage(arrowDamage, hitPoint, shooterClientId);
+			enemy.LocalPredictedDamage(arrowDamage, hitPoint, shooterClientId, arrowEffects);
 		}
 
 		// tell server if this arrow was big

@@ -15,6 +15,8 @@ public class BowEffects : NetworkBehaviour
 
 	public void UpdateEffects()
 	{
+		pRef.arrowParticles.UnApplyArrowEffects();
+
 		//List<ArrowEffect> effectsToDisable = new List<ArrowEffect>();
 
 		//foreach (var effect in activeArrowEffects.Value)
@@ -30,8 +32,6 @@ public class BowEffects : NetworkBehaviour
 
 		if (GetBigHit())
 			SetBigHit(false);
-
-		pRef.arrowParticles.UnApplyArrowEffects();
 	}
 
 	public void SetBigHit(bool b)

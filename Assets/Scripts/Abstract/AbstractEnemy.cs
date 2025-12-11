@@ -396,7 +396,7 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 	}
 
 	// called by the shooter client right when their arrow hits
-	public void LocalPredictedDamage(int amount, Vector3 hitPoint, ulong shooterClientId)
+	public void LocalPredictedDamage(int amount, Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
 	{
 		if (!IsClient) return;
 		if (NetworkManager.Singleton.LocalClientId != shooterClientId) return;

@@ -19,6 +19,11 @@ public class EventManager : MonoBehaviour
 			instance = this;
 	}
 
+	private void Start()
+	{
+		netHelper = GetComponent<NetHelper>();
+	}
+
 	#region ===== Activate-Deactivate-GameObject/Colliders =====
 	public void ActivateObjects(GameObject[] objs)
 	{

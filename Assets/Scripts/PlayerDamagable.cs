@@ -46,7 +46,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	private Vector3 deathPosition = new Vector3(9999, 9999, 9999);
 
-	private List<ArrowEffect> currentAppliedEffects = new List<ArrowEffect>();
+	private ArrowEffect[] currentAppliedEffects;
 
 	public override void OnNetworkSpawn()
 	{
@@ -107,7 +107,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
-		currentAppliedEffects = arrowEffects.ToList();
+		ApplyCurrentEffects(arrowEffects);
 
 		currentHealth = Mathf.Max(0, currentHealth - amount);
 
@@ -156,8 +156,10 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	#region DamageEffects
 
-	public void PlayPredictedHitFeedback(Vector3 hitPoint)
+	public void PlayPredictedHitFeedback(Vector3 hitPoint, ArrowEffect[] arrowEffects)
 	{
+		ApplyCurrentEffects(arrowEffects);
+
 		DamageEffects(hitPoint);
 	}
 
@@ -343,6 +345,10 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	#endregion
 
 	#region ArrowEffects
+	private void ApplyCurrentEffects(ArrowEffect[] arrowEffects)
+	{
+		currentAppliedEffects = arrowEffects;
+	}
 	private void OwnerPlayerShake()
 	{
 		foreach (var effect in currentAppliedEffects)
