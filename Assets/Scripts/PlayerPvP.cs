@@ -22,17 +22,8 @@ public class PlayerPvP : NetworkBehaviour
 			NetworkVariableReadPermission.Everyone,
 			NetworkVariableWritePermission.Owner);
 
-
-	public NetworkVariable<bool> extraDamage =
-		new NetworkVariable<bool>(
-			false,
-			NetworkVariableReadPermission.Everyone,
-			NetworkVariableWritePermission.Owner);
-
 	public override void OnNetworkSpawn()
 	{
-		extraDamage.OnValueChanged += OnExtraDamageChanged;
-
 		Invoke(nameof(GetSteamInformation), .1f);
 	}
 	private void GetSteamInformation()
@@ -55,32 +46,6 @@ public class PlayerPvP : NetworkBehaviour
 	{
 		if (PvPScoreboard.Instance != null)
 			PvPScoreboard.Instance.UnregisterPlayer(this);
-	}
-
-	public override void OnDestroy()
-	{
-		extraDamage.OnValueChanged -= OnExtraDamageChanged;
-	}
-
-	private void OnExtraDamageChanged(bool previous, bool current)
-	{
-		if (pRef != null && pRef.playerGraphics != null)
-			pRef.playerGraphics.PlayParticle(PfxToPlay.Fire, current);
-	}
-
-	public void SetExtraDamage(bool b)
-	{
-		// allow either server OR owner to set it
-		if (!IsServer && !IsOwner) return;
-
-		extraDamage.Value = b;
-	}
-
-
-
-	public bool HasExtraDamage()
-	{
-		return extraDamage.Value;
 	}
 
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]

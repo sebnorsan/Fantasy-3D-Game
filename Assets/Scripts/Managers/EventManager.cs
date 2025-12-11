@@ -7,7 +7,10 @@ using UnityEngine.UI;
 public class EventManager : MonoBehaviour
 {
 	public static EventManager instance;
+
 	public Animator interactionAnimator;
+	public NetHelper netHelper;
+
 	public void Awake()
 	{
 		if (instance != null)

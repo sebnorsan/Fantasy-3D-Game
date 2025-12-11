@@ -28,14 +28,14 @@ public class PvPPowerup : NetworkBehaviour
 		if (!p.IsOwner) return;
 
 		// LOCAL predicted FX
-		if (NetHelper.instance != null && pfx != null)
+		if (EventManager.instance.netHelper != null && pfx != null)
 		{
 			var ps = pfx.GetComponent<ParticleSystem>();
 			float life = ps != null
 				? ps.totalTime
 				: 2f;
 
-			NetHelper.instance.NetInstantiate(
+			EventManager.instance.netHelper.NetInstantiate(
 				pfx.gameObject,
 				transform.position,
 				pfx.transform.rotation,
@@ -81,7 +81,7 @@ public class PvPPowerup : NetworkBehaviour
 		switch (upType)
 		{
 			case PowerUpType.Damage:
-				p.playerPvP.SetExtraDamage(true); // SERVER write (WritePermission.Server)
+				p.bowEffects.SetBigHit(true);
 				break;
 		}
 	}

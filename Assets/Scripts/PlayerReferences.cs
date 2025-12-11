@@ -19,6 +19,7 @@ public class PlayerReferences : NetworkBehaviour
 	[Space(10)]
 
     public BowScript bowScript;
+    public BowEffects bowEffects;
     public BowNetCode bowNetCode;
 
     [Space(10)]

@@ -346,6 +346,7 @@ GameObject:
   - component: {fileID: 4018313990096128084}
   - component: {fileID: 292217674039140394}
   - component: {fileID: 720741483200660659}
+  - component: {fileID: 2108296303480839215}
   m_Layer: 0
   m_Name: Background
   m_TagString: Untagged
@@ -411,6 +412,18 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!225 &2108296303480839215
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943434218116168533}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &978904628286867327
 GameObject:
   m_ObjectHideFlags: 0
@@ -1085,6 +1098,7 @@ GameObject:
   - component: {fileID: 8452781350345223865}
   - component: {fileID: 5187165654771442823}
   - component: {fileID: 2663192786611062779}
+  - component: {fileID: 1499828512566899316}
   m_Layer: 0
   m_Name: ScoreboardPlayerRow
   m_TagString: Untagged
@@ -1136,6 +1150,28 @@ MonoBehaviour:
   nameText: {fileID: 4173365468306899735}
   killsText: {fileID: 5191127931657857231}
   deathsText: {fileID: 3556233905252514373}
+--- !u!95 &1499828512566899316
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4472584934006189347}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 461fb9ae8e5b03049b758432f04d5466, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &4642346111890348477
 GameObject:
   m_ObjectHideFlags: 0
@@ -1807,8 +1843,9 @@ GameObject:
   - component: {fileID: 8543246221717234304}
   - component: {fileID: 1399603570571423865}
   - component: {fileID: 4173365468306899735}
+  - component: {fileID: 1636553409593564775}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1933,3 +1970,27 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &1636553409593564775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8915801484774890560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9840f87219df84505803024c796e739d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: EasyTextEffects::EasyTextEffects.TextEffect
+  text: {fileID: 4173365468306899735}
+  usePreset: 0
+  preset: {fileID: 0}
+  tagEffects: []
+  globalEffects:
+  - triggerWhen: 0
+    effect: {fileID: 11400000, guid: 137386f28a3cd4b64b839515802b17ec, type: 2}
+    onEffectCompleted:
+      m_PersistentCalls:
+        m_Calls: []
+    overrideTagEffects: 0
+  updatesPerSecond: 30

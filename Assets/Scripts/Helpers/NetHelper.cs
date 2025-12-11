@@ -3,13 +3,8 @@ using UnityEngine;
 
 public class NetHelper : NetworkBehaviour
 {
-	public static NetHelper instance;
-
 	public GameObject[] netGameObjects;
-	private void Awake()
-	{
-		instance = this;
-	}
+
 	public void NetInstantiate(GameObject go, Vector3 pos, Quaternion rot, float destroyAfter = 0f)
 	{
 		int id = GetPrefabId(go);

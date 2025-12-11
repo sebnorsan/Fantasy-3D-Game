@@ -4,33 +4,33 @@ using UnityEngine;
 public class BowNetCode : NetworkBehaviour
 {
 	[SerializeField] private PlayerReferences pRef;
-	[SerializeField] private BowScript localBowScript;
 	[SerializeField] private GameObject arrowPrefab;
 
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-	public void SpawnArrowVisualServerRpc(Vector3 pos, Quaternion rot, Vector3 dir, int dmg, float spd, float size, ulong shooterClientId)
+	public void SpawnArrowVisualServerRpc(Vector3 pos, Quaternion rot, Vector3 dir, int dmg, float spd, float size, ulong shooterClientId, ArrowEffect[] arrowEffects)
 	{
-		SpawnArrowVisualClientRpc(pos, rot, dir, dmg, spd, size, shooterClientId);
+		SpawnArrowVisualClientRpc(pos, rot, dir, dmg, spd, size, shooterClientId, arrowEffects);
 	}
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	public void SpawnArrowVisualClientRpc(Vector3 pos, Quaternion rot, Vector3 dir, int dmg, float spd, float size, ulong shooterClientId)
+	public void SpawnArrowVisualClientRpc(Vector3 pos, Quaternion rot, Vector3 dir, int dmg, float spd, float size, ulong shooterClientId, ArrowEffect[] arrowEffects)
 	{
 		if (NetworkManager.Singleton.LocalClientId == shooterClientId) return;
 
 		var arrowObj = Instantiate(arrowPrefab, pos, rot);
 		var arrow = arrowObj.GetComponent<Arrow>();
 
-		arrow.Initialize(dmg, spd, size, dir, shooterPos: Vector3.zero, shooterClientId, false, null);
+		arrow.Initialize(dmg, spd, size, dir, shooterPos: Vector3.zero, shooterClientId, false, arrowEffects);
 	}
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-	public void HitServerRpc(ulong targetNetId, int amount, Vector3 hitPoint, ulong shooterClientId, bool bigHit = false)
+	public void HitServerRpc(ulong targetNetId, int amount, Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
 	{
 		var target = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetNetId];
 
 		if (target.TryGetComponent<PlayerDamagable>(out var playerDmg))
 		{
+			//playerDmg.ApplyEffects(arrowEffects);
 			playerDmg.SetLastHitBy(shooterClientId);
-			playerDmg.TakeDamage(amount, hitPoint, bigHit);    // NEW overload
+			playerDmg.TakeDamage(amount, hitPoint);    // NEW overload
 		}
 
 		if (target.TryGetComponent<AbstractEnemy>(out var enemyDmg))

@@ -6,13 +6,13 @@ using System.Linq;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem.iOS;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Arrow : MonoBehaviour
 {
 	[Header("Damage & Effects")]
 	public int arrowDamage = 1;
+	public ArrowEffect[] arrowEffects;
 
 	[Header("Flight Settings")]
 	public float initialSpeed = 30f;
@@ -28,18 +28,13 @@ public class Arrow : MonoBehaviour
 
 	private List<ulong> clientsHit = new List<ulong>();
 
-	private BowNetCode bowNetCode;
-
 	private PlayerReferences pRef;
 
 	//Temporary PvP Settings
 
-	[HideInInspector] public bool bigHit = false;
+	[Header("PFX on Arrows")]
+	[SerializeField] private ParticleSystem bigHitFX;
 
-	public void SetBigHit()
-	{
-		bigHit = true;
-	}
 	private void Awake()
 	{
 		rb = GetComponent<Rigidbody>();
@@ -56,16 +51,16 @@ public class Arrow : MonoBehaviour
 		Vector3 shooterPos,
 		ulong clientShooting,
 		bool isAuthority,
-		BowNetCode localNetCode = null,
-		bool biiiighiiiit = false
+		ArrowEffect[] arrowFx = null
 	)
 	{
-		this.bigHit = biiiighiiiit;
-
 		pRef = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerReferences>();
 
+		arrowEffects = arrowFx;
+
+		ApplyEffects(arrowEffects);
+
 		this.isAuthority = isAuthority;
-		bowNetCode = localNetCode;
 
 		shooterClientId = clientShooting;
 
@@ -86,7 +81,7 @@ public class Arrow : MonoBehaviour
 		ShakeShooter();
 		EnableTrailAfterDelay(0.03f);
 	}
-
+	
 	private IEnumerator LifeTimer()
 	{
 		yield return new WaitForSeconds(lifeTime);
@@ -136,6 +131,20 @@ public class Arrow : MonoBehaviour
 		CheckDamage(collision.gameObject);
 	}
 
+	public void ApplyEffects(ArrowEffect[] arrowEffects)
+	{
+		foreach (var effect in arrowEffects)
+		{
+			switch (effect)
+			{
+				case ArrowEffect.BigHit:
+					bigHitFX.Play();
+					break;
+				default:
+					break;
+			}
+		}
+	}
 	private void CheckDamage(GameObject go)
 	{
 		if (!go.TryGetComponent<IDamagable>(out var dmg))
@@ -154,7 +163,7 @@ public class Arrow : MonoBehaviour
 		if (go.TryGetComponent<PlayerDamagable>(out var player))
 		{
 			// tell client-side VFX if this hit is big
-			player.PlayPredictedHitFeedback(hitPoint, bigHit);
+			player.PlayPredictedHitFeedback(hitPoint);
 		}
 
 		if (go.TryGetComponent<AbstractEnemy>(out var enemy))
@@ -163,8 +172,6 @@ public class Arrow : MonoBehaviour
 		}
 
 		// tell server if this arrow was big
-		bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint, shooterClientId, bigHit);
+		pRef.bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint, shooterClientId, arrowEffects);
 	}
-
-
 }

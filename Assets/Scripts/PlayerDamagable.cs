@@ -4,6 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using EZCameraShake;
+using System.Linq;
 
 public class PlayerDamagable : NetworkBehaviour, IDamagable
 {
@@ -34,8 +35,6 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	[Header("Knockback")]
 	[SerializeField] private float knockbackStrength = 10f;
 
-	private bool isHardHit = false;
-
 	private float displayedHealth;
 
 	private Coroutine currFlashCoroutine;
@@ -46,6 +45,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	private ulong lastHitByClientId = ulong.MaxValue;
 
 	private Vector3 deathPosition = new Vector3(9999, 9999, 9999);
+
+	private List<ArrowEffect> currentAppliedEffects = new List<ArrowEffect>();
 
 	public override void OnNetworkSpawn()
 	{
@@ -102,7 +103,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		TakeDamage(currentHealth, transform.position);
 	}
 
-	public void TakeDamage(int amount, Vector3 hitPoint, bool isHardHit = false)
+	public void TakeDamage(int amount, Vector3 hitPoint)
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
@@ -111,7 +112,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		UpdateHealthClientRpc(currentHealth);
 
 		// propagate to clients with hard-hit info
-		DamageEffectsClientRpc(hitPoint, lastHitByClientId, isHardHit);
+		DamageEffectsClientRpc(hitPoint, lastHitByClientId);
 
 		Vector3 dir = (transform.position - hitPoint);
 		dir.y = 0f;
@@ -153,17 +154,14 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	#region DamageEffects
 
-	public void PlayPredictedHitFeedback(Vector3 hitPoint, bool isHardHit)
+	public void PlayPredictedHitFeedback(Vector3 hitPoint)
 	{
-		this.isHardHit = isHardHit;
 		DamageEffects(hitPoint);
 	}
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void DamageEffectsClientRpc(Vector3 hitPoint, ulong shooterClientId, bool isHardHit)
+	private void DamageEffectsClientRpc(Vector3 hitPoint, ulong shooterClientId)
 	{
-		this.isHardHit = isHardHit;
-
 		if (NetworkManager.Singleton.LocalClientId != shooterClientId)
 		{
 			DamageEffects(hitPoint);
@@ -174,19 +172,6 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		{
 			OwnerPlayerShake();
 		}
-
-		this.isHardHit = false;
-	}
-
-	private void OwnerPlayerShake()
-	{
-		if (isHardHit)
-		{
-			pRef.cameraShaker.ShakeOnce(13f, 3f, .1f, .8f);
-			return;
-		}
-
-		pRef.cameraShaker.ShakeOnce(7f, 3f, .1f, .4f);
 	}
 
 	public void DamageEffects(Vector3 hitPoint)
@@ -200,7 +185,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	private void OnSpawnDamagePFX()
 	{
-		GameObject pfxToPlay = isHardHit ? hitHardParticles.gameObject : hitParticles.gameObject;
+		ParticleSystem pfxToPlay = HitParticlesToPlay();
+
 
 		var pfx = Instantiate(pfxToPlay, transform.position, Quaternion.identity);
 		Destroy(pfx, 5f);
@@ -246,7 +232,6 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	}
 
 	#endregion
-
 	#region Knockback
 
 	[Rpc(SendTo.Owner, InvokePermission = RpcInvokePermission.Server)]
@@ -296,7 +281,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 		StartCoroutine(DeathCamFlow(killerClientId));
 	}
-	
+
 	private IEnumerator DeathCamFlow(ulong killerClientId)
 	{
 		var dCam = Instantiate(
@@ -312,7 +297,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 		EventManager.instance.TeleportPlayer(pRef.playerController, deathPosition);
 
-		yield return new WaitForSeconds(deathTime-2);
+		yield return new WaitForSeconds(deathTime - 2);
 		ScreenSummoner.SummonScreen(Color.black, 1f, true);
 		yield return new WaitForSeconds(1);
 		ScreenSummoner.SummonScreen(Color.black, 1f, false);
@@ -350,7 +335,56 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 			var pfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
 			Destroy(pfx, 5);
 		}
-	
+
+	}
+
+	#endregion
+
+	#region ArrowEffects
+	private void OwnerPlayerShake()
+	{
+		foreach (var effect in currentAppliedEffects)
+		{
+			switch (effect)
+			{
+				case ArrowEffect.BigHit:
+					pRef.cameraShaker.ShakeOnce(18f, 5f, .1f, 1.5f);
+					return;
+				default:
+					pRef.cameraShaker.ShakeOnce(7f, 3f, .1f, .4f);
+					return;
+			}
+		}
+	}
+	public void ApplyEffects(ArrowEffect[] arrowEffects)
+	{
+		currentAppliedEffects = arrowEffects.ToList();
+
+		foreach (var effect in currentAppliedEffects)
+		{
+			switch (effect)
+			{
+				case ArrowEffect.BigHit:
+					break;
+				default:
+					break;
+			}
+		}
+	}
+	private ParticleSystem HitParticlesToPlay()
+	{
+		foreach (var effect in currentAppliedEffects)
+		{
+			switch (effect)
+			{
+				case ArrowEffect.BigHit:
+					return hitHardParticles;
+				default:
+					return hitParticles;
+			}
+		}
+
+		return hitParticles;
 	}
 	#endregion
 }

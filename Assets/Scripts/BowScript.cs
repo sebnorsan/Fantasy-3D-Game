@@ -104,22 +104,19 @@ public class BowScript : MonoBehaviour
 		var arrowObj = Instantiate(go, pos, rot);
 		var arrow = arrowObj.GetComponent<Arrow>();
 
-		if (pRef.playerPvP.HasExtraDamage())
+		if (pRef.bowEffects.GetBigHit())
 		{
-			arrow.SetBigHit();   // mark arrow
-			dmg *= 3;            // more damage
+			dmg *= 5;
 		}
 
 		arrow.Initialize(dmg, spd, size, shootDir,
 			pRef.playerController.transform.position,
 			shooterId,
 			true,
-			pRef.bowNetCode,
-			pRef.playerPvP.HasExtraDamage());
+			pRef.bowEffects.activeArrowEffects.Value.ToArray());
 
-		pRef.bowNetCode.SpawnArrowVisualServerRpc(pos, rot, shootDir, dmg, spd, size, shooterId);
+		pRef.bowNetCode.SpawnArrowVisualServerRpc(pos, rot, shootDir, dmg, spd, size, shooterId, pRef.bowEffects.activeArrowEffects.Value.ToArray());
 
-		pRef.playerPvP.SetExtraDamage(false);
+		pRef.bowEffects.UpdateEffects();
 	}
-
 }

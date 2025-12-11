@@ -104,7 +104,7 @@ public class LobbyPanelManager : MonoBehaviour
 			sceneInputField.gameObject.SetActive(isHost);
 
 		if (sceneInputField != null && isHost)
-			sceneInputField.text = "SampleScene";
+			sceneInputField.text = "PvP-Scene";
 	}
 
 	private async Task RebuildMembersUI(Lobby lobby)
