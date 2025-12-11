@@ -2026,9 +2026,9 @@ MonoBehaviour:
   tagEffects: []
   globalEffects:
   - triggerWhen: 0
-    effect: {fileID: 11400000, guid: 137386f28a3cd4b64b839515802b17ec, type: 2}
+    effect: {fileID: 11400000, guid: f0b3345533740714c9217f0e80f22027, type: 2}
     onEffectCompleted:
       m_PersistentCalls:
         m_Calls: []
     overrideTagEffects: 0
-  updatesPerSecond: 30
+  updatesPerSecond: 60

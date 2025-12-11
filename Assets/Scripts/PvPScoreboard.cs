@@ -176,7 +176,7 @@ public class PvPScoreboard : MonoBehaviour
 		if (!rows.TryGetValue(key, out var row)) yield return null;
 
 		if (row != null)
-			row.GetComponent<Animator>().SetTrigger("Outro");
+			row.GetComponentInChildren<Animator>().SetTrigger("Outro");
 		
 		yield return new WaitForSeconds(1f);
 
