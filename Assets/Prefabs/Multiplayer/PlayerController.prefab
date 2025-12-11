@@ -23286,7 +23286,7 @@ MonoBehaviour:
   crouchCamPoint: {fileID: 2556143203140004230}
   bowScript: {fileID: 1227791032311695380}
   bowEffects: {fileID: 8675364865469383676}
-  arrowParticles: {fileID: 0}
+  arrowParticles: {fileID: 7628524721557430775}
   bowNetCode: {fileID: 515831196404787215}
   groundLayerMask:
     serializedVersion: 2
