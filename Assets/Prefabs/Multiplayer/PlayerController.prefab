@@ -5603,7 +5603,6 @@ GameObject:
   - component: {fileID: 6413132569534683115}
   - component: {fileID: 6784330846622331597}
   - component: {fileID: 1117162942100770194}
-  - component: {fileID: 3644136681132641030}
   m_Layer: 0
   m_Name: Bow
   m_TagString: Untagged
@@ -5790,22 +5789,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc6120ea733eea04b9c5917dd59dfa4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3644136681132641030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778696884442115976}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a663bec14972beb49af154a7bafb65e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  pRef: {fileID: 930708363686757887}
-  pfxParent: {fileID: 8490605231657870400}
-  multiplayerArrow: 0
-  arrowFirePfx: {fileID: 5310890218357641961}
 --- !u!1 &1825410108401040611
 GameObject:
   m_ObjectHideFlags: 0
@@ -22585,7 +22568,6 @@ GameObject:
   - component: {fileID: 5992513773659047312}
   - component: {fileID: 1580953526540048981}
   - component: {fileID: 1675141792546304797}
-  - component: {fileID: 1661887411645673153}
   m_Layer: 0
   m_Name: ThirdPersonBow
   m_TagString: Untagged
@@ -22720,22 +22702,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc6120ea733eea04b9c5917dd59dfa4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1661887411645673153
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6461153865382936948}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a663bec14972beb49af154a7bafb65e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  pRef: {fileID: 930708363686757887}
-  pfxParent: {fileID: 5628232318145657778}
-  multiplayerArrow: 1
-  arrowFirePfx: {fileID: 8249430700243438875}
 --- !u!1 &6564734663791927061
 GameObject:
   m_ObjectHideFlags: 0
@@ -23051,6 +23017,7 @@ GameObject:
   - component: {fileID: 150086669983804623}
   - component: {fileID: 4818609617636790534}
   - component: {fileID: 8675364865469383676}
+  - component: {fileID: 7628524721557430775}
   m_Layer: 3
   m_Name: PlayerController
   m_TagString: GameController
@@ -23149,7 +23116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2771618475
+  GlobalObjectIdHash: 222003529
   InScenePlacedSourceGlobalObjectIdHash: 2771618475
   DeferredDespawnTick: 0
   Ownership: 1
@@ -23319,9 +23286,7 @@ MonoBehaviour:
   crouchCamPoint: {fileID: 2556143203140004230}
   bowScript: {fileID: 1227791032311695380}
   bowEffects: {fileID: 8675364865469383676}
-  arrowParticles:
-  - {fileID: 3644136681132641030}
-  - {fileID: 1661887411645673153}
+  arrowParticles: {fileID: 0}
   bowNetCode: {fileID: 515831196404787215}
   groundLayerMask:
     serializedVersion: 2
@@ -23564,6 +23529,25 @@ MonoBehaviour:
   pRef: {fileID: 930708363686757887}
   activeArrowEffects:
     m_InternalValue: 
+--- !u!114 &7628524721557430775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7758727492805073096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a663bec14972beb49af154a7bafb65e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  ShowTopMostFoldoutHeaderGroup: 1
+  pRef: {fileID: 930708363686757887}
+  ownerPfxParent: {fileID: 8490605231657870400}
+  nonownerPfxParent: {fileID: 5628232318145657778}
+  arrowFirePfx:
+  - {fileID: 5310890218357641961}
+  - {fileID: 8249430700243438875}
 --- !u!1 &7973304527205840717
 GameObject:
   m_ObjectHideFlags: 0

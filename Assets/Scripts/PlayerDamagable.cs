@@ -100,12 +100,14 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	public void KillPlayer()
 	{
-		TakeDamage(currentHealth, transform.position);
+		TakeDamage(currentHealth, transform.position, null);
 	}
 
-	public void TakeDamage(int amount, Vector3 hitPoint)
+	public void TakeDamage(int amount, Vector3 hitPoint, ArrowEffect[] arrowEffects)
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
+
+		currentAppliedEffects = arrowEffects.ToList();
 
 		currentHealth = Mathf.Max(0, currentHealth - amount);
 
@@ -351,25 +353,11 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 					pRef.cameraShaker.ShakeOnce(18f, 5f, .1f, 1.5f);
 					return;
 				default:
-					pRef.cameraShaker.ShakeOnce(7f, 3f, .1f, .4f);
-					return;
+					break;
 			}
 		}
-	}
-	public void ApplyEffects(ArrowEffect[] arrowEffects)
-	{
-		currentAppliedEffects = arrowEffects.ToList();
 
-		foreach (var effect in currentAppliedEffects)
-		{
-			switch (effect)
-			{
-				case ArrowEffect.BigHit:
-					break;
-				default:
-					break;
-			}
-		}
+		pRef.cameraShaker.ShakeOnce(7f, 3f, .1f, .4f);
 	}
 	private ParticleSystem HitParticlesToPlay()
 	{

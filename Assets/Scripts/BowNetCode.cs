@@ -28,15 +28,14 @@ public class BowNetCode : NetworkBehaviour
 
 		if (target.TryGetComponent<PlayerDamagable>(out var playerDmg))
 		{
-			//playerDmg.ApplyEffects(arrowEffects);
 			playerDmg.SetLastHitBy(shooterClientId);
-			playerDmg.TakeDamage(amount, hitPoint);    // NEW overload
+			playerDmg.TakeDamage(amount, hitPoint, arrowEffects);    // NEW overload
 		}
 
 		if (target.TryGetComponent<AbstractEnemy>(out var enemyDmg))
 		{
 			enemyDmg.SetLastHitBy(shooterClientId);
-			enemyDmg.TakeDamage(amount, hitPoint);
+			enemyDmg.TakeDamage(amount, hitPoint, arrowEffects);
 		}
 	}
 

@@ -1,25 +1,24 @@
 using Unity.Netcode;
 using UnityEngine;
-using System.Collections.Generic;
 using System.Collections;
-using UnityEngine.Rendering;
 
-public class ArrowParticles : MonoBehaviour
+public class ArrowParticles : NetworkBehaviour
 {
     [SerializeField] private PlayerReferences pRef;
-	[SerializeField] private GameObject pfxParent;
-	[SerializeField] private bool multiplayerArrow;
+	[SerializeField] private GameObject ownerPfxParent;
+	[SerializeField] private GameObject nonownerPfxParent;
 
     [Header("Particles")]
 
-    [SerializeField] private ParticleSystem arrowFirePfx;
+    [SerializeField] private ParticleSystem[] arrowFirePfx = new ParticleSystem[2];
+
 
 	public void Start()
 	{
-		if (multiplayerArrow && pRef.IsOwner)
-			pfxParent.SetActive(false);
-		else if (!multiplayerArrow && !pRef.IsOwner)
-			pfxParent.SetActive(false);
+		if (pRef.IsOwner)
+			nonownerPfxParent.SetActive(false);
+		else if (!pRef.IsOwner)
+			ownerPfxParent.SetActive(false);
 	}
 	public void ApplyArrowEffects()
 	{
@@ -72,7 +71,7 @@ public class ArrowParticles : MonoBehaviour
 	}
 	private void PlayParticleFunctionality(ArrowPfxToPlay pfx, bool play)
 	{
-		ParticleSystem pfxToPlay = null;
+		ParticleSystem[] pfxToPlay = null;
 
 		switch (pfx)
 		{
@@ -83,22 +82,25 @@ public class ArrowParticles : MonoBehaviour
 
 		if (pfxToPlay == null) return;
 
-		var main = pfxToPlay.main;
+		foreach (var system in pfxToPlay)
+		{
+			var main = system.main;
 
-		if (play)
-		{
-			if (!pfxToPlay.isPlaying)
+			if (play)
 			{
-				main.playOnAwake = true;
-				pfxToPlay.Play();
+				if (!system.isPlaying)
+				{
+					main.playOnAwake = true;
+					system.Play();
+				}
 			}
-		}
-		else
-		{
-			if (pfxToPlay.isPlaying)
+			else
 			{
-				main.playOnAwake = false;
-				pfxToPlay.Stop();
+				if (system.isPlaying)
+				{
+					main.playOnAwake = false;
+					system.Stop();
+				}
 			}
 		}
 	}
