@@ -4,6 +4,7 @@ using Unity.Netcode;
 using System.Collections;
 using static UnityEngine.Rendering.DebugUI.Table;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PvPScoreboard : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class PvPScoreboard : MonoBehaviour
 
 	[SerializeField] private Transform contentRoot;
 	[SerializeField] private PvPScoreboardRow rowPrefab;
+	[SerializeField] private GridLayoutGroup gridLayoutGroup;
 
 	private readonly Dictionary<ulong, PvPScoreboardRow> rows =
 		new Dictionary<ulong, PvPScoreboardRow>();
@@ -22,6 +24,9 @@ public class PvPScoreboard : MonoBehaviour
 	private void Awake()
 	{
 		Instance = this;
+
+		if (gridLayoutGroup == null && contentRoot != null)
+			gridLayoutGroup = contentRoot.GetComponent<GridLayoutGroup>();
 	}
 
 	private void OnDestroy()
@@ -124,25 +129,37 @@ public class PvPScoreboard : MonoBehaviour
 			return a.Player.NetworkObjectId.CompareTo(b.Player.NetworkObjectId);
 		});
 
-		// 3) apply sibling order (GridLayoutGroup will snap them to new spots)
+		// 3) apply sibling order (this is what the GridLayout will use)
 		for (int i = 0; i < list.Count; i++)
 		{
 			if (list[i] != null)
 				list[i].transform.SetSiblingIndex(i);
 		}
 
-		// 4) wait a frame so GridLayoutGroup updates anchoredPositions
-		yield return new WaitForEndOfFrame();
+		// 4) let GridLayoutGroup compute final positions ONCE
+		if (gridLayoutGroup != null)
+		{
+			gridLayoutGroup.enabled = true;
+			LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)contentRoot);
+		}
 
-		// 5) now tell each row to lerp from old -> new position
+		// (optional) one frame just to be super safe
+		yield return null;
+
+		// 5) now read those as targets and start lerping
 		foreach (var r in list)
 		{
 			if (r != null)
 				r.SetTargetToCurrentPos();
 		}
 
+		// 6) disable layout so it stops fighting the animation
+		if (gridLayoutGroup != null)
+			gridLayoutGroup.enabled = false;
+
 		sortRoutine = null;
 	}
+
 
 
 	// Optional: keep your explicit register/unregister
