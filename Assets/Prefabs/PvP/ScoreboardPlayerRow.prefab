@@ -1150,7 +1150,7 @@ MonoBehaviour:
   nameText: {fileID: 4173365468306899735}
   killsText: {fileID: 5191127931657857231}
   deathsText: {fileID: 3556233905252514373}
-  moveDuration: 0.2
+  moveDuration: 1.2
 --- !u!95 &1499828512566899316
 Animator:
   serializedVersion: 7

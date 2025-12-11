@@ -172,7 +172,7 @@ public class PvPScoreboard : MonoBehaviour
 		if (row != null)
 			row.GetComponent<Animator>().SetTrigger("Outro");
 		
-		yield return new WaitForSeconds(.3f);
+		yield return new WaitForSeconds(1f);
 
 		if (row != null)
 			Destroy(row.gameObject);
