@@ -94,11 +94,27 @@ public class GameNetworkManager : MonoBehaviour
 		pendingFriendsOnly = friendsOnly;
 
 		NetworkManager.Singleton.OnServerStarted += OnServerStarted;
-		NetworkManager.Singleton.StartHost();
 
+		// Try to start host (this now respects the socket error)
+		bool ok = NetworkManager.Singleton.StartHost();
+
+		if (!ok)
+		{
+			LastNetworkErrorMessage = "Socket error – failed to start host.";
+
+			// Just to be safe, make sure everything is cleaned up
+			Disconnect();
+
+			// Send player back to Setup scene
+			SceneManager.LoadScene("Setup");
+			return;
+		}
+
+		// Only create lobby if host actually started
 		await SteamMatchmaking.CreateLobbyAsync(pendingMaxMembers);
 		// OnLobbyCreated will fire after this
 	}
+
 
 	public void StartClient(SteamId hostId)
 	{
