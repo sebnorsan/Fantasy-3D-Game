@@ -43,7 +43,7 @@ public class PlayerReferences : NetworkBehaviour
 			if (localClient != null && localClient.PlayerObject != null)
 			{
 				playerCheck = localClient.PlayerObject.GetComponent<PlayerReferences>().playerController;
-				Invoke(nameof(OnPlayerFound), .15f);
+				Invoke(nameof(OnPlayerFound), .4f);
 			}
 		}
 	}
