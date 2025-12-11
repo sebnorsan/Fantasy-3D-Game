@@ -517,6 +517,12 @@ public class PlayerController : NetworkBehaviour
 	{
 		float savedRadius = checkRadius;
 
+		Vector3 posToAdd = new Vector3(0, 1, 0);
+
+		EventManager.instance.TeleportPlayer(this, transform.position + posToAdd);
+
+		yield return new WaitForSeconds(.1f);
+
 		checkRadius = 0;
 		footstepStopPending = false;
 		pRef.playerAnimator.A_Jump();
