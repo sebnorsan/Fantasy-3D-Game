@@ -50,7 +50,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7367675338097855014
 Transform:
   m_ObjectHideFlags: 0
@@ -137,6 +137,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   pRef: {fileID: 0}
+  pfxParent: {fileID: 43047757756060895}
   arrowFirePfx: {fileID: 4393346441790808694}
 --- !u!1 &4393346441790808692
 GameObject:
@@ -244,7 +245,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 0
+  moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 2
   randomSeed: 0
@@ -1008,7 +1009,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 35
+      scalar: 100
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -1174,7 +1175,7 @@ ParticleSystem:
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: 0.08733631
+          value: 0.4829433
           inSlope: 0.19937925
           outSlope: 0.19937925
           tangentMode: 0
@@ -1182,8 +1183,8 @@ ParticleSystem:
           inWeight: 0.33333334
           outWeight: 0.33333334
         - serializedVersion: 3
-          time: 0.13621975
-          value: 0.515945
+          time: 0.018723654
+          value: 0.6917665
           inSlope: 3.4237504
           outSlope: 3.4237504
           tangentMode: 0

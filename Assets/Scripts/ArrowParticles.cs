@@ -6,11 +6,20 @@ using System.Collections;
 public class ArrowParticles : MonoBehaviour
 {
     [SerializeField] private PlayerReferences pRef;
+	[SerializeField] private GameObject pfxParent;
+	[SerializeField] private bool multiplayerArrow;
 
     [Header("Particles")]
 
     [SerializeField] private ParticleSystem arrowFirePfx;
 
+	public void Start()
+	{
+		if (multiplayerArrow && pRef.IsOwner)
+			pfxParent.SetActive(false);
+		else if (!multiplayerArrow && !pRef.IsOwner)
+			pfxParent.SetActive(false);
+	}
 	public void ApplyArrowEffects()
 	{
 		foreach (var effect in pRef.bowEffects.activeArrowEffects.Value)
@@ -52,6 +61,7 @@ public class ArrowParticles : MonoBehaviour
 		{
 			main.playOnAwake = false;
 			pfx.Stop();
+			pfx.Clear();
 		}
 	}
 	public void PlayParticle(ArrowPfxToPlay pfx, bool play = true, float delay = 0f)
