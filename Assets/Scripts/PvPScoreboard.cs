@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System.Collections;
 
 public class PvPScoreboard : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class PvPScoreboard : MonoBehaviour
 
 	private float resyncTimer = 0f;
 	private const float RESYNC_INTERVAL = 1f; // seconds
+	private Coroutine sortRoutine;
 
 	private void Awake()
 	{
@@ -84,36 +86,62 @@ public class PvPScoreboard : MonoBehaviour
 		SortRows();
 	}
 
+
 	private void SortRows()
+	{
+		if (sortRoutine != null)
+			StopCoroutine(sortRoutine);
+
+		sortRoutine = StartCoroutine(SortRowsLerped());
+	}
+
+	private IEnumerator SortRowsLerped()
 	{
 		// Copy rows into a list
 		var list = new List<PvPScoreboardRow>(rows.Values);
 
-		// Sort: most kills at top, then fewest deaths, then stable by id
+		// 1) capture current positions BEFORE we change siblings
+		foreach (var r in list)
+		{
+			if (r != null)
+				r.CaptureStartPos();
+		}
+
+		// 2) sort list like before
 		list.Sort((a, b) =>
 		{
 			if (a == null || a.Player == null) return 1;
 			if (b == null || b.Player == null) return -1;
 
-			// 1) Kills DESC
 			int killCompare = b.Player.Kills.Value.CompareTo(a.Player.Kills.Value);
 			if (killCompare != 0) return killCompare;
 
-			// 2) Deaths ASC (less deaths = higher)
 			int deathCompare = a.Player.Deaths.Value.CompareTo(b.Player.Deaths.Value);
 			if (deathCompare != 0) return deathCompare;
 
-			// 3) Tie-breaker: NetworkObjectId ASC
 			return a.Player.NetworkObjectId.CompareTo(b.Player.NetworkObjectId);
 		});
 
-		// Apply order to hierarchy (0 = top)
+		// 3) apply sibling order (GridLayoutGroup will snap them to new spots)
 		for (int i = 0; i < list.Count; i++)
 		{
 			if (list[i] != null)
 				list[i].transform.SetSiblingIndex(i);
 		}
+
+		// 4) wait a frame so GridLayoutGroup updates anchoredPositions
+		yield return new WaitForEndOfFrame();
+
+		// 5) now tell each row to lerp from old -> new position
+		foreach (var r in list)
+		{
+			if (r != null)
+				r.SetTargetToCurrentPos();
+		}
+
+		sortRoutine = null;
 	}
+
 
 	// Optional: keep your explicit register/unregister
 	public void RegisterPlayer(PlayerPvP stats)

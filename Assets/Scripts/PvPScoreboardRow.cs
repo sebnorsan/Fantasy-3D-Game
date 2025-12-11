@@ -15,6 +15,19 @@ public class PvPScoreboardRow : MonoBehaviour
 	private PlayerPvP playerPvP;
 	public PlayerPvP Player => playerPvP;
 
+	// ---- LERP FIELDS ----
+	private RectTransform rt;
+	private Vector2 startPos;
+	private Vector2 targetPos;
+	private float animTime;
+	private bool animating;
+	[SerializeField] private float moveDuration = 0.2f;
+
+	private void Awake()
+	{
+		rt = GetComponent<RectTransform>();
+	}
+
 	public void Init(PlayerPvP stats)
 	{
 		this.playerPvP = stats;
@@ -64,5 +77,34 @@ public class PvPScoreboardRow : MonoBehaviour
 		);
 
 		avatarImage.sprite = sprite;
+	}
+
+	// ----- LERP API CALLED BY SCOREBOARD -----
+
+	public void CaptureStartPos()
+	{
+		if (rt == null) rt = GetComponent<RectTransform>();
+		startPos = rt.anchoredPosition;
+	}
+
+	public void SetTargetToCurrentPos()
+	{
+		if (rt == null) rt = GetComponent<RectTransform>();
+		targetPos = rt.anchoredPosition;
+		animTime = 0f;
+		animating = true;
+	}
+
+	private void Update()
+	{
+		if (!animating || moveDuration <= 0f) return;
+
+		animTime += Time.unscaledDeltaTime;
+		float t = Mathf.Clamp01(animTime / moveDuration);
+
+		rt.anchoredPosition = Vector2.Lerp(startPos, targetPos, t);
+
+		if (t >= 1f)
+			animating = false;
 	}
 }
