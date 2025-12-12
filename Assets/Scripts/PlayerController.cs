@@ -424,7 +424,8 @@ public class PlayerController : NetworkBehaviour
 		Collider[] hits = Physics.OverlapSphere(
 		headCheck.position,
 		headCheckRadius,
-		headCheckMask   // everything
+		headCheckMask,
+		QueryTriggerInteraction.Collide
 		);
 
 		bool hasWorldBlock = false;
@@ -434,6 +435,8 @@ public class PlayerController : NetworkBehaviour
 		{
 			var col = hits[i];
 			if (!col) continue;
+
+			Debug.Log($"[HeadCheck] Hit {col.name} on layer {LayerMask.LayerToName(col.gameObject.layer)}");
 
 			var otherPc = col.GetComponentInParent<PlayerController>();
 
@@ -644,7 +647,7 @@ public class PlayerController : NetworkBehaviour
 	{
 		playerDamageCollider.height = newHeight;
 
-		otherGameControllerColl.transform.localPosition = new Vector3(0, (initialCrouchHeight - crouchHeight) / 2, 0);
+		otherGameControllerColl.transform.localPosition = new Vector3(0, -((initialCrouchHeight - crouchHeight) / 1.5f), 0);
 		otherGameControllerColl.transform.localScale = new Vector3(otherGameControllerColl.transform.localScale.x, .5f, otherGameControllerColl.transform.localScale.z);
 
 		pRef.playerAnimator.A_SetCrouch(true);
