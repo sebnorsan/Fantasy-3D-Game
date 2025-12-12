@@ -1,9 +1,9 @@
 ﻿using EvolveGames;
 using EZCameraShake;
 using System.Collections.Generic;
-using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : NetworkBehaviour
@@ -12,7 +12,6 @@ public class PlayerController : NetworkBehaviour
 
 	public PlayerReferences pRef;
 	public PlayerInputs pInput;
-	[SerializeField] private GameObject otherGameControllerColl;
 
 	[Header("Player Settings")]
 	[SerializeField] public Transform playerCamera;
@@ -42,7 +41,6 @@ public class PlayerController : NetworkBehaviour
 	public Transform headCheck;
 	public float headCheckRadius = 0.3f;
 	public CapsuleCollider playerDamageCollider;
-	public LayerMask headCheckMask;
 
 	private Vector3 standCamLocalPos;
 	[SerializeField] private float crouchCamLerpSpeed = 8f;
@@ -124,7 +122,6 @@ public class PlayerController : NetworkBehaviour
 		if (!IsOwner)
 		{
 			gameObject.layer = LayerMask.NameToLayer("OtherGameController");
-			otherGameControllerColl.layer = LayerMask.NameToLayer("GroundPlayerController");
 
 			foreach (var c in GetComponentsInChildren<Camera>(true))
 				c.enabled = false;
@@ -420,57 +417,21 @@ public class PlayerController : NetworkBehaviour
 	}
 	private void HandleCrouchingInput()
 	{
-		// Check what is above the head
-		Collider[] hits = Physics.OverlapSphere(
-		headCheck.position,
-		headCheckRadius,
-		headCheckMask,
-		QueryTriggerInteraction.Collide
+		bool crouchSphere = Physics.CheckSphere(
+			headCheck.position,
+			headCheckRadius,
+			pRef.groundLayerMask
 		);
-
-		bool hasWorldBlock = false;
-		PlayerController playerOnTop = null;
-
-		for (int i = 0; i < hits.Length; i++)
-		{
-			var col = hits[i];
-			if (!col) continue;
-
-			Debug.Log($"[HeadCheck] Hit {col.name} on layer {LayerMask.LayerToName(col.gameObject.layer)}");
-
-			var otherPc = col.GetComponentInParent<PlayerController>();
-
-			if (otherPc != null && otherPc != this)
-			{
-				// another player is standing on us
-				playerOnTop = otherPc;
-			}
-			else
-			{
-				// anything else (ceiling, level geo, etc.)
-				hasWorldBlock = true;
-			}
-		}
 
 		if (Input.GetKeyDown(pInput.crouchKey))
 		{
-			SetCrouchHeight(crouchHeight);         // local
-			SetCrouchHeightRpc(crouchHeight);     // others
+			SetCrouchHeight(crouchHeight);                // instant local
+			SetCrouchHeightRpc(crouchHeight);            // sync others
 		}
-		else if (Input.GetKeyUp(pInput.crouchKey))
+		else if (Input.GetKeyUp(pInput.crouchKey) && !crouchSphere)
 		{
-			// Only blocked by world? Then we stay crouched.
-			if (!hasWorldBlock)
-			{
-				ResetSetCrouchHeight(initialCrouchHeight);
-				ResetCrouchHeightRpc(initialCrouchHeight);
-			}
-
-			// If a player is on our head, launch them
-			if (playerOnTop != null)
-			{
-				RequestLaunchPlayerRpc(playerOnTop.NetworkObjectId);
-			}
+			ResetSetCrouchHeight(initialCrouchHeight);   // instant local
+			ResetCrouchHeightRpc(initialCrouchHeight);   // sync others
 		}
 
 		if (Input.GetKey(pInput.crouchKey))
@@ -479,7 +440,7 @@ public class PlayerController : NetworkBehaviour
 			if (isGrounded)
 				walkingSpeed = Mathf.Lerp(walkingSpeed, crouchSpeed, 6 * Time.deltaTime);
 		}
-		else if (!hasWorldBlock)        // <- use world only, players don't block auto-stand
+		else if (!crouchSphere)
 		{
 			isCrouching = false;
 			walkingSpeed = Mathf.Lerp(walkingSpeed, initialWalkingSpeed, 4 * Time.deltaTime);
@@ -488,70 +449,6 @@ public class PlayerController : NetworkBehaviour
 				ResetSetCrouchHeight(initialCrouchHeight);
 		}
 	}
-
-	// Crouching player -> Server: ask to launch the player on our head
-	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
-	private void RequestLaunchPlayerRpc(ulong targetNetworkObjectId)
-	{
-		if (NetworkManager.Singleton == null) return;
-
-		if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects
-				.TryGetValue(targetNetworkObjectId, out var nwo))
-			return;
-
-		var targetPc = nwo.GetComponent<PlayerController>();
-		if (targetPc == null) return;
-
-		// this will only go to that player's owner
-		targetPc.LaunchUpRpc();
-	}
-
-	// Server -> that player's owner: do the actual super jump
-	private Coroutine launchCoroutine;
-	[Rpc(SendTo.Owner)]
-	private void LaunchUpRpc()
-	{
-		if (!IsOwner) return;
-
-		// tweak multiplier to taste
-		if (launchCoroutine == null)
-			launchCoroutine = StartCoroutine(LaunchUp());
-	}
-
-	private IEnumerator LaunchUp()
-	{
-		float savedRadius = checkRadius;
-
-		int originalLayer = gameObject.layer;
-		int launchedLayer = LayerMask.NameToLayer("LaunchedPlayer");
-
-		// move this player to a layer that doesn't collide with other players
-		if (launchedLayer != -1)
-			gameObject.layer = launchedLayer;
-
-		checkRadius = 0;
-
-		yield return new WaitForSeconds(0.2f);
-
-		footstepStopPending = false;
-		pRef.playerAnimator.A_Jump();
-
-		moveDirection.y = 40f;
-
-		// ignore other players for a short time
-		yield return new WaitForSeconds(0.2f);
-
-		// restore collisions
-		gameObject.layer = originalLayer;
-
-		// keep your old ground-check restore timing if you want
-		yield return new WaitForSeconds(0.8f);
-		checkRadius = savedRadius;
-
-		launchCoroutine = null;
-	}
-
-
 	private void HandleCrouchCamera()
 	{
 		if (playerCamera == null || pRef.crouchCamPoint == null) return;
@@ -571,6 +468,7 @@ public class PlayerController : NetworkBehaviour
 	#endregion
 
 	#region Camera
+
 	public void ChangeFieldOfView(float newFov)
 	{
 		initialFOV = newFov;
@@ -647,9 +545,6 @@ public class PlayerController : NetworkBehaviour
 	{
 		playerDamageCollider.height = newHeight;
 
-		otherGameControllerColl.transform.localPosition = new Vector3(0, -((initialCrouchHeight - crouchHeight) / 1.5f), 0);
-		otherGameControllerColl.transform.localScale = new Vector3(otherGameControllerColl.transform.localScale.x, .5f, otherGameControllerColl.transform.localScale.z);
-
 		pRef.playerAnimator.A_SetCrouch(true);
 
 		pRef.playerCharacterController.stepOffset = 0.1f;
@@ -668,9 +563,6 @@ public class PlayerController : NetworkBehaviour
 	private void ResetSetCrouchHeight(float newHeight)
 	{
 		playerDamageCollider.height = newHeight;
-
-		otherGameControllerColl.transform.localPosition = Vector3.zero;
-		otherGameControllerColl.transform.localScale = new Vector3(otherGameControllerColl.transform.localScale.x, 1, otherGameControllerColl.transform.localScale.z);
 
 		pRef.playerAnimator.A_SetCrouch(false);
 

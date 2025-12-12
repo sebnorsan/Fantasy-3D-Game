@@ -22852,59 +22852,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 8
---- !u!1 &6241500318553274848
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8878377516728006166}
-  - component: {fileID: 7911336597538469206}
-  m_Layer: 3
-  m_Name: GroundPlayerCollisions
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8878377516728006166
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6241500318553274848}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5219615711813225076}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &7911336597538469206
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6241500318553274848}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.6, y: 1.5332015, z: 0.6}
-  m_Center: {x: 0, y: 0.091600806, z: 0}
 --- !u!1 &6461153865382936948
 GameObject:
   m_ObjectHideFlags: 0
@@ -23570,7 +23517,6 @@ Transform:
   - {fileID: 743770276343240314}
   - {fileID: 2556143203140004230}
   - {fileID: 3562491346119374754}
-  - {fileID: 8878377516728006166}
   - {fileID: 2932484719103457868}
   - {fileID: 5675913063235240685}
   - {fileID: 1230145777048426506}
@@ -23646,7 +23592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2771618475
+  GlobalObjectIdHash: 222003529
   InScenePlacedSourceGlobalObjectIdHash: 2771618475
   DeferredDespawnTick: 0
   Ownership: 1
@@ -23674,7 +23620,6 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   pRef: {fileID: 930708363686757887}
   pInput: {fileID: 5742270511285517812}
-  otherGameControllerColl: {fileID: 6241500318553274848}
   playerCamera: {fileID: 743770276343240314}
   walkingSpeed: 8
   crouchSpeed: 5
@@ -23696,9 +23641,6 @@ MonoBehaviour:
   headCheck: {fileID: 5675913063235240685}
   headCheckRadius: 0.79
   playerDamageCollider: {fileID: 6778015122654442836}
-  headCheckMask:
-    serializedVersion: 2
-    m_Bits: 13504
   crouchCamLerpSpeed: 8
   runToggle: 0
   knockbackDecay: 5
