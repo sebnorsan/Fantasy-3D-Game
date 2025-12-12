@@ -12,6 +12,7 @@ public class PlayerController : NetworkBehaviour
 
 	public PlayerReferences pRef;
 	public PlayerInputs pInput;
+	[SerializeField] private GameObject otherGameControllerColl;
 
 	[Header("Player Settings")]
 	[SerializeField] public Transform playerCamera;
@@ -123,6 +124,7 @@ public class PlayerController : NetworkBehaviour
 		if (!IsOwner)
 		{
 			gameObject.layer = LayerMask.NameToLayer("OtherGameController");
+			otherGameControllerColl.layer = LayerMask.NameToLayer("GroundPlayerController");
 
 			foreach (var c in GetComponentsInChildren<Camera>(true))
 				c.enabled = false;
@@ -566,7 +568,6 @@ public class PlayerController : NetworkBehaviour
 	#endregion
 
 	#region Camera
-
 	public void ChangeFieldOfView(float newFov)
 	{
 		initialFOV = newFov;
@@ -643,6 +644,9 @@ public class PlayerController : NetworkBehaviour
 	{
 		playerDamageCollider.height = newHeight;
 
+		otherGameControllerColl.transform.localPosition = new Vector3(transform.localPosition.x, (initialCrouchHeight - crouchHeight) / 2, transform.localPosition.z);
+		otherGameControllerColl.transform.localScale /= 2;
+
 		pRef.playerAnimator.A_SetCrouch(true);
 
 		pRef.playerCharacterController.stepOffset = 0.1f;
@@ -661,6 +665,9 @@ public class PlayerController : NetworkBehaviour
 	private void ResetSetCrouchHeight(float newHeight)
 	{
 		playerDamageCollider.height = newHeight;
+
+		otherGameControllerColl.transform.localPosition = Vector3.zero;
+		otherGameControllerColl.transform.localScale *= 2;
 
 		pRef.playerAnimator.A_SetCrouch(false);
 
