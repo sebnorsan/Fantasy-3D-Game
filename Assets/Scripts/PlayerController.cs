@@ -517,11 +517,12 @@ public class PlayerController : NetworkBehaviour
 	{
 		float savedRadius = checkRadius;
 
-		Vector3 posToAdd = new Vector3(0, 2, 0);
+		int originalLayer = gameObject.layer;
+		int launchedLayer = LayerMask.NameToLayer("LaunchedPlayer");
 
-		EventManager.instance.TeleportPlayer(this, transform.position + posToAdd);
-
-		yield return new WaitForSeconds(.2f);
+		// move this player to a layer that doesn't collide with other players
+		if (launchedLayer != -1)
+			gameObject.layer = launchedLayer;
 
 		checkRadius = 0;
 		footstepStopPending = false;
@@ -529,11 +530,19 @@ public class PlayerController : NetworkBehaviour
 
 		moveDirection.y = 40f;
 
-		yield return new WaitForSeconds(1f);
+		// ignore other players for a short time
+		yield return new WaitForSeconds(0.2f);
+
+		// restore collisions
+		gameObject.layer = originalLayer;
+
+		// keep your old ground-check restore timing if you want
+		yield return new WaitForSeconds(0.8f);
 		checkRadius = savedRadius;
 
 		launchCoroutine = null;
 	}
+
 
 	private void HandleCrouchCamera()
 	{
