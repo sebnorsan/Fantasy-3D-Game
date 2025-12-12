@@ -525,6 +525,9 @@ public class PlayerController : NetworkBehaviour
 			gameObject.layer = launchedLayer;
 
 		checkRadius = 0;
+
+		yield return new WaitForSeconds(0.2f);
+
 		footstepStopPending = false;
 		pRef.playerAnimator.A_Jump();
 
