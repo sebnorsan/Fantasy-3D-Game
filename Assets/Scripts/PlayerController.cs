@@ -644,8 +644,8 @@ public class PlayerController : NetworkBehaviour
 	{
 		playerDamageCollider.height = newHeight;
 
-		otherGameControllerColl.transform.localPosition = new Vector3(transform.localPosition.x, (initialCrouchHeight - crouchHeight) / 2, transform.localPosition.z);
-		otherGameControllerColl.transform.localScale /= 2;
+		otherGameControllerColl.transform.localPosition = new Vector3(0, (initialCrouchHeight - crouchHeight) / 2, 0);
+		otherGameControllerColl.transform.localScale = new Vector3(otherGameControllerColl.transform.localScale.x, .5f, otherGameControllerColl.transform.localScale.z);
 
 		pRef.playerAnimator.A_SetCrouch(true);
 
@@ -667,7 +667,7 @@ public class PlayerController : NetworkBehaviour
 		playerDamageCollider.height = newHeight;
 
 		otherGameControllerColl.transform.localPosition = Vector3.zero;
-		otherGameControllerColl.transform.localScale *= 2;
+		otherGameControllerColl.transform.localScale = new Vector3(otherGameControllerColl.transform.localScale.x, 1, otherGameControllerColl.transform.localScale.z);
 
 		pRef.playerAnimator.A_SetCrouch(false);
 
