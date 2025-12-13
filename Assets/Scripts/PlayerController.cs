@@ -416,11 +416,35 @@ public class PlayerController : NetworkBehaviour
 	}
 	private void HandleCrouchingInput()
 	{
-		bool crouchSphere = Physics.CheckSphere(
-			headCheck.position,
-			headCheckRadius,
-			pRef.headLayerMask
+		Collider[] hits = Physics.OverlapSphere(
+		headCheck.position,
+		headCheckRadius,
+		pRef.groundLayerMask
 		);
+
+		bool hasWorldBlock = false;
+		PlayerController playerOnTop = null;
+
+		for (int i = 0; i < hits.Length; i++)
+		{
+			var col = hits[i];
+			if (!col) continue;
+
+			var otherPc = col.GetComponentInParent<PlayerController>();
+
+			if (otherPc != null && otherPc != this)
+			{
+				// another player is standing on us
+				playerOnTop = otherPc;
+			}
+			else
+			{
+				// anything else (ceiling, level geo, etc.)
+				hasWorldBlock = true;
+			}
+		}
+
+		bool crouchSphere = hasWorldBlock || playerOnTop;
 
 		if (Input.GetKeyDown(pInput.crouchKey))
 		{
@@ -431,6 +455,11 @@ public class PlayerController : NetworkBehaviour
 		{
 			ResetSetCrouchHeight(initialCrouchHeight);   // instant local
 			ResetCrouchHeightRpc(initialCrouchHeight);   // sync others
+
+			if (playerOnTop != null)
+			{
+				RequestLaunchPlayerRpc(playerOnTop.NetworkObjectId);
+			}
 		}
 
 		if (Input.GetKey(pInput.crouchKey))
@@ -450,6 +479,29 @@ public class PlayerController : NetworkBehaviour
 
 			isCrouching = false;
 		}
+	}
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+	private void RequestLaunchPlayerRpc(ulong targetNetworkObjectId)
+	{
+		if (NetworkManager.Singleton == null) return;
+
+		if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects
+				.TryGetValue(targetNetworkObjectId, out var nwo))
+			return;
+
+		var targetPc = nwo.GetComponent<PlayerController>();
+		if (targetPc == null) return;
+
+		// this will only go to that player's owner
+		targetPc.LaunchUpRpc();
+	}
+	[Rpc(SendTo.Owner)]
+	private void LaunchUpRpc()
+	{
+		if (!IsOwner) return;
+
+		// tweak multiplier to taste
+		moveDirection.y = 40f;
 	}
 	private void HandleCrouchCamera()
 	{
