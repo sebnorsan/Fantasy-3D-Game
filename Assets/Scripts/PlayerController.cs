@@ -442,11 +442,14 @@ public class PlayerController : NetworkBehaviour
 		}
 		else if (!crouchSphere)
 		{
-			isCrouching = false;
 			walkingSpeed = Mathf.Lerp(walkingSpeed, initialWalkingSpeed, 4 * Time.deltaTime);
+
+			if (!isCrouching) return;
 
 			if (pRef.playerCharacterController?.height == crouchHeight)
 				ResetSetCrouchHeight(initialCrouchHeight);
+
+			isCrouching = false;
 		}
 	}
 	private void HandleCrouchCamera()
