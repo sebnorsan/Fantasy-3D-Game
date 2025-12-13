@@ -6,7 +6,11 @@ using UnityEngine.SceneManagement;
 public class InitialSceneLoad : MonoBehaviour
 {
 	public string sceneToLoad = "Scene";
+
+	[Space(10)]
+
 	public bool directlyToGame;
+	public string directSceneToLoad = "PvP-Scene";
 
 	private void Start()
 	{
@@ -27,6 +31,6 @@ public class InitialSceneLoad : MonoBehaviour
 	{
 		yield return new WaitUntil(() => NetworkManager.Singleton != null);
 		NetworkManager.Singleton.StartHost();
-		NetworkManager.Singleton.SceneManager.LoadScene("SampleScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+		NetworkManager.Singleton.SceneManager.LoadScene(directSceneToLoad, UnityEngine.SceneManagement.LoadSceneMode.Single);
 	}
 }
