@@ -36,6 +36,10 @@ public class PlayerAnimator : NetworkBehaviour
 			multiplayerCharacterAnim.speed = walkSpeedAnim;
 	}
 
+	public void A_ResetBow()
+	{
+		multiplayerBowAnim.SetTrigger("Reset");
+	}
 	public void A_LoadBow()
 	{
 		multiplayerBowAnim.ResetTrigger("Shoot");

@@ -41,7 +41,13 @@ public class BowScript : MonoBehaviour
 
 		if (!pRef || !pRef.IsOwner) return;
 
-		if (!canShoot || !pRef.playerController.canMove) return;
+		if (!canShoot) return;
+
+		if (!pRef.playerController.canMove)
+		{
+			anim.SetTrigger("Reset");
+			pRef.playerAnimator.A_ResetBow();
+		}
 
 		if (Input.GetKey(pInput.shootKey)) LoadBow();
 		else UnLoadBow();

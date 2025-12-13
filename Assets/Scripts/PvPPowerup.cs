@@ -72,8 +72,6 @@ public class PvPPowerup : NetworkBehaviour
 			nwo.Despawn(true);
 		else
 			gameObject.SetActive(false);
-
-		Debug.Log($"Powerup picked up by client {playerClientId}");
 	}
 
 	private void SetPowerUp(PlayerReferences p)
