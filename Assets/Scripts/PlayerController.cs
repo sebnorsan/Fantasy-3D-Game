@@ -37,9 +37,6 @@ public class PlayerController : NetworkBehaviour
 	[Range(0, 1)] public float coyoteTimeDuration = 0.2f;
 	public float maxFallSpeed = -15f;
 
-	[SerializeField] private float groundedGrace = 0.06f;
-	private float groundedGraceUntil = 0f;
-
 	[Header("CrouchCheck")]
 	public Transform headCheck;
 	public float headCheckRadius = 0.3f;
@@ -118,6 +115,9 @@ public class PlayerController : NetworkBehaviour
 	public ulong MyId => NetworkObject.OwnerClientId;
 
 	#endregion
+
+	private CollisionFlags lastMoveFlags;
+
 	#region Network Lifecycle
 
 	public override void OnNetworkSpawn()
@@ -179,12 +179,12 @@ public class PlayerController : NetworkBehaviour
 		if (!IsOwner) return;
 
 		HandleLookingAround();
-		HandleGrounded();
 		HandleInput();
 		HandleJumpingInput();   
 		HandleCrouchingInput();
 		HandleCrouchCamera();
-		HandleMovement();       
+		HandleMovement();
+		HandleGrounded();
 		HandleKnockback();
 		HandleFootsteps();
 	}
@@ -261,13 +261,7 @@ public class PlayerController : NetworkBehaviour
 	{
 		if (isFlying) return;
 
-		bool sphereGrounded = Physics.CheckSphere(groundCheck.position, checkRadius, pRef.groundLayerMask);
-
-		if (sphereGrounded)
-			groundedGraceUntil = Time.time + groundedGrace;
-
-		isGrounded = sphereGrounded || Time.time < groundedGraceUntil;
-
+		isGrounded = (lastMoveFlags & CollisionFlags.Below) != 0;
 
 		if (!isGrounded)
 		{
@@ -322,16 +316,16 @@ public class PlayerController : NetworkBehaviour
 	{
 		moveDirection.y -= gravity * Time.deltaTime; if (moveDirection.y < maxFallSpeed) moveDirection.y = maxFallSpeed;
 
-		//if (Vector3.Distance(
-		//			new Vector3(transform.position.x, prevFramePos.y, transform.position.z),
-		//			transform.position) < 0.001f && !rebound)
-		//{
-		//	rebound = true;
-		//	moveDirection.y = -.1f;
-		//	Invoke(nameof(ResetRebound), 0.1f);
+		if (Vector3.Distance(
+					new Vector3(transform.position.x, prevFramePos.y, transform.position.z),
+					transform.position) < 0.001f && !rebound)
+		{
+			rebound = true;
+			moveDirection.y = -.1f;
+			Invoke(nameof(ResetRebound), 0.1f);
 
-		//	prevFramePos = transform.position;
-		//}
+			prevFramePos = transform.position;
+		}
 	}
 	private void HandleKnockback()
 	{
@@ -374,6 +368,9 @@ public class PlayerController : NetworkBehaviour
 			pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Run, true);
 		else
 			pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Run, false);
+
+		if (pRef.playerCharacterController.enabled)
+			lastMoveFlags = pRef.playerCharacterController.Move(moveDirection * Time.deltaTime);
 	}
 	private void HandleInput()
 	{
