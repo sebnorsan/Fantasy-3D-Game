@@ -45,6 +45,10 @@ public class PlayerController : NetworkBehaviour
 	private Vector3 standCamLocalPos;
 	[SerializeField] private float crouchCamLerpSpeed = 8f;
 
+	[Header("Player Separation")]
+	[SerializeField] private float separationBuffer = 0.03f; // how far apart we want to be
+	[SerializeField] private float maxSeparationPerFrame = 0.04f;
+	[SerializeField] private float sameHeightThreshold = 1.0f; // only push when roughly same level
 
 	[Header("Input")]
 	public bool runToggle = false;
@@ -377,7 +381,67 @@ public class PlayerController : NetworkBehaviour
 			pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Run, true);
 		else
 			pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Run, false);
+
+		if (pRef.playerCharacterController.enabled)
+			SoftSeparateFromPlayers();
 	}
+	private readonly Collider[] _sepHits = new Collider[12];
+
+	private void SoftSeparateFromPlayers()
+	{
+		var cc = pRef.playerCharacterController;
+		if (!cc) return;
+
+		// Build our capsule in world space (matches CharacterController)
+		Vector3 center = transform.TransformPoint(cc.center);
+		float radius = cc.radius;
+		float height = Mathf.Max(cc.height, radius * 2f);
+
+		Vector3 bottom = center + Vector3.up * radius;
+		Vector3 top = center + Vector3.up * (height - radius);
+
+		int count = Physics.OverlapCapsuleNonAlloc(
+			bottom, top,
+			radius + separationBuffer,
+			_sepHits,
+			pRef.playerStandLayerMask,
+			QueryTriggerInteraction.Ignore
+		);
+
+		Vector3 totalPush = Vector3.zero;
+
+		for (int i = 0; i < count; i++)
+		{
+			var col = _sepHits[i];
+			if (!col) continue;
+			if (col.transform.root == transform) continue; // safety
+
+			// Don’t push when someone is clearly above/below (helps stacking)
+			float otherY = col.bounds.center.y;
+			if (Mathf.Abs(otherY - center.y) > sameHeightThreshold)
+				continue;
+
+			Vector3 closest = col.ClosestPoint(center);
+			Vector3 delta = center - closest;
+			delta.y = 0f; // sideways only
+
+			float dist = delta.magnitude;
+			if (dist < 0.0001f) continue;
+
+			float need = separationBuffer - dist;
+			if (need > 0f)
+				totalPush += (delta / dist) * need;
+		}
+
+		// clamp so it’s just a tiny nudge
+		totalPush.y = 0f;
+		if (totalPush.magnitude > maxSeparationPerFrame)
+			totalPush = totalPush.normalized * maxSeparationPerFrame;
+
+		if (totalPush.sqrMagnitude > 0f)
+			cc.Move(totalPush);
+	}
+
 	private void HandleInput()
 	{
 		if (dev || overrideDev)
