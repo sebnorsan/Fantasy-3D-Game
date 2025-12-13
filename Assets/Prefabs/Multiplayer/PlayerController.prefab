@@ -23767,7 +23767,7 @@ MonoBehaviour:
   bowNetCode: {fileID: 515831196404787215}
   groundLayerMask:
     serializedVersion: 2
-    m_Bits: 10432
+    m_Bits: 11456
   headLayerMask:
     serializedVersion: 2
     m_Bits: 3264
