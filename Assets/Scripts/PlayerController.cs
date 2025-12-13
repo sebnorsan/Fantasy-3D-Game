@@ -258,11 +258,19 @@ public class PlayerController : NetworkBehaviour
 	{
 		if (isFlying) return;
 
-		isGrounded = Physics.CheckSphere(
-			groundCheck.position,
-			checkRadius,
-			pRef.groundLayerMask
-		);
+		bool groundedWorld = Physics.CheckSphere(groundCheck.position, checkRadius, pRef.groundLayerMask);
+
+		bool groundedPlayer = false;
+		if (!groundedWorld)
+		{
+			if (Physics.SphereCast(groundCheck.position + Vector3.up * 0.05f, checkRadius * 0.95f,
+				Vector3.down, out var hit, 0.2f, pRef.playerStandLayerMask, QueryTriggerInteraction.Ignore))
+			{
+				groundedPlayer = hit.normal.y > 0.5f; // only “floor-like”
+			}
+		}
+
+		isGrounded = groundedWorld || groundedPlayer;
 
 		if (!isGrounded)
 		{

@@ -23592,7 +23592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 222003529
+  GlobalObjectIdHash: 2771618475
   InScenePlacedSourceGlobalObjectIdHash: 2771618475
   DeferredDespawnTick: 0
   Ownership: 1
@@ -23766,7 +23766,10 @@ MonoBehaviour:
   bowNetCode: {fileID: 515831196404787215}
   groundLayerMask:
     serializedVersion: 2
-    m_Bits: 11456
+    m_Bits: 10432
+  playerStandLayerMask:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!114 &5742270511285517812
 MonoBehaviour:
   m_ObjectHideFlags: 0

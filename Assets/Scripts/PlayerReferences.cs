@@ -26,6 +26,7 @@ public class PlayerReferences : NetworkBehaviour
     [Space(10)]
 
     public LayerMask groundLayerMask;
+    public LayerMask playerStandLayerMask;
 
 	public override void OnNetworkSpawn()
 	{
