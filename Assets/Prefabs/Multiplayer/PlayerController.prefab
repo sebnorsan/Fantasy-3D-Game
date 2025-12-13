@@ -23554,7 +23554,7 @@ CharacterController:
   m_Radius: 0.3
   m_SlopeLimit: 65
   m_StepOffset: 1.08
-  m_SkinWidth: 0.05
+  m_SkinWidth: 0.3
   m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!136 &6778015122654442836
@@ -23635,13 +23635,16 @@ MonoBehaviour:
   canMove: 1
   canRun: 1
   groundCheck: {fileID: 2932484719103457868}
-  checkRadius: 0.58
+  checkRadius: 1.25
   coyoteTimeDuration: 0.18
   maxFallSpeed: -45
   headCheck: {fileID: 5675913063235240685}
   headCheckRadius: 0.79
   playerDamageCollider: {fileID: 6778015122654442836}
   crouchCamLerpSpeed: 8
+  separationBuffer: 0.03
+  maxSeparationPerFrame: 0.04
+  sameHeightThreshold: 1
   runToggle: 0
   knockbackDecay: 5
   footstepStopThreshold: 0.1
