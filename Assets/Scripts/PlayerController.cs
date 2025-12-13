@@ -311,14 +311,17 @@ public class PlayerController : NetworkBehaviour
 	}
 	private void HandleGravity()
 	{
-		moveDirection.y -= gravity * Time.deltaTime; if (moveDirection.y < maxFallSpeed) moveDirection.y = maxFallSpeed;
+		moveDirection.y -= gravity * Time.deltaTime; 
+		
+		if (moveDirection.y < maxFallSpeed) 
+			moveDirection.y = maxFallSpeed;
 
 		if (Vector3.Distance(
 					new Vector3(transform.position.x, prevFramePos.y, transform.position.z),
 					transform.position) < 0.001f && !rebound)
 		{
 			rebound = true;
-			moveDirection.y = -.1f;
+			moveDirection.y = -1f;
 			Invoke(nameof(ResetRebound), 0.1f);
 
 			prevFramePos = transform.position;
@@ -416,7 +419,7 @@ public class PlayerController : NetworkBehaviour
 		bool crouchSphere = Physics.CheckSphere(
 			headCheck.position,
 			headCheckRadius,
-			pRef.groundLayerMask
+			pRef.headLayerMask
 		);
 
 		if (Input.GetKeyDown(pInput.crouchKey))
