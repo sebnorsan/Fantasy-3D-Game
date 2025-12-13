@@ -115,9 +115,6 @@ public class PlayerController : NetworkBehaviour
 	public ulong MyId => NetworkObject.OwnerClientId;
 
 	#endregion
-
-	private CollisionFlags lastMoveFlags;
-
 	#region Network Lifecycle
 
 	public override void OnNetworkSpawn()
@@ -261,7 +258,7 @@ public class PlayerController : NetworkBehaviour
 	{
 		if (isFlying) return;
 
-		isGrounded = (lastMoveFlags & CollisionFlags.Below) != 0;
+		isGrounded = Physics.CheckSphere(groundCheck.position, checkRadius, pRef.groundLayerMask);
 
 		if (!isGrounded)
 		{
@@ -368,9 +365,6 @@ public class PlayerController : NetworkBehaviour
 			pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Run, true);
 		else
 			pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Run, false);
-
-		if (pRef.playerCharacterController.enabled)
-			lastMoveFlags = pRef.playerCharacterController.Move(moveDirection * Time.deltaTime);
 	}
 	private void HandleInput()
 	{
