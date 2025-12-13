@@ -1,5 +1,6 @@
 ﻿using EvolveGames;
 using EZCameraShake;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -419,11 +420,14 @@ public class PlayerController : NetworkBehaviour
 		Collider[] hits = Physics.OverlapSphere(
 		headCheck.position,
 		headCheckRadius,
-		pRef.groundLayerMask
+		pRef.headLayerMask
 		);
 
 		bool hasWorldBlock = false;
 		PlayerController playerOnTop = null;
+
+		if (hits.Length > 0)
+			hasWorldBlock = true;
 
 		for (int i = 0; i < hits.Length; i++)
 		{
@@ -437,11 +441,6 @@ public class PlayerController : NetworkBehaviour
 				// another player is standing on us
 				playerOnTop = otherPc;
 			}
-			else
-			{
-				// anything else (ceiling, level geo, etc.)
-				hasWorldBlock = true;
-			}
 		}
 
 		bool crouchSphere = hasWorldBlock || playerOnTop;
@@ -453,12 +452,15 @@ public class PlayerController : NetworkBehaviour
 		}
 		else if (Input.GetKeyUp(pInput.crouchKey) && !crouchSphere)
 		{
-			ResetSetCrouchHeight(initialCrouchHeight);   // instant local
-			ResetCrouchHeightRpc(initialCrouchHeight);   // sync others
-
 			if (playerOnTop != null)
 			{
 				RequestLaunchPlayerRpc(playerOnTop.NetworkObjectId);
+			}
+
+			if (!crouchSphere)
+			{
+				ResetSetCrouchHeight(initialCrouchHeight);   // instant local
+				ResetCrouchHeightRpc(initialCrouchHeight);   // sync others
 			}
 		}
 
@@ -495,13 +497,31 @@ public class PlayerController : NetworkBehaviour
 		// this will only go to that player's owner
 		targetPc.LaunchUpRpc();
 	}
+	private Coroutine launchCoroutine;
 	[Rpc(SendTo.Owner)]
 	private void LaunchUpRpc()
 	{
 		if (!IsOwner) return;
 
 		// tweak multiplier to taste
+		if (launchCoroutine == null)
+			launchCoroutine = StartCoroutine(LaunchUp());
+	}
+
+	private IEnumerator LaunchUp()
+	{
+		float savedRadius = checkRadius;
+
+		checkRadius = 0;
+		footstepStopPending = false;
+		pRef.playerAnimator.A_Jump();
+
 		moveDirection.y = 40f;
+
+		yield return new WaitForSeconds(1f);
+		checkRadius = savedRadius;
+
+		launchCoroutine = null;
 	}
 	private void HandleCrouchCamera()
 	{
