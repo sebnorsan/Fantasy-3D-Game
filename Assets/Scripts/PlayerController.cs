@@ -283,7 +283,7 @@ public class PlayerController : NetworkBehaviour
 
 			HandleGravity();
 			
-			pRef.playerCharacterController.stepOffset = 0.1f;
+			//pRef.playerCharacterController.stepOffset = 0.1f;
 
 			if (canCoyote)
 			{
@@ -311,7 +311,7 @@ public class PlayerController : NetworkBehaviour
 				transform.SetParent(platformColliders[0].transform);
 
 			if (!isCrouching)
-				pRef.playerCharacterController.stepOffset = 0.65f;
+				//pRef.playerCharacterController.stepOffset = 0.65f;
 
 			canCoyote = true;
 			CancelInvoke(nameof(StopCoyote));
@@ -555,7 +555,7 @@ public class PlayerController : NetworkBehaviour
 
 		pRef.playerAnimator.A_SetCrouch(true);
 
-		pRef.playerCharacterController.stepOffset = 0.1f;
+		//pRef.playerCharacterController.stepOffset = 0.1f;
 		pRef.playerCharacterController.height = newHeight;
 
 		EventManager.instance.TeleportPlayer(
@@ -574,7 +574,7 @@ public class PlayerController : NetworkBehaviour
 
 		pRef.playerAnimator.A_SetCrouch(false);
 
-		pRef.playerCharacterController.stepOffset = 0.65f;
+		//pRef.playerCharacterController.stepOffset = 0.65f;
 		pRef.playerCharacterController.height = newHeight;
 
 		EventManager.instance.TeleportPlayer(

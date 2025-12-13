@@ -23553,7 +23553,7 @@ CharacterController:
   m_Height: 1.62
   m_Radius: 0.3
   m_SlopeLimit: 65
-  m_StepOffset: 1.08
+  m_StepOffset: 0.25
   m_SkinWidth: 0.05
   m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0, z: 0}
@@ -23572,7 +23572,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -23592,7 +23592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2771618475
+  GlobalObjectIdHash: 222003529
   InScenePlacedSourceGlobalObjectIdHash: 2771618475
   DeferredDespawnTick: 0
   Ownership: 1
@@ -23638,7 +23638,7 @@ MonoBehaviour:
   checkRadius: 0.58
   coyoteTimeDuration: 0.18
   maxFallSpeed: -45
-  groundedExitRadius: 0.66
+  groundedGrace: 0.06
   headCheck: {fileID: 5675913063235240685}
   headCheckRadius: 0.79
   playerDamageCollider: {fileID: 6778015122654442836}
