@@ -23636,7 +23636,7 @@ MonoBehaviour:
   canMove: 1
   canRun: 1
   groundCheck: {fileID: 2932484719103457868}
-  checkRadius: 0.34
+  checkRadius: 0.58
   coyoteTimeDuration: 0.18
   maxFallSpeed: -45
   headCheck: {fileID: 5675913063235240685}
@@ -23767,10 +23767,10 @@ MonoBehaviour:
   bowNetCode: {fileID: 515831196404787215}
   groundLayerMask:
     serializedVersion: 2
-    m_Bits: 11456
+    m_Bits: 10432
   headLayerMask:
     serializedVersion: 2
-    m_Bits: 3264
+    m_Bits: 2240
 --- !u!114 &5742270511285517812
 MonoBehaviour:
   m_ObjectHideFlags: 0
