@@ -23494,7 +23494,6 @@ GameObject:
   - component: {fileID: 4818609617636790534}
   - component: {fileID: 8675364865469383676}
   - component: {fileID: 7628524721557430775}
-  - component: {fileID: 8179897809218683913}
   m_Layer: 3
   m_Name: PlayerController
   m_TagString: GameController
@@ -24028,27 +24027,6 @@ MonoBehaviour:
   arrowFirePfx:
   - {fileID: 5310890218357641961}
   - {fileID: 8249430700243438875}
---- !u!65 &8179897809218683913
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7758727492805073096}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.62, y: 0.53, z: 0.65}
-  m_Center: {x: 0, y: 0.91, z: 0}
 --- !u!1 &7973304527205840717
 GameObject:
   m_ObjectHideFlags: 0
