@@ -37,6 +37,9 @@ public class PlayerController : NetworkBehaviour
 	[Range(0, 1)] public float coyoteTimeDuration = 0.2f;
 	public float maxFallSpeed = -15f;
 
+	[SerializeField] private float groundedGrace = 0.06f;
+	private float groundedGraceUntil = 0f;
+
 	[Header("CrouchCheck")]
 	public Transform headCheck;
 	public float headCheckRadius = 0.3f;
@@ -258,7 +261,13 @@ public class PlayerController : NetworkBehaviour
 	{
 		if (isFlying) return;
 
-		isGrounded = Physics.CheckSphere(groundCheck.position, checkRadius, pRef.groundLayerMask);
+		bool sphereGrounded = Physics.CheckSphere(groundCheck.position, checkRadius, pRef.groundLayerMask);
+
+		if (sphereGrounded)
+			groundedGraceUntil = Time.time + groundedGrace;
+
+		isGrounded = sphereGrounded || Time.time < groundedGraceUntil;
+
 
 		if (!isGrounded)
 		{
@@ -318,7 +327,7 @@ public class PlayerController : NetworkBehaviour
 					transform.position) < 0.001f && !rebound)
 		{
 			rebound = true;
-			moveDirection.y = -1;
+			moveDirection.y = -.1f;
 			Invoke(nameof(ResetRebound), 0.1f);
 
 			prevFramePos = transform.position;
