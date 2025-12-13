@@ -520,8 +520,6 @@ public class PlayerController : NetworkBehaviour
 
 		EventManager.instance.TeleportPlayer(this, transform.position + posToAdd);
 
-		yield return new WaitForSeconds(.1f);
-
 		moveDirection.y = 40f;
 
 		yield return new WaitForSeconds(1f);
