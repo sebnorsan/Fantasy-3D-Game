@@ -450,7 +450,7 @@ public class PlayerController : NetworkBehaviour
 			SetCrouchHeight(crouchHeight);                // instant local
 			SetCrouchHeightRpc(crouchHeight);            // sync others
 		}
-		else if (Input.GetKeyUp(pInput.crouchKey) && !crouchSphere)
+		else if (Input.GetKeyUp(pInput.crouchKey))
 		{
 			if (playerOnTop != null)
 			{
