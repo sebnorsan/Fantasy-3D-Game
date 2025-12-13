@@ -37,9 +37,6 @@ public class PlayerController : NetworkBehaviour
 	[Range(0, 1)] public float coyoteTimeDuration = 0.2f;
 	public float maxFallSpeed = -15f;
 
-	[Header("Ground Tuning")]
-	[SerializeField] private float groundedExitRadius = 0.28f; // slightly bigger than checkRadius
-
 	[Header("CrouchCheck")]
 	public Transform headCheck;
 	public float headCheckRadius = 0.3f;
@@ -261,8 +258,7 @@ public class PlayerController : NetworkBehaviour
 	{
 		if (isFlying) return;
 
-		float r = resetVertical ? groundedExitRadius : checkRadius; // resetVertical == "was grounded"
-		isGrounded = Physics.CheckSphere(groundCheck.position, r, pRef.groundLayerMask);
+		isGrounded = Physics.CheckSphere(groundCheck.position, checkRadius, pRef.groundLayerMask);
 
 		if (!isGrounded)
 		{
