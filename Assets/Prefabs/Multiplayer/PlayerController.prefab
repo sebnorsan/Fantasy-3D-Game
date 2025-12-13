@@ -311,7 +311,7 @@ GameObject:
   - component: {fileID: 5680381780153879692}
   - component: {fileID: 791981249248097800}
   - component: {fileID: 8852818881560722363}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Phone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6330,7 +6330,7 @@ GameObject:
   - component: {fileID: 6202063267719436907}
   - component: {fileID: 6949127173999524446}
   - component: {fileID: 443915241078141219}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: FMB_Retro Phone_01.016
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23767,10 +23767,10 @@ MonoBehaviour:
   bowNetCode: {fileID: 515831196404787215}
   groundLayerMask:
     serializedVersion: 2
-    m_Bits: 10432
+    m_Bits: 11456
   headLayerMask:
     serializedVersion: 2
-    m_Bits: 2240
+    m_Bits: 3264
 --- !u!114 &5742270511285517812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24060,7 +24060,7 @@ GameObject:
   - component: {fileID: 8787105480496917344}
   - component: {fileID: 4100376081774451292}
   - component: {fileID: 4483610884457526228}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: FMB_Retro Phone_01.015
   m_TagString: Untagged
   m_Icon: {fileID: 0}
