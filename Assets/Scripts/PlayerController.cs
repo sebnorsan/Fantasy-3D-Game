@@ -23,6 +23,8 @@ public class PlayerController : NetworkBehaviour
 	[Range(0.5f, 10)] public float lookSpeed = 2.0f;
 	[Range(10, 120)] public float lookXLimit = 80.0f;
 
+	[Range(0, 50)] public float superJumpSpeed = 30f;
+
 	[Header("Advanced")]
 	[SerializeField] private float runningFOV = 65.0f;
 	[SerializeField] private float fovTransitionSpeed = 4.0f;
@@ -485,6 +487,10 @@ public class PlayerController : NetworkBehaviour
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
 	private void RequestLaunchPlayerRpc(ulong targetNetworkObjectId)
 	{
+		pRef.cameraShaker.ShakeOnce(8f, 3f, .1f, .4f);
+
+		PlayMovementSound("CrouchSend", .9f, 1.1f);
+
 		if (NetworkManager.Singleton == null) return;
 
 		if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects
@@ -512,6 +518,9 @@ public class PlayerController : NetworkBehaviour
 	{
 		float savedRadius = checkRadius;
 
+		PlayMovementSound("CrouchRecieve", .9f, 1.1f);
+		pRef.cameraShaker.ShakeOnce(10f, 1f, .1f ,1f);
+
 		checkRadius = 0;
 		footstepStopPending = false;
 		pRef.playerAnimator.A_Jump();
@@ -522,7 +531,7 @@ public class PlayerController : NetworkBehaviour
 
 		yield return null;
 
-		moveDirection.y = 40f;
+		moveDirection.y = superJumpSpeed;
 
 		yield return new WaitForSeconds(1f);
 		checkRadius = savedRadius;
