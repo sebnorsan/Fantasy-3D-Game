@@ -457,6 +457,9 @@ public class PlayerController : NetworkBehaviour
 			if (playerOnTop != null)
 			{
 				RequestLaunchPlayerRpc(playerOnTop.NetworkObjectId);
+
+				pRef.cameraShaker.ShakeOnce(8f, 3f, .1f, .4f);
+				PlayMovementSound("CrouchSend", .9f, 1.1f);
 			}
 
 			if (!crouchSphere)
@@ -487,10 +490,6 @@ public class PlayerController : NetworkBehaviour
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
 	private void RequestLaunchPlayerRpc(ulong targetNetworkObjectId)
 	{
-		pRef.cameraShaker.ShakeOnce(8f, 3f, .1f, .4f);
-
-		PlayMovementSound("CrouchSend", .9f, 1.1f);
-
 		if (NetworkManager.Singleton == null) return;
 
 		if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects
@@ -525,7 +524,7 @@ public class PlayerController : NetworkBehaviour
 		footstepStopPending = false;
 		pRef.playerAnimator.A_Jump();
 
-		Vector3 posToAdd = new Vector3(0, 1, 0);
+		Vector3 posToAdd = new Vector3(0, 2, 0);
 
 		EventManager.instance.TeleportPlayer(this, transform.position + posToAdd);
 
