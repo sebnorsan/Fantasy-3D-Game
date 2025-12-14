@@ -56,5 +56,32 @@ MonoBehaviour:
       spatialBlend: 0
       minDistance: 0
       maxDistance: 500
+      randomPitch: 0
+      minPitch: 0.9
+      maxPitch: 1.1
+      subtitlesEnabled: 0
+      subtitles: []
+    - audioName: CrouchSend
+      loop: 0
+      audioToPlay: {fileID: 8300000, guid: 7ee0e76dc361a6948b7bf35c178e3d5a, type: 3}
+      audioVolume: 1
+      spatialBlend: 0
+      minDistance: 0
+      maxDistance: 500
+      randomPitch: 0
+      minPitch: 0.9
+      maxPitch: 1.1
+      subtitlesEnabled: 0
+      subtitles: []
+    - audioName: CrouchRecieve
+      loop: 0
+      audioToPlay: {fileID: 8300000, guid: ef4f107286b39da469bbcda86a6a2d3e, type: 3}
+      audioVolume: 1
+      spatialBlend: 0
+      minDistance: 0
+      maxDistance: 500
+      randomPitch: 0
+      minPitch: 0.9
+      maxPitch: 1.1
       subtitlesEnabled: 0
       subtitles: []
