@@ -5676,7 +5676,6 @@ GameObject:
   - component: {fileID: 5685961037242288458}
   - component: {fileID: 1227791032311695380}
   - component: {fileID: 6413132569534683115}
-  - component: {fileID: 6784330846622331597}
   - component: {fileID: 1117162942100770194}
   m_Layer: 0
   m_Name: Bow
@@ -5766,92 +5765,6 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
---- !u!114 &6784330846622331597
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778696884442115976}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0838dcb6db1022f41ae76534348c2360, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  audios:
-  - audioName: BowStretch
-    loop: 0
-    audioToPlay: {fileID: 8300000, guid: 78b00e6e3b9c6e84c8ca99b228c596ef, type: 3}
-    audioVolume: 1
-    spatialBlend: 0
-    minDistance: 1
-    maxDistance: 500
-    randomPitch: 0
-    minPitch: 0.9
-    maxPitch: 1.1
-    subtitlesEnabled: 0
-    subtitles: []
-  - audioName: ArrowOn
-    loop: 0
-    audioToPlay: {fileID: 8300000, guid: f08d0ec4aad1a8d4a86109db372d90a4, type: 3}
-    audioVolume: 1
-    spatialBlend: 0
-    minDistance: 1
-    maxDistance: 500
-    randomPitch: 0
-    minPitch: 0.9
-    maxPitch: 1.1
-    subtitlesEnabled: 0
-    subtitles: []
-  - audioName: Shoot
-    loop: 0
-    audioToPlay: {fileID: 8300000, guid: 177cd423f775e3549a3ae368ae4290f0, type: 3}
-    audioVolume: 1
-    spatialBlend: 0
-    minDistance: 1
-    maxDistance: 500
-    randomPitch: 1
-    minPitch: 0.9
-    maxPitch: 1.1
-    subtitlesEnabled: 0
-    subtitles: []
-  audiosServer:
-  - audioName: BowStretch
-    loop: 0
-    audioToPlay: {fileID: 8300000, guid: 78b00e6e3b9c6e84c8ca99b228c596ef, type: 3}
-    audioVolume: 1
-    spatialBlend: 1
-    minDistance: 1
-    maxDistance: 40
-    randomPitch: 1
-    minPitch: 0.9
-    maxPitch: 1.1
-    subtitlesEnabled: 0
-    subtitles: []
-  - audioName: ArrowOn
-    loop: 0
-    audioToPlay: {fileID: 8300000, guid: f08d0ec4aad1a8d4a86109db372d90a4, type: 3}
-    audioVolume: 1
-    spatialBlend: 1
-    minDistance: 1
-    maxDistance: 20
-    randomPitch: 1
-    minPitch: 0.9
-    maxPitch: 1.1
-    subtitlesEnabled: 0
-    subtitles: []
-  - audioName: Shoot
-    loop: 0
-    audioToPlay: {fileID: 8300000, guid: 177cd423f775e3549a3ae368ae4290f0, type: 3}
-    audioVolume: 1
-    spatialBlend: 1
-    minDistance: 1
-    maxDistance: 80
-    randomPitch: 1
-    minPitch: 0.9
-    maxPitch: 1.1
-    subtitlesEnabled: 0
-    subtitles: []
 --- !u!114 &1117162942100770194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22928,43 +22841,79 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audios:
-  - audioName: 
+  - audioName: BowStretch
     loop: 0
     audioToPlay: {fileID: 8300000, guid: 78b00e6e3b9c6e84c8ca99b228c596ef, type: 3}
-    audioVolume: 0
+    audioVolume: 1
     spatialBlend: 0
-    minDistance: 0
-    maxDistance: 0
+    minDistance: 1
+    maxDistance: 500
     randomPitch: 0
-    minPitch: 0
-    maxPitch: 0
+    minPitch: 0.9
+    maxPitch: 1.1
     subtitlesEnabled: 0
     subtitles: []
-  - audioName: 
+  - audioName: ArrowOn
     loop: 0
     audioToPlay: {fileID: 8300000, guid: f08d0ec4aad1a8d4a86109db372d90a4, type: 3}
-    audioVolume: 0
+    audioVolume: 1
     spatialBlend: 0
-    minDistance: 0
-    maxDistance: 0
+    minDistance: 1
+    maxDistance: 500
     randomPitch: 0
-    minPitch: 0
-    maxPitch: 0
+    minPitch: 0.9
+    maxPitch: 1.1
     subtitlesEnabled: 0
     subtitles: []
-  - audioName: 
+  - audioName: Shoot
     loop: 0
     audioToPlay: {fileID: 8300000, guid: 177cd423f775e3549a3ae368ae4290f0, type: 3}
-    audioVolume: 0
+    audioVolume: 1
     spatialBlend: 0
-    minDistance: 0
-    maxDistance: 0
-    randomPitch: 0
-    minPitch: 0
-    maxPitch: 0
+    minDistance: 1
+    maxDistance: 500
+    randomPitch: 1
+    minPitch: 0.9
+    maxPitch: 1.1
     subtitlesEnabled: 0
     subtitles: []
-  audiosServer: []
+  audiosServer:
+  - audioName: BowStretch
+    loop: 0
+    audioToPlay: {fileID: 8300000, guid: 78b00e6e3b9c6e84c8ca99b228c596ef, type: 3}
+    audioVolume: 1
+    spatialBlend: 1
+    minDistance: 1
+    maxDistance: 40
+    randomPitch: 1
+    minPitch: 0.9
+    maxPitch: 1.1
+    subtitlesEnabled: 0
+    subtitles: []
+  - audioName: ArrowOn
+    loop: 0
+    audioToPlay: {fileID: 8300000, guid: f08d0ec4aad1a8d4a86109db372d90a4, type: 3}
+    audioVolume: 1
+    spatialBlend: 1
+    minDistance: 1
+    maxDistance: 20
+    randomPitch: 1
+    minPitch: 0.9
+    maxPitch: 1.1
+    subtitlesEnabled: 0
+    subtitles: []
+  - audioName: Shoot
+    loop: 0
+    audioToPlay: {fileID: 8300000, guid: 177cd423f775e3549a3ae368ae4290f0, type: 3}
+    audioVolume: 1
+    spatialBlend: 1
+    minDistance: 1
+    maxDistance: 80
+    randomPitch: 1
+    minPitch: 0.9
+    maxPitch: 1.1
+    subtitlesEnabled: 0
+    subtitles: []
 --- !u!114 &1580953526540048981
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23592,7 +23541,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2771618475
+  GlobalObjectIdHash: 222003529
   InScenePlacedSourceGlobalObjectIdHash: 2771618475
   DeferredDespawnTick: 0
   Ownership: 1
