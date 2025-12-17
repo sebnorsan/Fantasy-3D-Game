@@ -10,10 +10,8 @@ public class NetHelper : NetworkBehaviour
 		int id = GetPrefabId(go);
 		if (id < 0) return;
 
-		ulong origin = NetworkManager.Singleton.LocalClientId;
-
 		InstantiateObjectFunction(id, pos, rot, destroyAfter);
-		InstantiateObjectServerRpc(id, pos, rot, destroyAfter, origin);
+		InstantiateObjectServerRpc(id, pos, rot, destroyAfter);
 	}
 
 	private int GetPrefabId(GameObject go)
@@ -27,17 +25,14 @@ public class NetHelper : NetworkBehaviour
 	}
 
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-	private void InstantiateObjectServerRpc(int id, Vector3 pos, Quaternion rot, float destroyAfter, ulong originClientId)
+	private void InstantiateObjectServerRpc(int id, Vector3 pos, Quaternion rot, float destroyAfter = 0f)
 	{
-		InstantiateObjectClientRpc(id, pos, rot, destroyAfter, originClientId);
+		InstantiateObjectClientRpc(id, pos, rot, destroyAfter);
 	}
 
-	[Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Server)]
-	private void InstantiateObjectClientRpc(int id, Vector3 pos, Quaternion rot, float destroyAfter, ulong originClientId)
+	[Rpc(SendTo.NotOwner, InvokePermission = RpcInvokePermission.Server)]
+	private void InstantiateObjectClientRpc(int id, Vector3 pos, Quaternion rot, float destroyAfter = 0f)
 	{
-		if (NetworkManager.Singleton.LocalClientId == originClientId)
-			return; // already did predicted spawn locally
-
 		InstantiateObjectFunction(id, pos, rot, destroyAfter);
 	}
 
