@@ -22862,7 +22862,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8995315640763831669}
   - component: {fileID: 7790377399799966768}
-  - component: {fileID: 5992513773659047312}
   - component: {fileID: 1580953526540048981}
   - component: {fileID: 1675141792546304797}
   m_Layer: 0
@@ -22915,56 +22914,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &5992513773659047312
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6461153865382936948}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0838dcb6db1022f41ae76534348c2360, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  audios:
-  - audioName: 
-    loop: 0
-    audioToPlay: {fileID: 8300000, guid: 78b00e6e3b9c6e84c8ca99b228c596ef, type: 3}
-    audioVolume: 0
-    spatialBlend: 0
-    minDistance: 0
-    maxDistance: 0
-    randomPitch: 0
-    minPitch: 0
-    maxPitch: 0
-    subtitlesEnabled: 0
-    subtitles: []
-  - audioName: 
-    loop: 0
-    audioToPlay: {fileID: 8300000, guid: f08d0ec4aad1a8d4a86109db372d90a4, type: 3}
-    audioVolume: 0
-    spatialBlend: 0
-    minDistance: 0
-    maxDistance: 0
-    randomPitch: 0
-    minPitch: 0
-    maxPitch: 0
-    subtitlesEnabled: 0
-    subtitles: []
-  - audioName: 
-    loop: 0
-    audioToPlay: {fileID: 8300000, guid: 177cd423f775e3549a3ae368ae4290f0, type: 3}
-    audioVolume: 0
-    spatialBlend: 0
-    minDistance: 0
-    maxDistance: 0
-    randomPitch: 0
-    minPitch: 0
-    maxPitch: 0
-    subtitlesEnabled: 0
-    subtitles: []
-  audiosServer: []
 --- !u!114 &1580953526540048981
 MonoBehaviour:
   m_ObjectHideFlags: 0
