@@ -2,29 +2,66 @@ using System;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UI;
 
 public class OptionsManager : MonoBehaviour
 {
 	public static OptionsManager instance;
 
+	[Header("Tabs")]
+	[SerializeField] private GameObject gameSettingsPanel;   // contains sens/FOV/run etc.
+	[SerializeField] private GameObject videoSettingsPanel;  // your video UI
+	[SerializeField] private GameObject audioSettingsPanel;  // your audio UI
+	
+	[Space(5)]
+
+	[SerializeField] private Button gameTabButton;
+	[SerializeField] private Button videoTabButton;
+	[SerializeField] private Button audioTabButton;
+
+	[Space(5)]
+
+	[SerializeField] private AudioMixer masterMixer; // All three groups live in this one mixer asset
+	[SerializeField] private AudioMixer musicMixer;  // Music subgroup
+	[SerializeField] private AudioMixer sfxMixer;    // SFX subgroup
+
 	#region OptionVariables
+
 	[Space(10)]
+
 	public float sensitivity = 2f;
 	public float minSensitivity = 0;
 	public float maxSensitivity = 5;
+
 	[Space(5)]
+
 	public float fov = 90;
 	public float minFov = 50;
 	public float maxFov = 120;
+
 	[Space(5)]
+
 	public bool toggleRun = false;
+
+	[Space(5)]
+
+	public float masterVol = 1f;
+	public float musicVol = 1f;
+	public float sfxVol = 1f;
+
+	[Space(5)]
+
 	#endregion
 
 	#region OptionVariablesKeys
 	private string K_sensitivity = "sens";
 	private string K_fov = "fov";
 	private string K_toggleRun = "tglrun";
+
+	private string K_masterVol = "mastervolume";
+	private string K_musicVol = "musicvolume";
+	private string K_sfxVol = "sfxvolume";
 	#endregion
 
 	#region OptionObjects
@@ -59,6 +96,7 @@ public class OptionsManager : MonoBehaviour
 		instance = this;
 
 		InitialApplies();  // always init UI + prefs, even in main menu
+		InitTabs();
 	}
 
 	private void Update()
@@ -78,6 +116,53 @@ public class OptionsManager : MonoBehaviour
 		}
 	}
 
+
+	#region Tabs
+	private void InitTabs()
+	{
+		// Button listeners
+		if (gameTabButton != null)
+			gameTabButton.onClick.AddListener(ShowGameTab);
+
+		if (videoTabButton != null)
+			videoTabButton.onClick.AddListener(ShowVideoTab);
+
+		if (audioTabButton != null)
+			audioTabButton.onClick.AddListener(ShowAudioTab);
+
+		// Default tab = Game
+		ShowGameTab();
+	}
+
+	private void ShowGameTab()
+	{
+		SetTabActive(gameSettingsPanel);
+	}
+
+	private void ShowVideoTab()
+	{
+		SetTabActive(videoSettingsPanel);
+	}
+
+	private void ShowAudioTab()
+	{
+		SetTabActive(audioSettingsPanel);
+	}
+
+	private void SetTabActive(GameObject active)
+	{
+		SetTabInactive();
+
+		if (active != null) active.SetActive(true);
+	}
+	private void SetTabInactive()
+	{
+		audioSettingsPanel.SetActive(false);
+		gameSettingsPanel.SetActive(false);
+		videoSettingsPanel.SetActive(false);
+	}
+	#endregion
+
 	// --------- OPTIONS INIT / APPLY ---------
 	#region InitialVariableApplies
 	private void InitialApplies()
@@ -91,6 +176,13 @@ public class OptionsManager : MonoBehaviour
 			OptionsPrefs.SetFloat(K_fov, fov);
 		if (!OptionsPrefs.Has(K_toggleRun))
 			OptionsPrefs.SetBool(K_toggleRun, toggleRun);
+
+		if (!OptionsPrefs.Has(K_masterVol))
+			OptionsPrefs.SetFloat(K_masterVol, masterVol);
+		if (!OptionsPrefs.Has(K_musicVol))
+			OptionsPrefs.SetFloat(K_musicVol, musicVol);
+		if (!OptionsPrefs.Has(K_sfxVol))
+			OptionsPrefs.SetFloat(K_sfxVol, sfxVol);
 
 		ApplyOptionValues();
 	}
@@ -140,8 +232,22 @@ public class OptionsManager : MonoBehaviour
 		fov = OptionsPrefs.GetFloat(K_fov);
 		toggleRun = OptionsPrefs.GetBool(K_toggleRun);
 
+		masterVol = OptionsPrefs.GetFloat(K_masterVol);
+		musicVol = OptionsPrefs.GetFloat(K_musicVol);
+		sfxVol = OptionsPrefs.GetFloat(K_sfxVol);
+
+		if (masterVol == 0 || musicVol == 0 || sfxVol == 0)
+		{
+			masterVol = 1f;
+			musicVol = 0f;
+			sfxVol = 0f;
+
+			//Summon sound settings panel, like in ultrakill
+		}
+
 		ApplyToPlayer();
 		ApplyVisualUpdates();
+		ApplyVolumes();
 	}
 
 	public void ApplyToPlayer()
@@ -157,6 +263,21 @@ public class OptionsManager : MonoBehaviour
 	private void ApplyFOV() => player.ChangeFieldOfView(fov);
 	private void ApplyRunToggle() => player.runToggle = toggleRun;
 	#endregion
+	#region Applies
+	void ApplyVolumes()
+	{
+		float musicEffT = masterVol * musicVol;
+		float sfxEffT = masterVol * sfxVol;
+
+		float masterDb = TtoDb(masterVol);
+		float musicDb = TtoDb(musicEffT);
+		float sfxDb = TtoDb(sfxEffT);
+
+		masterMixer.SetFloat("volume", masterDb);
+		musicMixer.SetFloat("volume", musicDb);
+		sfxMixer.SetFloat("volume", sfxDb);
+	}
+	#endregion
 
 	#region DynamicOptionFunctions
 	public void ChangeSensitivitySlider(float value)
@@ -164,7 +285,6 @@ public class OptionsManager : MonoBehaviour
 		OptionsPrefs.SetFloat(K_sensitivity, value);
 		ApplyOptionValues();
 	}
-
 	public void ChangeSensitivityInputField(string text)
 	{
 		if (!float.TryParse(text, out float value))
@@ -177,15 +297,12 @@ public class OptionsManager : MonoBehaviour
 		OptionsPrefs.SetFloat(K_sensitivity, CheckSensValue(value));
 		ApplyOptionValues();
 	}
-
 	private float CheckSensValue(float value) => Mathf.Clamp(value, minSensitivity, maxSensitivity);
-
 	public void ChangeFovSlider(float value)
 	{
 		OptionsPrefs.SetFloat(K_fov, value);
 		ApplyOptionValues();
 	}
-
 	public void ChangFovInputField(string text)
 	{
 		if (!float.TryParse(text, out float value))
@@ -198,13 +315,38 @@ public class OptionsManager : MonoBehaviour
 		OptionsPrefs.SetFloat(K_fov, CheckFovValue(value));
 		ApplyOptionValues();
 	}
-
 	private float CheckFovValue(float value) => Mathf.Clamp(value, minFov, maxFov);
-
 	public void ToggleRun(bool isOn)
 	{
 		OptionsPrefs.SetBool(K_toggleRun, isOn);
 		ApplyOptionValues();
+	}
+
+	private float SliderToT(float sliderValue) => Mathf.InverseLerp(-10f, 0f, sliderValue);
+	private float TtoDb(float t)
+	{
+		float curved = 1f - Mathf.Pow(1f - t, 4f);
+		return Mathf.Lerp(-80f, 0f, curved);
+	}
+	public void OnMasterSliderChanged(float sliderValue)
+	{
+		masterVol = SliderToT(sliderValue);
+		OptionsPrefs.SetFloat(K_masterVol, masterVol);
+		ApplyVolumes();
+	}
+
+	public void OnMusicSliderChanged(float sliderValue)
+	{
+		musicVol = SliderToT(sliderValue);
+		OptionsPrefs.SetFloat(K_musicVol, musicVol);
+		ApplyVolumes();
+	}
+
+	public void OnSfxSliderChanged(float sliderValue)
+	{
+		sfxVol = SliderToT(sliderValue);
+		OptionsPrefs.SetFloat(K_sfxVol, sfxVol);
+		ApplyVolumes();
 	}
 	#endregion
 

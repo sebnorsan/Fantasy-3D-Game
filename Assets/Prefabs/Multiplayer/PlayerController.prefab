@@ -22932,7 +22932,7 @@ MonoBehaviour:
     Layer: 0
     OriginatingState: 1007621405
     DestinationState: -1405782425
-    TransitionDuration: 0.05
+    TransitionDuration: 0
     TriggerNameHash: -1316629574
     TransitionIndex: 0
   m_Animator: {fileID: 7790377399799966768}
@@ -23541,7 +23541,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2771618475
+  GlobalObjectIdHash: 222003529
   InScenePlacedSourceGlobalObjectIdHash: 2771618475
   DeferredDespawnTick: 0
   Ownership: 1

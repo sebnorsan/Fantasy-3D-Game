@@ -58,6 +58,8 @@ public class MainMenuManager : MonoBehaviour
 	private bool isRefreshing;
 	private bool isJoining;
 
+	private GameObject lastActivePanel;
+
 	private void Awake()
 	{
 		hostButton.onClick.AddListener(OpenHostPanel);
@@ -122,17 +124,40 @@ public class MainMenuManager : MonoBehaviour
 	}
 	private void OpenOptionsPanel()
 	{
-		if (optionsPanel != null)
-			optionsPanel.SetActive(true);
+		if (optionsPanel == null)
+			return;
 
-		// hide other menu panels while in settings
+		// figure out what was open BEFORE we hide things
+		lastActivePanel = null;
+
+		if (topLevelPanel != null && topLevelPanel.activeSelf)
+			lastActivePanel = topLevelPanel;
+		else if (mainPanel != null && mainPanel.activeSelf)
+			lastActivePanel = mainPanel;
+		else if (hostPanel != null && hostPanel.activeSelf)
+			lastActivePanel = hostPanel;
+		else if (browserPanel != null && browserPanel.activeSelf)
+			lastActivePanel = browserPanel;
+		else if (passwordPanel != null && passwordPanel.activeSelf)
+			lastActivePanel = passwordPanel;
+		// if all are false, we're probably in the LobbyPanel (or something else),
+		// so lastActivePanel stays null -> we just won't touch panels on close.
+
+		// show options
+		optionsPanel.SetActive(true);
+
+		// hide menu panels while in settings
 		if (topLevelPanel != null)
 			topLevelPanel.SetActive(false);
 
-		mainPanel.SetActive(false);
-		hostPanel.SetActive(false);
-		browserPanel.SetActive(false);
-		passwordPanel.SetActive(false);
+		if (mainPanel != null)
+			mainPanel.SetActive(false);
+		if (hostPanel != null)
+			hostPanel.SetActive(false);
+		if (browserPanel != null)
+			browserPanel.SetActive(false);
+		if (passwordPanel != null)
+			passwordPanel.SetActive(false);
 	}
 
 	private void CloseOptionsPanel()
@@ -140,8 +165,13 @@ public class MainMenuManager : MonoBehaviour
 		if (optionsPanel != null)
 			optionsPanel.SetActive(false);
 
-		// back to main top-level (Single / Multi / Settings / Quit)
-		ShowTopLevelMenu();
+		// if we had a menu panel open before, restore it
+		if (lastActivePanel != null)
+		{
+			lastActivePanel.SetActive(true);
+		}
+		// else: we were probably in the lobby, or something outside these panels,
+		// so do nothing and just fall back to whatever was already visible.
 	}
 
 	public void BackToMain()

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Win32.SafeHandles;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.Android.Gradle;
 
 public class AudioManagement : MonoBehaviour
 {
@@ -69,6 +70,8 @@ public class AudioManagement : MonoBehaviour
 
 		if (randomizePitch)
 			RandomizePitchOnSound(src, min, max);
+		else if (data.randomPitch)
+			RandomizePitchOnSound(src, data.minPitch, data.maxPitch);
 		if (parentToGameObject != null)
 			go.transform.SetParent(parentToGameObject.transform);
 
