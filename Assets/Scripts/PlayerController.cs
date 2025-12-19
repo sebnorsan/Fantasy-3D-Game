@@ -367,7 +367,7 @@ public class PlayerController : NetworkBehaviour
 
 		float verticalSpeed = moveDirection.y;
 
-		Vector3 horizontalMove = desiredMove * (baseSpeed + flySpeedToUse) + knockbackVelocity;
+		Vector3 horizontalMove = desiredMove * pRef.playerMultipliers.GetSpeedMulti(baseSpeed + flySpeedToUse) + knockbackVelocity;
 		moveDirection = new Vector3(horizontalMove.x, verticalSpeed, horizontalMove.z);
 
 		if (pRef.playerCharacterController.enabled)
@@ -415,7 +415,7 @@ public class PlayerController : NetworkBehaviour
 			if (coyoteActive)
 				StopCoyote();
 
-			moveDirection.y = jumpSpeed;
+			moveDirection.y = pRef.playerMultipliers.GetJumpMulti(jumpSpeed);
 
 			PlayMovementSound("Slide", .65f, 1.35f);
 
