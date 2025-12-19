@@ -1,10 +1,6 @@
 using TMPro;
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
-using Microsoft.Win32.SafeHandles;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.Android.Gradle;
 
 public class AudioManagement : MonoBehaviour
 {
