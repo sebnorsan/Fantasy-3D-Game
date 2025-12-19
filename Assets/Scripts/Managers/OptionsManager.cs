@@ -46,9 +46,9 @@ public class OptionsManager : MonoBehaviour
 
 	[Space(5)]
 
-	public float masterVol = 1f;
-	public float musicVol = 1f;
-	public float sfxVol = 1f;
+	public float masterVol = 0f;
+	public float musicVol = -10f;
+	public float sfxVol = -10f;
 
 	[Space(5)]
 
@@ -69,13 +69,30 @@ public class OptionsManager : MonoBehaviour
 	[Header("Sensitivity")]
 	[SerializeField] private Slider sens_slider;
 	[SerializeField] private TMP_InputField sens_inputField;
+
 	[Space(4)]
 	[Header("Field of View")]
 	[SerializeField] private Slider fov_slider;
 	[SerializeField] private TMP_InputField fov_inputField;
+
 	[Space(4)]
 	[Header("Toggle run")]
 	[SerializeField] private Toggle run_toggle;
+
+	[Space(10)]
+	[Header("Audio - Master")]
+	[SerializeField] private Slider master_slider;
+	[SerializeField] private TMP_InputField master_inputField;
+
+	[Space(4)]
+	[Header("Audio - Music")]
+	[SerializeField] private Slider music_slider;
+	[SerializeField] private TMP_InputField music_inputField;
+
+	[Space(4)]
+	[Header("Audio - SFX")]
+	[SerializeField] private Slider sfx_slider;
+	[SerializeField] private TMP_InputField sfx_inputField;
 	#endregion
 
 	private PlayerController player;
@@ -94,15 +111,20 @@ public class OptionsManager : MonoBehaviour
 			return;
 		}
 		instance = this;
-
-		InitialApplies();  // always init UI + prefs, even in main menu
+	}
+	private void Start()
+	{
+		InitialApplies();
 		InitTabs();
+	}
+	public void ReSetupAudioUI()
+	{
+		SetMinMaxValues();
+		ApplyOptionValues();
 	}
 
 	private void Update()
 	{
-		// In menu scenes without NGO, just skip the player lookup,
-		// but the UI + prefs still work.
 		if (NetworkManager.Singleton == null) return;
 
 		if (player == null)
@@ -157,9 +179,12 @@ public class OptionsManager : MonoBehaviour
 	}
 	private void SetTabInactive()
 	{
-		audioSettingsPanel.SetActive(false);
-		gameSettingsPanel.SetActive(false);
-		videoSettingsPanel.SetActive(false);
+		if (audioSettingsPanel != null)
+			audioSettingsPanel.SetActive(false);
+		if (gameSettingsPanel != null)
+			gameSettingsPanel.SetActive(false);
+		if (videoSettingsPanel != null)
+			videoSettingsPanel.SetActive(false);
 	}
 	#endregion
 
@@ -201,6 +226,21 @@ public class OptionsManager : MonoBehaviour
 
 		if (run_toggle != null)
 			run_toggle.onValueChanged.AddListener(ToggleRun);
+
+		if (master_slider != null)
+			master_slider.onValueChanged.AddListener(OnMasterSliderChanged);
+		if (master_inputField != null)
+			master_inputField.onEndEdit.AddListener(ChangeMasterInputField);
+
+		if (music_slider != null)
+			music_slider.onValueChanged.AddListener(OnMusicSliderChanged);
+		if (music_inputField != null)
+			music_inputField.onEndEdit.AddListener(ChangeMusicInputField);
+
+		if (sfx_slider != null)
+			sfx_slider.onValueChanged.AddListener(OnSfxSliderChanged);
+		if (sfx_inputField != null)
+			sfx_inputField.onEndEdit.AddListener(ChangeSfxInputField);
 	}
 
 	private void SetMinMaxValues()
@@ -216,13 +256,28 @@ public class OptionsManager : MonoBehaviour
 			fov_slider.minValue = minFov;
 			fov_slider.maxValue = maxFov;
 		}
+
+		if (master_slider != null)
+		{
+			master_slider.minValue = -10f;
+			master_slider.maxValue = 0f;
+		}
+		if (music_slider != null)
+		{
+			music_slider.minValue = -10f;
+			music_slider.maxValue = 0f;
+		}
+		if (sfx_slider != null)
+		{
+			sfx_slider.minValue = -10f;
+			sfx_slider.maxValue = 0f;
+		}
 	}
 	#endregion
 
 	#region PlayerApplies
 	private void PlayerObjectFound()
 	{
-		// player just appeared (game scene) -> apply current prefs to them
 		ApplyToPlayer();
 	}
 
@@ -232,18 +287,9 @@ public class OptionsManager : MonoBehaviour
 		fov = OptionsPrefs.GetFloat(K_fov);
 		toggleRun = OptionsPrefs.GetBool(K_toggleRun);
 
-		masterVol = OptionsPrefs.GetFloat(K_masterVol);
-		musicVol = OptionsPrefs.GetFloat(K_musicVol);
-		sfxVol = OptionsPrefs.GetFloat(K_sfxVol);
-
-		if (masterVol == 0 || musicVol == 0 || sfxVol == 0)
-		{
-			masterVol = 1f;
-			musicVol = 0f;
-			sfxVol = 0f;
-
-			//Summon sound settings panel, like in ultrakill
-		}
+		masterVol = OptionsPrefs.GetFloat(K_masterVol, 0f);
+		musicVol = OptionsPrefs.GetFloat(K_musicVol, -10f);
+		sfxVol = OptionsPrefs.GetFloat(K_sfxVol, -10f);
 
 		ApplyToPlayer();
 		ApplyVisualUpdates();
@@ -266,10 +312,14 @@ public class OptionsManager : MonoBehaviour
 	#region Applies
 	void ApplyVolumes()
 	{
-		float musicEffT = masterVol * musicVol;
-		float sfxEffT = masterVol * sfxVol;
+		float masterT = DbLikeToT(masterVol);
+		float musicT = DbLikeToT(musicVol);
+		float sfxT = DbLikeToT(sfxVol);
 
-		float masterDb = TtoDb(masterVol);
+		float musicEffT = masterT * musicT;
+		float sfxEffT = masterT * sfxT;
+
+		float masterDb = TtoDb(masterT);
 		float musicDb = TtoDb(musicEffT);
 		float sfxDb = TtoDb(sfxEffT);
 
@@ -277,6 +327,7 @@ public class OptionsManager : MonoBehaviour
 		musicMixer.SetFloat("volume", musicDb);
 		sfxMixer.SetFloat("volume", sfxDb);
 	}
+
 	#endregion
 
 	#region DynamicOptionFunctions
@@ -322,7 +373,6 @@ public class OptionsManager : MonoBehaviour
 		ApplyOptionValues();
 	}
 
-	private float SliderToT(float sliderValue) => Mathf.InverseLerp(-10f, 0f, sliderValue);
 	private float TtoDb(float t)
 	{
 		float curved = 1f - Mathf.Pow(1f - t, 4f);
@@ -330,24 +380,89 @@ public class OptionsManager : MonoBehaviour
 	}
 	public void OnMasterSliderChanged(float sliderValue)
 	{
-		masterVol = SliderToT(sliderValue);
+		masterVol = ClampDbLike(sliderValue);
 		OptionsPrefs.SetFloat(K_masterVol, masterVol);
+		MasterVolumeVisual();
 		ApplyVolumes();
 	}
 
 	public void OnMusicSliderChanged(float sliderValue)
 	{
-		musicVol = SliderToT(sliderValue);
+		musicVol = ClampDbLike(sliderValue);
 		OptionsPrefs.SetFloat(K_musicVol, musicVol);
+		MusicVolumeVisual();
 		ApplyVolumes();
 	}
 
 	public void OnSfxSliderChanged(float sliderValue)
 	{
-		sfxVol = SliderToT(sliderValue);
+		sfxVol = ClampDbLike(sliderValue);
 		OptionsPrefs.SetFloat(K_sfxVol, sfxVol);
+		SfxVolumeVisual();
 		ApplyVolumes();
 	}
+
+	public void ChangeMasterInputField(string text)
+	{
+		if (!float.TryParse(text, out float percent))
+		{
+			MasterVolumeVisual();
+			return;
+		}
+
+		percent = Mathf.Clamp(percent, 0f, 100f);
+
+		masterVol = PercentToDbLike(percent);          // <- REAL value -10..0
+		OptionsPrefs.SetFloat(K_masterVol, masterVol);
+
+		if (master_slider != null)
+			master_slider.SetValueWithoutNotify(masterVol);
+
+		MasterVolumeVisual();
+		ApplyVolumes();
+	}
+
+	public void ChangeMusicInputField(string text)
+	{
+		if (!float.TryParse(text, out float percent))
+		{
+			MusicVolumeVisual();
+			return;
+		}
+
+		percent = Mathf.Clamp(percent, 0f, 100f);
+
+		musicVol = PercentToDbLike(percent);     // -10..0
+		OptionsPrefs.SetFloat(K_musicVol, musicVol);
+
+		if (music_slider != null)
+			music_slider.SetValueWithoutNotify(musicVol);
+
+		MusicVolumeVisual();
+		ApplyVolumes();
+	}
+
+	public void ChangeSfxInputField(string text)
+	{
+		if (!float.TryParse(text, out float percent))
+		{
+			SfxVolumeVisual();
+			return;
+		}
+
+		percent = Mathf.Clamp(percent, 0f, 100f);
+
+		sfxVol = PercentToDbLike(percent);       // -10..0
+		OptionsPrefs.SetFloat(K_sfxVol, sfxVol);
+
+		if (sfx_slider != null)
+			sfx_slider.SetValueWithoutNotify(sfxVol);
+
+		SfxVolumeVisual();
+		ApplyVolumes();
+	}
+
+
 	#endregion
 
 	#region VisualUpdates
@@ -356,6 +471,10 @@ public class OptionsManager : MonoBehaviour
 		SensitivityVisual();
 		FovVisual();
 		ToggleRunVisual();
+
+		MasterVolumeVisual();
+		MusicVolumeVisual();
+		SfxVolumeVisual();
 	}
 
 	private void SensitivityVisual()
@@ -379,6 +498,44 @@ public class OptionsManager : MonoBehaviour
 		if (run_toggle != null)
 			run_toggle.SetIsOnWithoutNotify(toggleRun);
 	}
+
+	private float ClampDbLike(float v) => Mathf.Clamp(v, -10f, 0f);
+	private float DbLikeToT(float dbLike) => Mathf.InverseLerp(-10f, 0f, dbLike);
+	private float DbLikeToPercent(float dbLike) => DbLikeToT(dbLike) * 100f;
+	private float PercentToDbLike(float percent) => Mathf.Lerp(-10f, 0f, Mathf.Clamp01(percent / 100f));
+	private void MasterVolumeVisual()
+	{
+		if (master_slider != null)
+			master_slider.SetValueWithoutNotify(masterVol);
+
+		if (master_inputField != null)
+			master_inputField.SetTextWithoutNotify(
+				Mathf.RoundToInt(DbLikeToPercent(masterVol)).ToString()
+			);
+	}
+
+	private void MusicVolumeVisual()
+	{
+		if (music_slider != null)
+			music_slider.SetValueWithoutNotify(musicVol);
+
+		if (music_inputField != null)
+			music_inputField.SetTextWithoutNotify(
+				Mathf.RoundToInt(DbLikeToPercent(musicVol)).ToString()
+			);
+	}
+
+	private void SfxVolumeVisual()
+	{
+		if (sfx_slider != null)
+			sfx_slider.SetValueWithoutNotify(sfxVol);
+
+		if (sfx_inputField != null)
+			sfx_inputField.SetTextWithoutNotify(
+				Mathf.RoundToInt(DbLikeToPercent(sfxVol)).ToString()
+			);
+	}
+
 	#endregion
 }
 

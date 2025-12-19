@@ -7,12 +7,12 @@ public class BowNetCode : NetworkBehaviour
 	[SerializeField] private GameObject arrowPrefab;
 
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-	public void SpawnArrowVisualServerRpc(Vector3 pos, Quaternion rot, Vector3 dir, int dmg, float spd, float size, ulong shooterClientId, ArrowEffect[] arrowEffects)
+	public void SpawnArrowVisualServerRpc(Vector3 pos, Quaternion rot, Vector3 dir, float dmg, float spd, float size, ulong shooterClientId, ArrowEffect[] arrowEffects)
 	{
 		SpawnArrowVisualClientRpc(pos, rot, dir, dmg, spd, size, shooterClientId, arrowEffects);
 	}
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	public void SpawnArrowVisualClientRpc(Vector3 pos, Quaternion rot, Vector3 dir, int dmg, float spd, float size, ulong shooterClientId, ArrowEffect[] arrowEffects)
+	public void SpawnArrowVisualClientRpc(Vector3 pos, Quaternion rot, Vector3 dir, float dmg, float spd, float size, ulong shooterClientId, ArrowEffect[] arrowEffects)
 	{
 		if (NetworkManager.Singleton.LocalClientId == shooterClientId) return;
 
@@ -22,7 +22,7 @@ public class BowNetCode : NetworkBehaviour
 		arrow.Initialize(dmg, spd, size, dir, shooterPos: Vector3.zero, shooterClientId, false, arrowEffects);
 	}
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-	public void HitServerRpc(ulong targetNetId, int amount, Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
+	public void HitServerRpc(ulong targetNetId, float amount, Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
 	{
 		var target = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetNetId];
 

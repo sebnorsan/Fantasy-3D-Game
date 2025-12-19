@@ -155,12 +155,15 @@ public class PlayerController : NetworkBehaviour
 
 	private void Start()
 	{
+		if (IsOwner)
+		{
+			Cursor.lockState = CursorLockMode.Locked;
+			Cursor.visible = false;
+		}
+
 		initialFOV = pRef.playerCam.fieldOfView;
 		runningFovMultiplier = runningFOV / initialFOV;
 		footsteps = GetComponent<Footsteps>();
-
-		Cursor.lockState = CursorLockMode.Locked;
-		Cursor.visible = false;
 
 		initialCrouchHeight = pRef.playerCharacterController.height;
 
@@ -241,21 +244,26 @@ public class PlayerController : NetworkBehaviour
 	}
 	private void HandleLookingAround()
 	{
-		if (Cursor.lockState == CursorLockMode.Locked && canMove)
+		if (canMove)
 		{
-			float mouseY = -Input.GetAxis("Mouse Y");
-			float mouseX = Input.GetAxis("Mouse X");
+			if (Cursor.lockState == CursorLockMode.Locked)
+			{
+				float mouseY = -Input.GetAxis("Mouse Y");
+				float mouseX = Input.GetAxis("Mouse X");
 
-			rotationX += mouseY * lookSpeed;
-			rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
-			playerCamera.localRotation = Quaternion.Euler(rotationX, 0, 0);
-			transform.Rotate(0, mouseX * lookSpeed, 0);
+				rotationX += mouseY * lookSpeed;
+				rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+				playerCamera.localRotation = Quaternion.Euler(rotationX, 0, 0);
+				transform.Rotate(0, mouseX * lookSpeed, 0);
+			}
 
 			if (isRunning && isMoving)
 				pRef.playerCam.fieldOfView = Mathf.Lerp(pRef.playerCam.fieldOfView, runningFOV, fovTransitionSpeed * Time.deltaTime);
 			else
 				pRef.playerCam.fieldOfView = Mathf.Lerp(pRef.playerCam.fieldOfView, initialFOV, fovTransitionSpeed * Time.deltaTime);
 		}
+		else
+			pRef.playerCam.fieldOfView = Mathf.Lerp(pRef.playerCam.fieldOfView, initialFOV, fovTransitionSpeed * Time.deltaTime);
 	}
 	private void HandleGrounded()
 	{

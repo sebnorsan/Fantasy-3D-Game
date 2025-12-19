@@ -11,7 +11,7 @@ using UnityEngine;
 public class Arrow : MonoBehaviour
 {
 	[Header("Damage & Effects")]
-	public int arrowDamage = 1;
+	public float arrowDamage = 1;
 	public ArrowEffect[] arrowEffects;
 
 	[Header("Flight Settings")]
@@ -44,7 +44,7 @@ public class Arrow : MonoBehaviour
 	}
 
 	public void Initialize(
-		int damage,
+		float damage,
 		float speed,
 		float size,
 		Vector3 shootDir,

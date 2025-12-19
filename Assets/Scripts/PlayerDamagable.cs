@@ -3,16 +3,17 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
-using EZCameraShake;
-using System.Linq;
 
 public class PlayerDamagable : NetworkBehaviour, IDamagable
 {
 	[SerializeField] private PlayerReferences pRef;
 
 	[Space(15)]
-	public int maxHealth = 100;
-	[SerializeField] private int currentHealth = 100;
+	public float maxHealth = 100;
+	[SerializeField] private float currentHealth = 100;
+
+	private float baseMaxHealth = 100;
+	private float baseCurrentHealth = 100;
 
 	[Space(15)]
 	[SerializeField] private float deathTime;
@@ -63,19 +64,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 		displayedHealth = currentHealth;
 
-		// existing multiplayer slider init
-		if (healthSlider != null)
-		{
-			healthSlider.maxValue = maxHealth;
-			healthSlider.value = currentHealth;
-		}
-
-		// local HUD slider init (owner only)
-		if (IsOwner && localHealthSlider != null)
-		{
-			localHealthSlider.maxValue = maxHealth;
-			localHealthSlider.value = currentHealth;
-		}
+		SetHealthBar();
 	}
 
 	private void Update()
@@ -97,13 +86,47 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		if (IsOwner && localHealthSlider != null)
 			localHealthSlider.value = displayedHealth;
 	}
+	private float GetCurrentHealth()
+	{
+		float newCurrHealth = pRef.playerMultipliers.GetHealthMulti(baseCurrentHealth);
 
+		if (newCurrHealth < currentHealth)
+			return Mathf.Min(currentHealth, GetMaxHealth());
+		else
+			return newCurrHealth;
+	}
+	private float GetMaxHealth() => pRef.playerMultipliers.GetHealthMulti(baseMaxHealth);
+	public void SetHealthMultiplier()
+	{
+		maxHealth = GetMaxHealth();
+		currentHealth = GetCurrentHealth();
+
+		SetHealthBar();
+
+		CheckForDeathServerRpc();
+	}
+	private void SetHealthBar()
+	{
+		// existing multiplayer slider init
+		if (healthSlider != null)
+		{
+			healthSlider.maxValue = maxHealth;
+			healthSlider.value = currentHealth;
+		}
+
+		// local HUD slider init (owner only)
+		if (IsOwner && localHealthSlider != null)
+		{
+			localHealthSlider.maxValue = maxHealth;
+			localHealthSlider.value = currentHealth;
+		}
+	}
 	public void KillPlayer()
 	{
 		TakeDamage(currentHealth, transform.position, null);
 	}
 
-	public void TakeDamage(int amount, Vector3 hitPoint, ArrowEffect[] arrowEffects)
+	public void TakeDamage(float amount, Vector3 hitPoint, ArrowEffect[] arrowEffects)
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
@@ -124,16 +147,24 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 			ApplyKnockbackOwnerRpc(dir * knockbackStrength);
 		}
 
+		CheckForDeath();
+	}
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+	private void CheckForDeathServerRpc()
+	{
+		CheckForDeath();
+	}
+	private void CheckForDeath()
+	{
 		if (currentHealth <= 0)
 			DieServer();
 	}
-
 	public void SetLastHitBy(ulong shooterClientId)
 	{
 		lastHitByClientId = shooterClientId;
 	}
 
-	public void Heal(int amount)
+	public void Heal(float amount)
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
@@ -231,7 +262,7 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	}
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void UpdateHealthClientRpc(int newHealth)
+	private void UpdateHealthClientRpc(float newHealth)
 	{
 		currentHealth = newHealth;
 	}

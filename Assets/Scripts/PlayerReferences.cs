@@ -12,6 +12,7 @@ public class PlayerReferences : NetworkBehaviour
     public CharacterController playerCharacterController;
 	public Camera playerCam;
 	public PlayerPvP playerPvP;
+	public PlayerMultipliers playerMultipliers;
 
 	[Space(10)]
 	public Transform crouchCamPoint;

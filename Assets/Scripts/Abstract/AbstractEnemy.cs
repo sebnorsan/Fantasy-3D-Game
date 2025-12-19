@@ -18,10 +18,10 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 	private EnemyTarget targetScript;
 
 	[Header("Enemy Stats")]
-	[SerializeField] private int maxHealth = 100;
-	private int currentHealth = 0;
+	[SerializeField] private float maxHealth = 100;
+	private float currentHealth = 0;
 
-	private NetworkVariable<int> syncedHealth = new NetworkVariable<int>(
+	private NetworkVariable<float> syncedHealth = new NetworkVariable<float>(
 	writePerm: NetworkVariableWritePermission.Server);
 
 	private bool locallyPredictedDead;
@@ -72,7 +72,7 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 		syncedHealth.OnValueChanged -= OnHealthChanged;
 	}
 
-	private void OnHealthChanged(int previous, int current)
+	private void OnHealthChanged(float previous, float current)
 	{
 		currentHealth = current;
 	}
@@ -307,13 +307,13 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 
 	// ------------- IDamagable --------------
 
-	public void TakeDamage(int amount, Vector3 hitPoint, ArrowEffect[] arrowEffects)
+	public void TakeDamage(float amount, Vector3 hitPoint, ArrowEffect[] arrowEffects)
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
 		//currentHealth = Mathf.Max(0, currentHealth - amount);
 
-		int newHealth = Mathf.Max(0, syncedHealth.Value - amount);
+		float newHealth = Mathf.Max(0, syncedHealth.Value - amount);
 		syncedHealth.Value = newHealth;
 
 		DamageEffectsClientRpc(hitPoint, lastHitByClientId);
@@ -322,7 +322,7 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 			DieServer();
 	}
 
-	public void Heal(int amount)
+	public void Heal(float amount)
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
@@ -396,13 +396,13 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 	}
 
 	// called by the shooter client right when their arrow hits
-	public void LocalPredictedDamage(int amount, Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
+	public void LocalPredictedDamage(float amount, Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
 	{
 		if (!IsClient) return;
 		if (NetworkManager.Singleton.LocalClientId != shooterClientId) return;
 		if (locallyPredictedDead) return;
 
-		int newHealth = Mathf.Max(0, currentHealth - amount);
+		float newHealth = Mathf.Max(0, currentHealth - amount);
 		currentHealth = newHealth;
 
 		// instant local VFX
@@ -442,6 +442,6 @@ public abstract class AbstractEnemy : NetworkBehaviour, IDamagable
 
 public interface IDamagable
 {
-	public void TakeDamage(int amount, Vector3 hitPoint, ArrowEffect[] arrowEffects);
-	public void Heal(int amount);
+	public void TakeDamage(float amount, Vector3 hitPoint, ArrowEffect[] arrowEffects);
+	public void Heal(float amount);
 }

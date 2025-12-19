@@ -6,7 +6,7 @@ public class BowScript : MonoBehaviour
 	[SerializeField] private PlayerReferences pRef;
 	[SerializeField] private PlayerInputs pInput;
 
-	public int arrowDamage = 1;
+	public float arrowDamage = 1;
 	public float arrowSpeed = 30f;
 
 	public float arrowDrawSpeed = 1f;
@@ -96,14 +96,16 @@ public class BowScript : MonoBehaviour
 		// Aim direction from the owner's camera
 		Vector3 shootDir = pRef.playerCam.transform.forward;
 
-		SpawnArrow(arrowFired, arrowTransform.position, arrowTransform.rotation, shootDir, arrowDamage, arrowSpeed, arrowSize);
+		float dmgToUse = pRef.playerMultipliers.GetDamageMulti(arrowDamage);
+
+		SpawnArrow(arrowFired, arrowTransform.position, arrowTransform.rotation, shootDir, dmgToUse, arrowSpeed, arrowSize);
 	}
 	private void SpawnArrow(
 	GameObject go,
 	Vector3 pos,
 	Quaternion rot,
 	Vector3 shootDir,
-	int dmg,
+	float dmg,
 	float spd,
 	float size)
 	{

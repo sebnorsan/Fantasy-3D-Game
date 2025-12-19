@@ -60,7 +60,7 @@ public class MainMenuManager : MonoBehaviour
 
 	private GameObject lastActivePanel;
 
-	private void Awake()
+	private void Start()
 	{
 		hostButton.onClick.AddListener(OpenHostPanel);
 		joinButton.onClick.AddListener(OpenBrowserPanel);
@@ -127,7 +127,12 @@ public class MainMenuManager : MonoBehaviour
 		if (optionsPanel == null)
 			return;
 
-		// figure out what was open BEFORE we hide things
+		if (optionsPanel.activeSelf)
+			return;
+
+		if (openOptionsButton != null) openOptionsButton.interactable = false;
+		if (topSettingsButton != null) topSettingsButton.interactable = false;
+
 		lastActivePanel = null;
 
 		if (topLevelPanel != null && topLevelPanel.activeSelf)
@@ -140,24 +145,14 @@ public class MainMenuManager : MonoBehaviour
 			lastActivePanel = browserPanel;
 		else if (passwordPanel != null && passwordPanel.activeSelf)
 			lastActivePanel = passwordPanel;
-		// if all are false, we're probably in the LobbyPanel (or something else),
-		// so lastActivePanel stays null -> we just won't touch panels on close.
 
-		// show options
 		optionsPanel.SetActive(true);
 
-		// hide menu panels while in settings
-		if (topLevelPanel != null)
-			topLevelPanel.SetActive(false);
-
-		if (mainPanel != null)
-			mainPanel.SetActive(false);
-		if (hostPanel != null)
-			hostPanel.SetActive(false);
-		if (browserPanel != null)
-			browserPanel.SetActive(false);
-		if (passwordPanel != null)
-			passwordPanel.SetActive(false);
+		if (topLevelPanel != null) topLevelPanel.SetActive(false);
+		if (mainPanel != null) mainPanel.SetActive(false);
+		if (hostPanel != null) hostPanel.SetActive(false);
+		if (browserPanel != null) browserPanel.SetActive(false);
+		if (passwordPanel != null) passwordPanel.SetActive(false);
 	}
 
 	private void CloseOptionsPanel()
@@ -165,14 +160,15 @@ public class MainMenuManager : MonoBehaviour
 		if (optionsPanel != null)
 			optionsPanel.SetActive(false);
 
-		// if we had a menu panel open before, restore it
+		if (openOptionsButton != null) openOptionsButton.interactable = true;
+		if (topSettingsButton != null) topSettingsButton.interactable = true;
+
 		if (lastActivePanel != null)
-		{
 			lastActivePanel.SetActive(true);
-		}
-		// else: we were probably in the lobby, or something outside these panels,
-		// so do nothing and just fall back to whatever was already visible.
+		else
+			ShowTopLevelMenu();
 	}
+
 
 	public void BackToMain()
 	{
