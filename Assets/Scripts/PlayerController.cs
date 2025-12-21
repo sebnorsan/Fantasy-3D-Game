@@ -156,10 +156,8 @@ public class PlayerController : NetworkBehaviour
 	private void Start()
 	{
 		if (IsOwner)
-		{
 			Cursor.lockState = CursorLockMode.Locked;
-			Cursor.visible = false;
-		}
+		Cursor.visible = false;
 
 		initialFOV = pRef.playerCam.fieldOfView;
 		runningFovMultiplier = runningFOV / initialFOV;

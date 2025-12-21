@@ -165,7 +165,7 @@ public class Arrow : MonoBehaviour
 			player.PlayPredictedHitFeedback(hitPoint, arrowEffects);
 		}
 
-		if (go.TryGetComponent<AbstractEnemy>(out var enemy))
+		if (go.TryGetComponent<AbstractEnemyDamagable>(out var enemy))
 		{
 			enemy.LocalPredictedDamage(arrowDamage, hitPoint, shooterClientId, arrowEffects);
 		}

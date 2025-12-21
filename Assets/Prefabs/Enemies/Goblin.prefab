@@ -103,6 +103,7 @@ GameObject:
   - component: {fileID: 2343002635592316809}
   - component: {fileID: 8661901004868796739}
   - component: {fileID: 4245414219368997270}
+  - component: {fileID: 7669670211180847998}
   m_Layer: 0
   m_Name: Eyes
   m_TagString: Untagged
@@ -204,6 +205,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7669670211180847998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1993421306231187859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a6667acf0536fd4ab8b288acc90246f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Blink
+  anim: {fileID: 4245414219368997270}
 --- !u!1 &3070977239302808498
 GameObject:
   m_ObjectHideFlags: 0
@@ -220,12 +234,15 @@ GameObject:
   - component: {fileID: 8630723966367710834}
   - component: {fileID: -5819705572486460096}
   - component: {fileID: 2437505393328859429}
-  - component: {fileID: 6665354131383936063}
   - component: {fileID: 1277491528084641670}
   - component: {fileID: 920353816357705695}
-  - component: {fileID: 8097084765042306960}
-  - component: {fileID: 7276308973786988445}
-  - component: {fileID: 5390605844405255136}
+  - component: {fileID: 7088274710624416125}
+  - component: {fileID: 6665354131383936063}
+  - component: {fileID: 6417466505740927892}
+  - component: {fileID: 2309492620002421278}
+  - component: {fileID: 1788526774317990989}
+  - component: {fileID: 5015275027837258405}
+  - component: {fileID: 5817319669080395596}
   m_Layer: 11
   m_Name: Goblin
   m_TagString: Untagged
@@ -247,6 +264,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7256944004361502440}
+  - {fileID: 554870033918973275}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7287968445112079893
@@ -354,7 +372,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2482919236
+  GlobalObjectIdHash: 2745228606
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -413,32 +431,6 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &6665354131383936063
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3070977239302808498}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d512ff26db1d89f4282cd8a3d7ab004f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
-  lod_anim: {fileID: 7276308973786988445}
-  agent: {fileID: 7065662842040489496}
-  anim: {fileID: 440903288752805972}
-  maxHealth: 5
-  damage: 1
-  attackDelay: 3
-  xpDrop: 1
-  speed: 3.5
-  hitParticles: {fileID: 5024009746357069194, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
-  deathParticles: {fileID: 3548588485384254792, guid: 7fb0f6e51e8cdbe4e99603aa917a2d53, type: 3}
-  knockbackForce: 30
-  knockbackDuration: 0.2
-  attackTurnSpeed: 10
 --- !u!114 &1277491528084641670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -479,7 +471,7 @@ MonoBehaviour:
     TriggerNameHash: 1080829965
     TransitionIndex: 1
   m_Animator: {fileID: 440903288752805972}
---- !u!114 &8097084765042306960
+--- !u!114 &7088274710624416125
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -488,11 +480,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 3070977239302808498}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a6667acf0536fd4ab8b288acc90246f, type: 3}
+  m_Script: {fileID: 11500000, guid: 2b0bd3e1cdd8dc54fb88aef0187c9154, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Blink
-  anim: {fileID: 4245414219368997270}
---- !u!114 &7276308973786988445
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyReferences
+  enemy: {fileID: 6665354131383936063}
+  enemyAttack: {fileID: 6417466505740927892}
+  enemyDamagable: {fileID: 2309492620002421278}
+  enemyNavigation: {fileID: 1788526774317990989}
+  enemyAnimator: {fileID: 5015275027837258405}
+  enemyTarget: {fileID: 0}
+--- !u!114 &6665354131383936063
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -501,17 +498,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 3070977239302808498}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a82c8d3cdf041349be4642ee20911ee, type: 3}
+  m_Script: {fileID: 11500000, guid: d512ff26db1d89f4282cd8a3d7ab004f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimatorLOD
-  blinkAnimator: {fileID: 4245414219368997270}
-  enemyAnimator: {fileID: 440903288752805972}
-  spawnAnimationTime: 1.5
-  nearDist: 25
-  midDist: 75
-  farDist: 150
-  framesPerUpdate: 1
---- !u!114 &5390605844405255136
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  eRef: {fileID: 7088274710624416125}
+  lod_anim: {fileID: 6789067440576598229}
+  xpDrop: 1
+--- !u!114 &6417466505740927892
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -520,21 +514,79 @@ MonoBehaviour:
   m_GameObject: {fileID: 3070977239302808498}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df5470103c259e74690352ab559e8d5b, type: 3}
+  m_Script: {fileID: 11500000, guid: e2305dbf6a2eb554eb0b08b6708448b3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: '::'
-  renderers:
-  - {fileID: 6215152226707891547}
-  - {fileID: 4371237967362697861}
-  - {fileID: 8661901004868796739}
-  animatorLOD: {fileID: 7276308973786988445}
-  extraAnimators:
-  - {fileID: 4245414219368997270}
-  - {fileID: 440903288752805972}
-  extraClientLogic:
-  - {fileID: 8097084765042306960}
-  - {fileID: 920353816357705695}
-  - {fileID: 1277491528084641670}
+  m_EditorClassIdentifier: Assembly-CSharp::SimpleEnemyAttack
+  ShowTopMostFoldoutHeaderGroup: 1
+  eRef: {fileID: 7088274710624416125}
+  damage: 1
+  attackDelay: 3
+  attackTurnSpeed: 10
+--- !u!114 &2309492620002421278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3070977239302808498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c9d78f592c535f41b41d1bf13f313cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SimpleEnemyDamagable
+  ShowTopMostFoldoutHeaderGroup: 1
+  dmgFeedback: {fileID: 5817319669080395596}
+  deathParticles: {fileID: 3548588485384254794, guid: 7fb0f6e51e8cdbe4e99603aa917a2d53, type: 3}
+  maxHealth: 5
+  eRef: {fileID: 7088274710624416125}
+--- !u!114 &1788526774317990989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3070977239302808498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd8e746a00cd8634185ff09f9c42840e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SimpleEnemyNavigation
+  ShowTopMostFoldoutHeaderGroup: 1
+  eRef: {fileID: 7088274710624416125}
+  agent: {fileID: 7065662842040489496}
+  speed: 3.5
+  knockbackForce: 15
+  knockbackDuration: 0.6
+--- !u!114 &5015275027837258405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3070977239302808498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd3db9a03bb76a948a9471b2e4f63733, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
+  eRef: {fileID: 7088274710624416125}
+  anim: {fileID: 440903288752805972}
+--- !u!114 &5817319669080395596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3070977239302808498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1db198c719ba8574496fdee6ad011fab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageFeedback
+  hitParticle: {fileID: 5024009746357069192, guid: ec3f674830402cc45bce805cf6493db7, type: 3}
+  bigHitParticle: {fileID: 5024009746357069192, guid: 924af94442fdddd469b8f564bf1f980b, type: 3}
+  flashDuration: 0.1
+  flashMaterial: {fileID: 2100000, guid: 1cbe87e2f738d164b9dd99a5c2f5e8fe, type: 2}
 --- !u!1 &4429469026348770911
 GameObject:
   m_ObjectHideFlags: 0
@@ -626,3 +678,79 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &8338707685864320836
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 554870033918973275}
+  - component: {fileID: 6789067440576598229}
+  - component: {fileID: 400154082143239777}
+  m_Layer: 11
+  m_Name: Culling
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &554870033918973275
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8338707685864320836}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8864574165799043315}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6789067440576598229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8338707685864320836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a82c8d3cdf041349be4642ee20911ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimatorLOD
+  blinkAnimator: {fileID: 4245414219368997270}
+  enemyAnimator: {fileID: 440903288752805972}
+  spawnAnimationTime: 1.5
+  nearDist: 25
+  midDist: 75
+  farDist: 150
+  framesPerUpdate: 1
+--- !u!114 &400154082143239777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8338707685864320836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df5470103c259e74690352ab559e8d5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  renderers:
+  - {fileID: 6215152226707891547}
+  - {fileID: 4371237967362697861}
+  - {fileID: 8661901004868796739}
+  animatorLOD: {fileID: 6789067440576598229}
+  extraAnimators:
+  - {fileID: 4245414219368997270}
+  - {fileID: 440903288752805972}
+  extraClientLogic:
+  - {fileID: 0}
+  - {fileID: 920353816357705695}
+  - {fileID: 1277491528084641670}

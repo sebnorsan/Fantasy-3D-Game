@@ -170,7 +170,7 @@ public class EnemyTarget : NetworkBehaviour
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
-		if (other.TryGetComponent(out AbstractEnemy enemy))
+		if (other.TryGetComponent(out AbstractEnemyAttack enemy))
 			enemy.StartAttack(); // AI / animation; damage still server-only
 	}
 
@@ -178,7 +178,7 @@ public class EnemyTarget : NetworkBehaviour
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
-		if (other.TryGetComponent(out AbstractEnemy enemy))
+		if (other.TryGetComponent(out AbstractEnemyAttack enemy))
 			enemy.StopAttack();
 	}
 

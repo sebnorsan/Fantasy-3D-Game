@@ -16,7 +16,7 @@ public class Explosion : MonoBehaviour
         }
 
         // Find all enemies inside the sphere
-        List<AbstractEnemy> enemies = FindEnemiesInSphere();
+        List<AbstractEnemyDamagable> enemies = FindEnemiesInSphere();
 
         foreach (var enemy in enemies)
         {
@@ -24,14 +24,14 @@ public class Explosion : MonoBehaviour
         }
     }
 
-    private List<AbstractEnemy> FindEnemiesInSphere()
+    private List<AbstractEnemyDamagable> FindEnemiesInSphere()
     {
-        List<AbstractEnemy> results = new List<AbstractEnemy>();
+        List<AbstractEnemyDamagable> results = new List<AbstractEnemyDamagable>();
 
         Collider[] hits = Physics.OverlapSphere(transform.position, sphere.radius * transform.localScale.x);
         foreach (var hit in hits)
         {
-            if (hit.TryGetComponent(out AbstractEnemy enemy))
+            if (hit.TryGetComponent(out AbstractEnemyDamagable enemy))
             {
                 results.Add(enemy);
             }

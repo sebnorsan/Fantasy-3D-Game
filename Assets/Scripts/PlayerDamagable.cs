@@ -3,26 +3,16 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using static Steamworks.InventoryItem;
+using UnityEngine.Rendering;
 
-public class PlayerDamagable : NetworkBehaviour, IDamagable
+public class PlayerDamagable : AbstractDamagable
 {
 	[SerializeField] private PlayerReferences pRef;
 
 	[Space(15)]
-	public float maxHealth = 100;
-	[SerializeField] private float currentHealth = 100;
-
-	private float baseMaxHealth = 100;
-	private float baseCurrentHealth = 100;
-
-	[Space(15)]
 	[SerializeField] private float deathTime;
 	[SerializeField] private GameObject deathCam;
-
-	[Space(15)]
-	[SerializeField] private ParticleSystem deathParticles;
-	[SerializeField] private ParticleSystem hitParticles;
-	[SerializeField] private ParticleSystem hitHardParticles;
 
 	[Space(15)]
 	[Header("Health UI (world / multiplayer)")]
@@ -38,29 +28,16 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	private float displayedHealth;
 
-	private Coroutine currFlashCoroutine;
-
-	private Material flashMaterial;
-	private float flashDuration = .1f;
-
-	private ulong lastHitByClientId = ulong.MaxValue;
-
 	private Vector3 deathPosition = new Vector3(9999, 9999, 9999);
 
-	private ArrowEffect[] currentAppliedEffects;
-
-	public override void OnNetworkSpawn()
+	protected override void NetworkSpawn()
 	{
-		// local HUD: only the owning client should see/use this slider
 		if (!IsOwner && localHealthSlider != null)
 			localHealthSlider.gameObject.SetActive(false);
 	}
-
 	private void Start()
 	{
 		ScreenSummoner.SummonScreen(Color.black, 1f, false);
-
-		flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
 
 		displayedHealth = currentHealth;
 
@@ -125,20 +102,8 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	{
 		TakeDamage(currentHealth, transform.position, null);
 	}
-
-	public void TakeDamage(float amount, Vector3 hitPoint, ArrowEffect[] arrowEffects)
+	protected override void HandleKnockback(Vector3 hitPoint)
 	{
-		if (!NetworkManager.Singleton.IsServer) return;
-
-		ApplyCurrentEffects(arrowEffects);
-
-		currentHealth = Mathf.Max(0, currentHealth - amount);
-
-		UpdateHealthClientRpc(currentHealth);
-
-		// propagate to clients with hard-hit info
-		DamageEffectsClientRpc(hitPoint, lastHitByClientId, arrowEffects);
-
 		Vector3 dir = (transform.position - hitPoint);
 		dir.y = 0f;
 		if (dir.sqrMagnitude > 0.001f)
@@ -146,37 +111,20 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 			dir.Normalize();
 			ApplyKnockbackOwnerRpc(dir * knockbackStrength);
 		}
-
-		CheckForDeath();
 	}
-	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-	private void CheckForDeathServerRpc()
+	protected override float DamageSet(float amount)
 	{
-		CheckForDeath();
+		return Mathf.Max(0, currentHealth - amount);
 	}
-	private void CheckForDeath()
+	protected override float HealSet(float amount)
 	{
-		if (currentHealth <= 0)
-			DieServer();
-	}
-	public void SetLastHitBy(ulong shooterClientId)
-	{
-		lastHitByClientId = shooterClientId;
-	}
+		float healthHolder = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
 
-	public void Heal(float amount)
-	{
-		if (!NetworkManager.Singleton.IsServer) return;
-
-		if (currentHealth == maxHealth) return;
-		currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
-
-		UpdateHealthClientRpc(currentHealth);
-
-		if (currentHealth > 0)
+		if (healthHolder > 0)
 			SetAliveStateClientRpc();
-	}
 
+		return healthHolder;
+	}
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void SetAliveStateClientRpc()
 	{
@@ -187,84 +135,18 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	#region DamageEffects
 
-	public void PlayPredictedHitFeedback(Vector3 hitPoint, ArrowEffect[] arrowEffects)
+	protected override void OnDamageEffectsClient(Vector3 hitPoint, ulong shooterClientId, bool isShooter)
 	{
-		ApplyCurrentEffects(arrowEffects);
-
-		DamageEffects(hitPoint);
-	}
-
-	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void DamageEffectsClientRpc(Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
-	{
-		ApplyCurrentEffects(arrowEffects);
-
-		if (NetworkManager.Singleton.LocalClientId != shooterClientId)
-		{
-			DamageEffects(hitPoint);
-			pRef.playerAnimator.A_TakeDamage();
-		}
-
 		if (IsOwner)
 		{
 			OwnerPlayerShake();
 		}
 	}
 
-	public void DamageEffects(Vector3 hitPoint)
-	{
-		if (currFlashCoroutine == null)
-			currFlashCoroutine = StartCoroutine(OnFlashMaterial());
-
-		OnSpawnDamagePFX();
-		OnPlayDamageAnimation();
-	}
-
-	private void OnSpawnDamagePFX()
-	{
-		ParticleSystem pfxToPlay = HitParticlesToPlay();
-
-		var pfx = Instantiate(pfxToPlay, transform.position, Quaternion.identity);
-		Destroy(pfx, 5f);
-	}
-
-	private void OnPlayDamageAnimation()
+	protected override void OnPlayDamageAnimation()
 	{
 		if (pRef != null)
 			pRef.playerAnimator.A_TakeDamage();
-	}
-
-	private IEnumerator OnFlashMaterial()
-	{
-		if (flashMaterial == null)
-			flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
-
-		var allRenderers = GetComponentsInChildren<MeshRenderer>(includeInactive: true);
-
-		var affected = new List<(MeshRenderer renderer, Material[] originals)>(allRenderers.Length);
-		foreach (var rend in allRenderers)
-		{
-			affected.Add((rend, rend.materials));
-
-			var flashMats = new Material[rend.materials.Length];
-			for (int i = 0; i < flashMats.Length; i++)
-				flashMats[i] = flashMaterial;
-
-			rend.materials = flashMats;
-		}
-
-		yield return new WaitForSeconds(flashDuration);
-
-		foreach (var (renderer, originals) in affected)
-			renderer.materials = originals;
-
-		currFlashCoroutine = null;
-	}
-
-	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void UpdateHealthClientRpc(float newHealth)
-	{
-		currentHealth = newHealth;
 	}
 
 	#endregion
@@ -279,37 +161,30 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 
 	#endregion
 	#region Dying
-	private void DieServer()
+	protected override void DieServer()
 	{
-		//pfx
-		DieParticlesClientRpc();
-
-		// server-side state
 		SetDeadStateClientRpc();
-
-		// tell clients; only the dead player's client will actually spawn the cam
 		SpawnDeathCamClientRpc(lastHitByClientId);
 
-		StartCoroutine(DeathFlowServer()); // teleports + heal etc on server
+		StartCoroutine(DeathFlowServer());
 		pRef.playerController.canMove = false;
 
-		// --- PvP stats: add death to THIS player ---
+		AddDeathForPlayer();
+		AddKillForPlayer();
+	}
+	private void AddDeathForPlayer()
+	{
 		pRef.playerPvP?.AddDeathServerRpc();
-
-		// --- PvP stats: add kill to LAST SHOOTER, if valid ---
-		if (lastHitByClientId != ulong.MaxValue &&
-			NetworkManager.Singleton.ConnectedClients.TryGetValue(lastHitByClientId, out var killerCc))
+	}
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	protected override void DieParticlesClientRpc()
+	{
+		if (deathParticles != null)
 		{
-			var killerRefs = killerCc.PlayerObject.GetComponent<PlayerReferences>();
-			if (killerRefs != null && killerRefs.playerPvP != null)
-			{
-				killerRefs.playerPvP.AddKillServerRpc();
-
-				lastHitByClientId = ulong.MaxValue;
-			}
+			var pfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
+			Destroy(pfx, 5);
 		}
 	}
-
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void SpawnDeathCamClientRpc(ulong killerClientId)
 	{
@@ -353,34 +228,18 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void SetDeadStateClientRpc()
 	{
-		var pc = GetComponent<PlayerController>();
-		if (pc != null)
-			pc.canMove = false;
+		pRef.playerController.canMove = false;
 
 		if (IsOwner)
 		{
 			// e.g. show death screen, disable bow input, etc.
 		}
 	}
-
-	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void DieParticlesClientRpc()
-	{
-		if (deathParticles != null)
-		{
-			var pfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
-			Destroy(pfx, 5);
-		}
-
-	}
+	
 
 	#endregion
 
 	#region ArrowEffects
-	private void ApplyCurrentEffects(ArrowEffect[] arrowEffects)
-	{
-		currentAppliedEffects = arrowEffects;
-	}
 	private void OwnerPlayerShake()
 	{
 		if (currentAppliedEffects != null)
@@ -399,26 +258,5 @@ public class PlayerDamagable : NetworkBehaviour, IDamagable
 		// default shake
 		pRef.cameraShaker.ShakeOnce(7f, 3f, .1f, .4f);
 	}
-
-	private ParticleSystem HitParticlesToPlay()
-	{
-		if (currentAppliedEffects != null)
-		{
-			foreach (var effect in currentAppliedEffects)
-			{
-				switch (effect)
-				{
-					case ArrowEffect.BigHit:
-						return hitHardParticles;
-					default:
-						return hitParticles;
-				}
-			}
-		}
-
-		// no effects? default to normal hit
-		return hitParticles;
-	}
-
 	#endregion
 }

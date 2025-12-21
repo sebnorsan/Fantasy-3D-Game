@@ -26,17 +26,10 @@ public class BowNetCode : NetworkBehaviour
 	{
 		var target = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetNetId];
 
-		if (target.TryGetComponent<PlayerDamagable>(out var playerDmg))
+		if (target.TryGetComponent<AbstractDamagable>(out var dmg))
 		{
-			playerDmg.SetLastHitBy(shooterClientId);
-			playerDmg.TakeDamage(amount, hitPoint, arrowEffects);    // NEW overload
-		}
-
-		if (target.TryGetComponent<AbstractEnemy>(out var enemyDmg))
-		{
-			enemyDmg.SetLastHitBy(shooterClientId);
-			enemyDmg.TakeDamage(amount, hitPoint, arrowEffects);
+			dmg.SetLastHitBy(shooterClientId);
+			dmg.TakeDamage(amount, hitPoint, arrowEffects);
 		}
 	}
-
 }
