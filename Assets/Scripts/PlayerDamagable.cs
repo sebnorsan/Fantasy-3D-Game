@@ -131,6 +131,8 @@ public class PlayerDamagable : AbstractDamagable
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void SetAliveStateClientRpc()
 	{
+		locallyPredictedDead = false;
+
 		var pc = GetComponent<PlayerController>();
 		if (pc != null)
 			pc.canMove = true;
