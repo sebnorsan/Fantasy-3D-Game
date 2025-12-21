@@ -75,10 +75,7 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 		float newHealth = Mathf.Max(0, currentHealth - amount);
 
 		if (newHealth == 0)
-		{
-			locallyPredictedDead = true;
 			LocalPredictedDie();
-		}
 
 		if (IsServer) return;
 		
