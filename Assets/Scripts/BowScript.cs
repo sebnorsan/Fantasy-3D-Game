@@ -54,8 +54,13 @@ public class BowScript : MonoBehaviour
 
 		if (Input.GetKeyUp(pInput.shootKey)) ShootBow();
 
-		AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
-		anim.speed = stateInfo.IsName("bow_loadIn") ? arrowDrawSpeed : 1f;
+		AnimatorStateInfo bowStateInfo = anim.GetCurrentAnimatorStateInfo(0);
+
+		bool affectedByDrawSpeed = false;
+		if (bowStateInfo.IsName("bow_loadIn") || bowStateInfo.IsName("bow_loaded"))
+			affectedByDrawSpeed = true;
+
+		anim.speed = affectedByDrawSpeed ? pRef.playerMultipliers.GetAttackSpeedMulti(pRef.bowScript.arrowDrawSpeed) : 1f;
 	}
 
 	private void LoadBow()

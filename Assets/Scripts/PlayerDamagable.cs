@@ -30,6 +30,27 @@ public class PlayerDamagable : AbstractDamagable
 
 	private Vector3 deathPosition = new Vector3(9999, 9999, 9999);
 
+
+	public void SetHealthMultiplier()
+	{
+		maxHealth = GetMaxHealth();
+		currentHealth = GetCurrentHealth();
+
+		SetHealthBar();
+
+		CheckForDeathServerRpc();
+	}
+	private float GetCurrentHealth()
+	{
+		float newCurrHealth = pRef.playerMultipliers.GetHealthMulti(baseHealth);
+
+		if (newCurrHealth < currentHealth)
+			return Mathf.Min(currentHealth, GetMaxHealth());
+		else
+			return newCurrHealth;
+	}
+	private float GetMaxHealth() => pRef.playerMultipliers.GetHealthMulti(baseHealth);
+
 	protected override void NetworkSpawn()
 	{
 		if (!IsOwner && localHealthSlider != null)
@@ -63,25 +84,8 @@ public class PlayerDamagable : AbstractDamagable
 		if (IsOwner && localHealthSlider != null)
 			localHealthSlider.value = displayedHealth;
 	}
-	private float GetCurrentHealth()
-	{
-		float newCurrHealth = pRef.playerMultipliers.GetHealthMulti(baseCurrentHealth);
-
-		if (newCurrHealth < currentHealth)
-			return Mathf.Min(currentHealth, GetMaxHealth());
-		else
-			return newCurrHealth;
-	}
-	private float GetMaxHealth() => pRef.playerMultipliers.GetHealthMulti(baseMaxHealth);
-	public void SetHealthMultiplier()
-	{
-		maxHealth = GetMaxHealth();
-		currentHealth = GetCurrentHealth();
-
-		SetHealthBar();
-
-		CheckForDeathServerRpc();
-	}
+	
+	
 	private void SetHealthBar()
 	{
 		// existing multiplayer slider init

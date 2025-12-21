@@ -8,7 +8,7 @@ public class PlayerReferences : NetworkBehaviour
     public PlayerAnimator playerAnimator;
     public PlayerGraphicVisuals playerGraphics;
     public PlayerDamagable playerDamagable;
-	public EZCameraShake.CameraShaker cameraShaker;
+	public CameraShaker cameraShaker;
     public CharacterController playerCharacterController;
 	public Camera playerCam;
 	public PlayerPvP playerPvP;

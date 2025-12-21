@@ -243,6 +243,7 @@ GameObject:
   - component: {fileID: 1788526774317990989}
   - component: {fileID: 5015275027837258405}
   - component: {fileID: 5817319669080395596}
+  - component: {fileID: 4448349686517036069}
   m_Layer: 11
   m_Name: Goblin
   m_TagString: Untagged
@@ -587,6 +588,18 @@ MonoBehaviour:
   bigHitParticle: {fileID: 5024009746357069192, guid: 924af94442fdddd469b8f564bf1f980b, type: 3}
   flashDuration: 0.1
   flashMaterial: {fileID: 2100000, guid: 1cbe87e2f738d164b9dd99a5c2f5e8fe, type: 2}
+--- !u!114 &4448349686517036069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3070977239302808498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9ae46ee21b082345b7eaa7d4590d469, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
 --- !u!1 &4429469026348770911
 GameObject:
   m_ObjectHideFlags: 0

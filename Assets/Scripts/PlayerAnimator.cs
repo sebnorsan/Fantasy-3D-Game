@@ -26,7 +26,12 @@ public class PlayerAnimator : NetworkBehaviour
 		A_WalkingChecker();
 
 		AnimatorStateInfo bowStateInfo = multiplayerBowAnim.GetCurrentAnimatorStateInfo(0);
-		multiplayerBowAnim.speed = bowStateInfo.IsName("bow_loadIn") ? pRef.bowScript.arrowDrawSpeed : 1f;
+
+		bool affectedByDrawSpeed = false;
+		if (bowStateInfo.IsName("bow_loadIn") || bowStateInfo.IsName("bow_loaded"))
+			affectedByDrawSpeed = true;
+
+		multiplayerBowAnim.speed = affectedByDrawSpeed ? pRef.playerMultipliers.GetAttackSpeedMulti(pRef.bowScript.arrowDrawSpeed) : 1f;
 
 		AnimatorStateInfo charStateInfo = multiplayerCharacterAnim.GetCurrentAnimatorStateInfo(0);
 

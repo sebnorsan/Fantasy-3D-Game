@@ -31,17 +31,27 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 	private void Start()
 	{
 		if (!agent) agent = GetComponent<NavMeshAgent>();
-
-		originalSpeed = speed;
+		
 		originalAcceleration = agent.acceleration;
 
 		InitializeEnemy();
+	}
+	public void SetSpeedMultiplier()
+	{
+		if (currKnockbackCoroutine != null)
+		{
+			Invoke(nameof(SetSpeedMultiplier), .25f);
+			return;
+		}
+
+		originalSpeed = eRef.enemyMultipliers.GetSpeedMulti(speed);
+		agent.speed = eRef.enemyMultipliers.GetSpeedMulti(speed);
 	}
 	protected virtual void InitializeEnemy()
 	{
 		eRef.enemyAnimator.A_SetWalk(true);
 
-		agent.speed = speed;
+		SetSpeedMultiplier();
 
 		InitializeDestination();
 	}

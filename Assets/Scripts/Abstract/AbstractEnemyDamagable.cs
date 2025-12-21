@@ -7,6 +7,24 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 
 	[SerializeField] private EnemyReferences eRef;
 
+	public void SetHealthMultiplier()
+	{
+		maxHealth = GetMaxHealth();
+		currentHealth = GetCurrentHealth();
+
+		CheckForDeathServerRpc();
+	}
+	private float GetCurrentHealth()
+	{
+		float newCurrHealth = eRef.enemyMultipliers.GetHealthMulti(baseHealth);
+
+		if (newCurrHealth < currentHealth)
+			return Mathf.Min(currentHealth, GetMaxHealth());
+		else
+			return newCurrHealth;
+	}
+	private float GetMaxHealth() => eRef.enemyMultipliers.GetHealthMulti(baseHealth);
+
 	protected override void OnPlayDamageAnimation()
 	{
 		eRef.enemyAnimator.A_TakeDamage();

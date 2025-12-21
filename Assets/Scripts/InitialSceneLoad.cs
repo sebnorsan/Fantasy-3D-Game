@@ -11,7 +11,7 @@ public class InitialSceneLoad : MonoBehaviour
 
 	public bool directlyToGame;
 	public string directSceneToLoad = "PvP-Scene";
-
+	
 	private void Start()
 	{
 		if (directlyToGame)

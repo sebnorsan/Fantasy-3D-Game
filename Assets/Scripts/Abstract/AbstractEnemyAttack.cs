@@ -8,7 +8,7 @@ public abstract class AbstractEnemyAttack : NetworkBehaviour
 
 	[Space(5)]
 
-	[SerializeField] private int damage = 1;
+	[SerializeField] private float damage = 1;
 	[SerializeField] private float attackDelay = 3;
 
 	[SerializeField] private float attackTurnSpeed = 10f;
@@ -21,7 +21,7 @@ public abstract class AbstractEnemyAttack : NetworkBehaviour
 
 		if (eRef.enemyTarget == null) return;
 
-		eRef.enemyTarget.TakeDamage(damage);
+		eRef.enemyTarget.TakeDamage(eRef.enemyMultipliers.GetDamageMulti(damage));
 	}
 	/// <summary>
 	/// These are called from the EnemyTarget script itself,

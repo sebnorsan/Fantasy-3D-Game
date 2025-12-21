@@ -11,8 +11,8 @@ public class EnemyTarget : NetworkBehaviour
 	[SerializeField] private Animator anim;
 
 	[Header("Stats")]
-	[SerializeField] private int maxHealth = 1000;
-	private int currentHealth;
+	[SerializeField] private float maxHealth = 1000;
+	private float currentHealth;
 	[SerializeField] private float targetRadius = 10f;
 
 	[Header("UI")]
@@ -75,7 +75,7 @@ public class EnemyTarget : NetworkBehaviour
 	
 
 	// -------- DAMAGE & DEATH (SERVER AUTHORITATIVE) --------
-	public void TakeDamage(int dmg)
+	public void TakeDamage(float dmg)
 	{
 		if (!NetworkManager.Singleton.IsServer) return; // only server changes health
 
@@ -103,7 +103,7 @@ public class EnemyTarget : NetworkBehaviour
 	}
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void DamageEffectsClientRpc(int newHealth)
+	private void DamageEffectsClientRpc(float newHealth)
 	{
 		// sync health for UI lerp on all clients
 		currentHealth = newHealth;

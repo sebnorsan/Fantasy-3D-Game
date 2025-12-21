@@ -20,11 +20,14 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 	protected NetworkVariable<float> syncedHealth = new(
 	writePerm: NetworkVariableWritePermission.Server);
 
-	protected float baseMaxHealth = 100;
-	protected float baseCurrentHealth = 100;
+	protected float baseHealth = 100;
 
 	protected bool locallyPredictedDead;
 
+	private void Start()
+	{
+		baseHealth = maxHealth;
+	}
 	public override void OnNetworkSpawn()
 	{
 		base.OnNetworkSpawn();
