@@ -160,12 +160,7 @@ public class Arrow : MonoBehaviour
 
 		clientsHit.Add(targetNetId);
 
-		if (go.TryGetComponent<PlayerDamagable>(out var player))
-		{
-			player.PlayPredictedHitFeedback(hitPoint, arrowEffects);
-		}
-
-		if (go.TryGetComponent<AbstractEnemyDamagable>(out var enemy))
+		if (go.TryGetComponent<AbstractDamagable>(out var enemy))
 		{
 			enemy.LocalPredictedDamage(arrowDamage, hitPoint, shooterClientId, arrowEffects);
 		}

@@ -7,10 +7,6 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 
 	[SerializeField] private EnemyReferences eRef;
 
-	[Space(5)]
-
-	private bool locallyPredictedDead;
-
 	protected override void OnPlayDamageAnimation()
 	{
 		eRef.enemyAnimator.A_TakeDamage();
@@ -28,31 +24,10 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 	{
 		eRef.enemyNavigation.DoKnockback(hitPoint);
 	}
-	public void LocalPredictedDamage(float amount, Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
+	protected override void LocalPredictedDie()
 	{
-		if (!IsClient) return;
-		if (NetworkManager.Singleton.LocalClientId != shooterClientId) return;
-		if (locallyPredictedDead) return;
+		base.LocalPredictedDie();
 
-		float newHealth = Mathf.Max(0, currentHealth - amount);
-		currentHealth = newHealth;
-
-		// instant local VFX
-		DamageEffects(hitPoint);
-
-		if (newHealth == 0)
-		{
-			locallyPredictedDead = true;
-			LocalPredictedDie();
-		}
-	}
-
-	private void LocalPredictedDie()
-	{
-		// purely visual/client-side "death", no despawn
-		PlayDeathPfx();
-
-		// hide enemy on this client
 		foreach (var rend in GetComponentsInChildren<MeshRenderer>(includeInactive: true))
 			if (rend) rend.enabled = false;
 
@@ -85,7 +60,7 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 			PlayDeathPfx();
 		}
 	}
-	private void PlayDeathPfx()
+	protected override void PlayDeathPfx()
 	{
 		if (deathParticles != null)
 		{

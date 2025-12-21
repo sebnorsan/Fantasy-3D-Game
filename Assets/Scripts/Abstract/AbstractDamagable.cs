@@ -23,6 +23,8 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 	protected float baseMaxHealth = 100;
 	protected float baseCurrentHealth = 100;
 
+	protected bool locallyPredictedDead;
+
 	public override void OnNetworkSpawn()
 	{
 		base.OnNetworkSpawn();
@@ -66,11 +68,38 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 		ApplyCurrentEffects(arrowEffects);
 		DamageEffects(hitPoint);
 	}
+	public virtual void LocalPredictedDamage(float amount, Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
+	{
+		if (!IsClient) return;
+		if (NetworkManager.Singleton.LocalClientId != shooterClientId) return;
+		if (locallyPredictedDead) return;
 
+		float newHealth = Mathf.Max(0, currentHealth - amount);
+		currentHealth = newHealth;
+
+		// instant local VFX
+		DamageEffects(hitPoint);
+
+		if (newHealth == 0)
+		{
+			locallyPredictedDead = true;
+			LocalPredictedDie();
+		}
+	}
+	protected virtual void LocalPredictedDie()
+	{
+		PlayDeathPfx();
+	}
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	protected virtual void DieParticlesClientRpc()
+	{
+		PlayDeathPfx();
+	}
 	protected void BroadcastDamageEffects(Vector3 hitPoint, ArrowEffect[] arrowEffects)
 	{
 		DamageEffectsClientRpc(hitPoint, lastHitByClientId, arrowEffects);
 	}
+	protected abstract void PlayDeathPfx();
 
 	// default: skip shooter to prevent double VFX when doing prediction
 	protected virtual bool SkipClientEffectsForShooter => true;
@@ -162,6 +191,5 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 		else
 			Destroy(gameObject);
 	}
-	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	protected virtual void DieParticlesClientRpc() { }
+	
 }

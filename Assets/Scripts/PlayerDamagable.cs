@@ -176,8 +176,7 @@ public class PlayerDamagable : AbstractDamagable
 	{
 		pRef.playerPvP?.AddDeathServerRpc();
 	}
-	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	protected override void DieParticlesClientRpc()
+	protected override void PlayDeathPfx()
 	{
 		if (deathParticles != null)
 		{
