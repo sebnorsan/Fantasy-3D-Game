@@ -121,7 +121,10 @@ public class PlayerDamagable : AbstractDamagable
 		float healthHolder = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
 
 		if (healthHolder > 0)
+		{
+			locallyPredictedDead = false;
 			SetAliveStateClientRpc();
+		}
 
 		return healthHolder;
 	}
