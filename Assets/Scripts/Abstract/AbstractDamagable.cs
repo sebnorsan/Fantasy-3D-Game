@@ -78,16 +78,17 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 		ApplyCurrentEffects(arrowEffects);
 		DamageEffects(hitPoint);
 
-		if (IsServer) return;
-
 		float newHealth = Mathf.Max(0, currentHealth - amount);
-		currentHealth = newHealth;
 
 		if (newHealth == 0)
 		{
 			locallyPredictedDead = true;
 			LocalPredictedDie();
 		}
+
+		if (IsServer) return;
+		
+		currentHealth = newHealth;
 	}
 	protected virtual void LocalPredictedDie()
 	{
