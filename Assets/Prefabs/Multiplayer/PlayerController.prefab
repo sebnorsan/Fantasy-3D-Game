@@ -23444,6 +23444,7 @@ GameObject:
   - component: {fileID: 8675364865469383676}
   - component: {fileID: 7628524721557430775}
   - component: {fileID: 6574249655433990806}
+  - component: {fileID: 6234475594236647715}
   m_Layer: 3
   m_Name: PlayerController
   m_TagString: GameController
@@ -23622,14 +23623,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  pRef: {fileID: 930708363686757887}
+  dmgFeedback: {fileID: 0}
+  deathParticles: {fileID: 3548588485384254794, guid: 3a1bfe20f1684bc4ca15eb061cba3362, type: 3}
   maxHealth: 10
-  currentHealth: 10
+  pRef: {fileID: 930708363686757887}
   deathTime: 6
   deathCam: {fileID: 3697209131461708778, guid: ab6915eb62cd27142847f8cc4b7addc1, type: 3}
-  deathParticles: {fileID: 3548588485384254794, guid: 3a1bfe20f1684bc4ca15eb061cba3362, type: 3}
-  hitParticles: {fileID: 5024009746357069192, guid: 5540ed9c3d556b24d9f00eefefe68cc1, type: 3}
-  hitHardParticles: {fileID: 5024009746357069192, guid: 924af94442fdddd469b8f564bf1f980b, type: 3}
   healthSlider: {fileID: 2622446098186953589}
   sliderLerpSpeed: 10
   localHealthSlider: {fileID: 180058822542579069}
@@ -23996,6 +23995,22 @@ MonoBehaviour:
   healthMultiplier: 100
   speedMultiplier: 100
   jumpMultiplier: 100
+--- !u!114 &6234475594236647715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7758727492805073096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1db198c719ba8574496fdee6ad011fab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageFeedback
+  hitParticle: {fileID: 5024009746357069192, guid: 5540ed9c3d556b24d9f00eefefe68cc1, type: 3}
+  bigHitParticle: {fileID: 5024009746357069192, guid: 924af94442fdddd469b8f564bf1f980b, type: 3}
+  flashDuration: 0.1
+  flashMaterial: {fileID: 2100000, guid: 1cbe87e2f738d164b9dd99a5c2f5e8fe, type: 2}
 --- !u!1 &7973304527205840717
 GameObject:
   m_ObjectHideFlags: 0
