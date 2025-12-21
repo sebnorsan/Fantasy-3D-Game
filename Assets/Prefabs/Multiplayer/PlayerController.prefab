@@ -23623,7 +23623,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  dmgFeedback: {fileID: 0}
+  dmgFeedback: {fileID: 6234475594236647715}
   deathParticles: {fileID: 3548588485384254794, guid: 3a1bfe20f1684bc4ca15eb061cba3362, type: 3}
   maxHealth: 10
   pRef: {fileID: 930708363686757887}

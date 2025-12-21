@@ -63,22 +63,25 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 	}
 
 	// shooter client can call this locally to avoid waiting for rpc
-	public virtual void PlayPredictedHitFeedback(Vector3 hitPoint, ArrowEffect[] arrowEffects)
-	{
-		ApplyCurrentEffects(arrowEffects);
-		DamageEffects(hitPoint);
-	}
+	//public virtual void PlayPredictedHitFeedback(Vector3 hitPoint, ArrowEffect[] arrowEffects)
+	//{
+	//	ApplyCurrentEffects(arrowEffects);
+	//	DamageEffects(hitPoint);
+	//}
 	public virtual void LocalPredictedDamage(float amount, Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
 	{
 		if (!IsClient) return;
 		if (NetworkManager.Singleton.LocalClientId != shooterClientId) return;
 		if (locallyPredictedDead) return;
 
+		// instant local VFX
+		ApplyCurrentEffects(arrowEffects);
+		DamageEffects(hitPoint);
+
+		if (IsServer) return;
+
 		float newHealth = Mathf.Max(0, currentHealth - amount);
 		currentHealth = newHealth;
-
-		// instant local VFX
-		DamageEffects(hitPoint);
 
 		if (newHealth == 0)
 		{
