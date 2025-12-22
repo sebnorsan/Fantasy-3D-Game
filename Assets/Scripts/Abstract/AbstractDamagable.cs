@@ -77,7 +77,7 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 
 		// instant local VFX
 		ApplyCurrentEffects(arrowEffects);
-		DamageEffects(hitPoint);
+		DamageEffects(hitPoint, true);
 
 		float newHealth = Mathf.Max(0, currentHealth - amount);
 
@@ -121,10 +121,10 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 		OnDamageEffectsClient(hitPoint, shooterClientId, isShooter);
 	}
 
-	protected virtual void DamageEffects(Vector3 hitPoint)
+	protected virtual void DamageEffects(Vector3 hitPoint, bool owner = false)
 	{
 		dmgFeedback?.PlayFlash();
-		dmgFeedback?.PlayDamageParticle(currentAppliedEffects);
+		dmgFeedback?.PlayDamageParticle(currentAppliedEffects, owner);
 		OnPlayDamageAnimation();
 	}
 
