@@ -9,16 +9,16 @@ public class MultiplayerAudioSource : MonoBehaviour
 	public void Play(bool isOwner)
 	{
 		if (isOwner)
-			AudioManagement.instance.PlayThisSound(ownerAudio);
+			AudioManagement.instance.PlayThisSound(ownerAudio, posToGo: transform.position);
 		else
-			AudioManagement.instance.PlayThisSound(nonownerAudio);
+			AudioManagement.instance.PlayThisSound(nonownerAudio, posToGo: transform.position);
 	}
 	public void Stop(bool isOwner)
 	{
 		if (isOwner)
-			AudioManagement.instance.PlayThisSound(ownerAudio);
+			AudioManagement.instance.StopThisSound(ownerAudio.audioToPlay);
 		else
-			AudioManagement.instance.PlayThisSound(nonownerAudio);
+			AudioManagement.instance.StopThisSound(nonownerAudio.audioToPlay);
 	}
 
 	private void OnDrawGizmos()
