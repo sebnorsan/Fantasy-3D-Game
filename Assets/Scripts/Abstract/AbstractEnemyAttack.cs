@@ -45,7 +45,7 @@ public abstract class AbstractEnemyAttack : NetworkBehaviour
 	{
 		eRef.enemyAnimator.A_SetWalk(false);
 		float elapsed = 0f;
-		while (elapsed < attackDelay)
+		while (elapsed < eRef.enemyMultipliers.ApplyInverseMultiplier(attackDelay, eRef.enemyMultipliers.attackSpeedMultiplier))
 		{
 			elapsed += Time.deltaTime;
 			RotateTowardsTarget();

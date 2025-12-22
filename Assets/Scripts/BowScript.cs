@@ -8,7 +8,6 @@ public class BowScript : MonoBehaviour
 
 	public float arrowDamage = 1;
 	public float arrowSpeed = 30f;
-
 	public float arrowDrawSpeed = 1f;
 	public float arrowSize = 1f;
 
@@ -57,7 +56,7 @@ public class BowScript : MonoBehaviour
 		AnimatorStateInfo bowStateInfo = anim.GetCurrentAnimatorStateInfo(0);
 
 		bool affectedByDrawSpeed = false;
-		if (bowStateInfo.IsName("bow_loadIn") || bowStateInfo.IsName("bow_loaded"))
+		if (bowStateInfo.IsName("bow_loadIn") || bowStateInfo.IsName("bow_loaded") || bowStateInfo.IsName("bow_shot"))
 			affectedByDrawSpeed = true;
 
 		anim.speed = affectedByDrawSpeed ? pRef.playerMultipliers.GetAttackSpeedMulti(pRef.bowScript.arrowDrawSpeed) : 1f;
@@ -103,7 +102,7 @@ public class BowScript : MonoBehaviour
 
 		float dmgToUse = pRef.playerMultipliers.GetDamageMulti(arrowDamage);
 
-		SpawnArrow(arrowFired, arrowTransform.position, arrowTransform.rotation, shootDir, dmgToUse, arrowSpeed, arrowSize);
+		SpawnArrow(arrowFired, arrowTransform.position, arrowTransform.rotation, shootDir, dmgToUse, pRef.playerMultipliers.GetProjectileSpeedMulti(arrowSpeed), pRef.playerMultipliers.GetProjectileSizeMulti(arrowSize));
 	}
 	private void SpawnArrow(
 	GameObject go,

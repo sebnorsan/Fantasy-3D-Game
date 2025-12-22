@@ -33,24 +33,46 @@ public class PlayerDamagable : AbstractDamagable
 
 	public void SetHealthMultiplier()
 	{
-		maxHealth = GetMaxHealth();
-		currentHealth = GetCurrentHealth();
+		if (!IsServer)
+		{
+			RequestSetHealthMultiplierServerRpc();
+			return;
+		}
 
-		SetHealthBar();
+		ApplyHealthMultiplierServer();
+	}
 
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+	private void RequestSetHealthMultiplierServerRpc()
+	{
+		ApplyHealthMultiplierServer();
 		CheckForDeathServerRpc();
 	}
-	private float GetCurrentHealth()
-	{
-		float newCurrHealth = pRef.playerMultipliers.GetHealthMulti(baseHealth);
 
-		if (newCurrHealth < currentHealth)
-			return Mathf.Min(currentHealth, GetMaxHealth());
-		else
-			return newCurrHealth;
+	private void ApplyHealthMultiplierServer()
+	{
+		float oldMax = maxHealth;
+
+		maxHealth = GetMaxHealth();
+		float deltaMax = maxHealth - oldMax;
+
+		if (deltaMax > 0f)
+			currentHealth += deltaMax;
+
+		currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+
+		syncedHealth.Value = currentHealth;
+		SyncMaxHealthClientRpc(maxHealth);
 	}
+
 	private float GetMaxHealth() => pRef.playerMultipliers.GetHealthMulti(baseHealth);
 
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void SyncMaxHealthClientRpc(float newMax)
+	{
+		maxHealth = newMax;
+		SetHealthBar();
+	}
 	protected override void NetworkSpawn()
 	{
 		if (!IsOwner && localHealthSlider != null)
@@ -189,7 +211,7 @@ public class PlayerDamagable : AbstractDamagable
 	{
 		if (deathParticles != null)
 		{
-			var pfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
+			GameObject pfx = Instantiate(deathParticles.gameObject, transform.position, Quaternion.identity);
 			Destroy(pfx, 5);
 		}
 	}

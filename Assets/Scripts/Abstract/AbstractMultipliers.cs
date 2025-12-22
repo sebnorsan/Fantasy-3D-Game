@@ -1,15 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public abstract class AbstractMultipliers : MonoBehaviour
 {
-	[SerializeField] protected float damageMultiplier = 100;
-	[SerializeField] protected float healthMultiplier = 100;
-	[SerializeField] protected float speedMultiplier = 100;
-	[SerializeField] protected float jumpMultiplier = 100;
-	[SerializeField] protected float attackSpeedMultiplier = 100;
-	[SerializeField] protected float projectileSizeMultiplier = 100;
+	public float damageMultiplier = 100;
+	public float healthMultiplier = 100;
+	public float speedMultiplier = 100;
+	public float jumpMultiplier = 100;
+	public float attackSpeedMultiplier = 100;
+	public float projectileSizeMultiplier = 100;
+	public float projectileSpeedMultiplier = 100;
 
 	public float GetDamageMulti(float baseVal) => baseVal * (damageMultiplier / 100);
 	public float GetHealthMulti(float baseVal) => baseVal * (healthMultiplier / 100);
@@ -17,6 +19,7 @@ public abstract class AbstractMultipliers : MonoBehaviour
 	public float GetJumpMulti(float baseVal) => baseVal * (jumpMultiplier / 100);
 	public float GetAttackSpeedMulti(float baseVal) => baseVal * (attackSpeedMultiplier / 100);
 	public float GetProjectileSizeMulti(float baseVal) => baseVal * (projectileSizeMultiplier / 100);
+	public float GetProjectileSpeedMulti(float baseVal) => baseVal * (projectileSpeedMultiplier / 100);
 
 
 	protected List<Coroutine> currentTempMults = new List<Coroutine>();
@@ -24,8 +27,18 @@ public abstract class AbstractMultipliers : MonoBehaviour
 
 	private void OnValidate()
 	{
+		if (!NetworkManager.Singleton) return;
+		if (!GetComponent<NetworkObject>()) return;
+		if (!GetComponent<NetworkObject>().IsSpawned) return;
+
 		if (Application.isPlaying && Application.isEditor)
 			ApplyValues();
+	}
+	public float ApplyInverseMultiplier(float baseVal, float percentMultiplier)
+	{
+		float m = percentMultiplier / 100f;
+		if (m <= 0.0001f) m = 0.0001f;
+		return baseVal / m;
 	}
 	public void ApplyPermanentMultiplier(Multiplier type, float percent)
 	{
@@ -64,6 +77,9 @@ public abstract class AbstractMultipliers : MonoBehaviour
 			case Multiplier.PrjSize:
 				projectileSizeMultiplier += percent;
 				break;
+			case Multiplier.PrjSpeed:
+				projectileSpeedMultiplier += percent;
+				break;
 			default:
 				break;
 		}
@@ -92,11 +108,15 @@ public abstract class AbstractMultipliers : MonoBehaviour
 				break;
 			case Multiplier.AtkSpd:
 				attackSpeedMultiplier -= percent;
-				attackSpeedMultiplier = Mathf.Max(1f, jumpMultiplier);
+				attackSpeedMultiplier = Mathf.Max(1f, attackSpeedMultiplier);
 				break;
 			case Multiplier.PrjSize:
 				projectileSizeMultiplier -= percent;
-				projectileSizeMultiplier = Mathf.Max(1f, jumpMultiplier);
+				projectileSizeMultiplier = Mathf.Max(1f, projectileSizeMultiplier);
+				break;
+			case Multiplier.PrjSpeed:
+				projectileSpeedMultiplier -= percent;
+				projectileSpeedMultiplier = Mathf.Max(1f, projectileSpeedMultiplier);
 				break;
 			default:
 				break;
@@ -114,5 +134,6 @@ public enum Multiplier
 	Speed,
 	Jump,
 	AtkSpd,
-	PrjSize
+	PrjSize,
+	PrjSpeed
 }

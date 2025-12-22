@@ -117,8 +117,8 @@ public class EnemyTarget : NetworkBehaviour
 	{
 		if (deathParticles != null)
 		{
-			var deathPfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
-			Destroy(deathPfx, deathPfx.totalTime);
+			var deathPfx = Instantiate(deathParticles.gameObject, transform.position, Quaternion.identity);
+			Destroy(deathPfx, 12);
 		}
 	}
 
@@ -126,8 +126,8 @@ public class EnemyTarget : NetworkBehaviour
 	{
 		if (damageParticles != null)
 		{
-			var damagePfx = Instantiate(damageParticles, transform.position, Quaternion.identity);
-			Destroy(damagePfx, damagePfx.totalTime);
+			var damagePfx = Instantiate(damageParticles.gameObject, transform.position, Quaternion.identity);
+			Destroy(damagePfx, 5);
 		}
 
 		AudioManagement.instance.PlayThisSound(damageSound, true, .6f, .9f);

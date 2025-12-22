@@ -15,12 +15,12 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 
 	[Space(15)]
 	public float maxHealth = 100;
-	protected float currentHealth = 100;
+	[SerializeField] protected float currentHealth = 100;
 
-	protected NetworkVariable<float> syncedHealth = new(
+	[SerializeField] protected NetworkVariable<float> syncedHealth = new(
 	writePerm: NetworkVariableWritePermission.Server);
 
-	protected float baseHealth = 100;
+	protected float baseHealth = -1;
 
 	protected bool locallyPredictedDead;
 
@@ -36,8 +36,12 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 
 		if (IsServer)
 		{
-			syncedHealth.Value = maxHealth; // or maxHealth if you prefer
+			if (baseHealth <= 0f) // only init once
+				baseHealth = maxHealth;  // store ORIGINAL max
+
+			maxHealth = baseHealth;
 			currentHealth = maxHealth;
+			syncedHealth.Value = currentHealth;
 		}
 
 		NetworkSpawn();

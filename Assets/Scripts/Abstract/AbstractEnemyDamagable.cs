@@ -9,21 +9,53 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 
 	public void SetHealthMultiplier()
 	{
-		maxHealth = GetMaxHealth();
-		currentHealth = GetCurrentHealth();
+		if (!IsServer)
+		{
+			RequestSetHealthMultiplierServerRpc();
+			return;
+		}
 
+		ApplyHealthMultiplierServer();
+	}
+
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+	private void RequestSetHealthMultiplierServerRpc()
+	{
+		ApplyHealthMultiplierServer();
 		CheckForDeathServerRpc();
 	}
-	private float GetCurrentHealth()
-	{
-		float newCurrHealth = eRef.enemyMultipliers.GetHealthMulti(baseHealth);
 
-		if (newCurrHealth < currentHealth)
-			return Mathf.Min(currentHealth, GetMaxHealth());
-		else
-			return newCurrHealth;
+	private void ApplyHealthMultiplierServer()
+	{
+		float oldMax = maxHealth;
+
+		maxHealth = GetMaxHealth(); // baseHealth * multiplier
+
+		float deltaMax = maxHealth - oldMax;
+
+		// if max increased, add that increase to current
+		if (deltaMax > 0f)
+			currentHealth += deltaMax;
+
+		// if max decreased, don't reduce current, only clamp if too high
+		currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+
+		// server writes NV
+		syncedHealth.Value = currentHealth;
+
+		// clients need maxHealth for any UI/logic
+		SyncMaxHealthClientRpc(maxHealth);
 	}
+
 	private float GetMaxHealth() => eRef.enemyMultipliers.GetHealthMulti(baseHealth);
+
+
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void SyncMaxHealthClientRpc(float newMax)
+	{
+		maxHealth = newMax;
+	}
+
 
 	protected override void OnPlayDamageAnimation()
 	{
@@ -82,7 +114,7 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 	{
 		if (deathParticles != null)
 		{
-			var pfx = Instantiate(deathParticles, transform.position, Quaternion.identity);
+			var pfx = Instantiate(deathParticles.gameObject, transform.position, Quaternion.identity);
 			var text = pfx.GetComponentInChildren<TMPro.TextMeshProUGUI>();
 			if (text != null)
 				text.text = $"+{eRef.enemy.xpDrop}xp";

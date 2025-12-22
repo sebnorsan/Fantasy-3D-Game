@@ -489,6 +489,7 @@ MonoBehaviour:
   enemyDamagable: {fileID: 2309492620002421278}
   enemyNavigation: {fileID: 1788526774317990989}
   enemyAnimator: {fileID: 5015275027837258405}
+  enemyMultipliers: {fileID: 4448349686517036069}
   enemyTarget: {fileID: 0}
 --- !u!114 &6665354131383936063
 MonoBehaviour:
@@ -539,6 +540,7 @@ MonoBehaviour:
   dmgFeedback: {fileID: 5817319669080395596}
   deathParticles: {fileID: 3548588485384254794, guid: 7fb0f6e51e8cdbe4e99603aa917a2d53, type: 3}
   maxHealth: 5
+  currentHealth: 5
   eRef: {fileID: 7088274710624416125}
 --- !u!114 &1788526774317990989
 MonoBehaviour:
@@ -600,6 +602,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9ae46ee21b082345b7eaa7d4590d469, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  damageMultiplier: 100
+  healthMultiplier: 100
+  speedMultiplier: 100
+  jumpMultiplier: 100
+  attackSpeedMultiplier: 100
+  projectileSizeMultiplier: 100
+  projectileSpeedMultiplier: 100
+  eRef: {fileID: 7088274710624416125}
 --- !u!1 &4429469026348770911
 GameObject:
   m_ObjectHideFlags: 0
