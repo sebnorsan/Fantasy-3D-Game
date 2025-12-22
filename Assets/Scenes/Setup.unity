@@ -757,7 +757,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efecb3ebd0f97fb49b481d78531ef49c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  networkManagerObject: {fileID: 3584335349920593158, guid: 02dd5b46bede98b408372ccbf17fc6b8, type: 3}
   sceneToLoad: LobbyScene
   directlyToGame: 0
   directSceneToLoad: PvP-Scene

@@ -88,6 +88,8 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 	}
 	protected override void DieServer()
 	{
+		base.DieServer();
+
 		DieClientRpc(lastHitByClientId);
 		StopAllCoroutines();
 		DespawnObject();
