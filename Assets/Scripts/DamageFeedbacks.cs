@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.UI.GridLayoutGroup;
 
 public class DamageFeedback : MonoBehaviour
 {
@@ -24,9 +25,13 @@ public class DamageFeedback : MonoBehaviour
 	}
 	public void PlayDamageParticle(ArrowEffect[] arrowEffects, bool owner = false)
 	{
+		PlayDamageParticle(Vector3.zero, arrowEffects, owner);
+	}
+	public void PlayDamageParticle(Vector3 pos ,ArrowEffect[] arrowEffects, bool owner = false)
+	{
 		ParticleSystem pfxToPlay = GetHitParticles(arrowEffects);
 
-		var pfx = Instantiate(pfxToPlay, transform.position, Quaternion.identity);
+		var pfx = Instantiate(pfxToPlay, pos, Quaternion.identity);
 
 		var source = pfx.GetComponent<MultiplayerAudioSource>();
 		source?.Play(owner);

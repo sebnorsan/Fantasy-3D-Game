@@ -124,7 +124,7 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 	protected virtual void DamageEffects(Vector3 hitPoint, bool owner = false)
 	{
 		dmgFeedback?.PlayFlash();
-		dmgFeedback?.PlayDamageParticle(currentAppliedEffects, owner);
+		dmgFeedback?.PlayDamageParticle(transform.position, currentAppliedEffects, owner);
 		OnPlayDamageAnimation();
 	}
 
