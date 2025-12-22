@@ -8,6 +8,7 @@ public class EnemyReferences : MonoBehaviour
     public AbstractEnemyNavigation enemyNavigation;
 	public EnemyAnimator enemyAnimator;
 	public EnemyMultipliers enemyMultipliers;
+	public EnemyLevelling enemyLevel;
 	//---Set during runtime---
 	[HideInInspector] public EnemyTarget enemyTarget = null;
 }

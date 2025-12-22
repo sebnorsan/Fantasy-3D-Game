@@ -40,6 +40,10 @@ public abstract class AbstractMultipliers : MonoBehaviour
 		if (m <= 0.0001f) m = 0.0001f;
 		return baseVal / m;
 	}
+	public void SetPermanentMultiplier(Multiplier type, float multiplier)
+	{
+		SetMultiplier(type, multiplier);
+	}
 	public void ApplyPermanentMultiplier(Multiplier type, float percent)
 	{
 		AddMultiplier(type, percent);
@@ -54,6 +58,39 @@ public abstract class AbstractMultipliers : MonoBehaviour
 		yield return new WaitForSeconds(resetTime);
 
 		RemoveMultiplier(type, amount);
+	}
+	private void SetMultiplier(Multiplier type, float multiplier)
+	{
+		float percent = 100 + (100 * multiplier);
+
+		switch (type)
+		{
+			case Multiplier.Damage:
+				damageMultiplier = percent;
+				break;
+			case Multiplier.Health:
+				healthMultiplier = percent;
+				break;
+			case Multiplier.Speed:
+				speedMultiplier = percent;
+				break;
+			case Multiplier.Jump:
+				jumpMultiplier = percent;
+				break;
+			case Multiplier.AtkSpd:
+				attackSpeedMultiplier = percent;
+				break;
+			case Multiplier.PrjSize:
+				projectileSizeMultiplier = percent;
+				break;
+			case Multiplier.PrjSpeed:
+				projectileSpeedMultiplier = percent;
+				break;
+			default:
+				break;
+		}
+
+		ApplyValues();
 	}
 	private void AddMultiplier(Multiplier type, float percent)
 	{
