@@ -85,3 +85,17 @@ MonoBehaviour:
       maxPitch: 1.1
       subtitlesEnabled: 0
       subtitles: []
+  - libName: Damage
+    audios:
+    - audioName: PlayerDamage
+      loop: 0
+      audioToPlay: {fileID: 8300000, guid: 112bfa28a2300274486958208f3e3e98, type: 3}
+      audioVolume: 1
+      spatialBlend: 0
+      minDistance: 0
+      maxDistance: 500
+      randomPitch: 0
+      minPitch: 0.8
+      maxPitch: 1.2
+      subtitlesEnabled: 0
+      subtitles: []

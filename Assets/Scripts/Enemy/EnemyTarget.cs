@@ -130,7 +130,7 @@ public class EnemyTarget : NetworkBehaviour
 			Destroy(damagePfx, 5);
 		}
 
-		AudioManagement.instance.PlayThisSound(damageSound, true, .6f, .9f);
+		AudioManagement.instance.PlayThisSound(damageSound, true, .6f, 1.1f);
 
 		if (currFlashCoroutine == null)
 			currFlashCoroutine = StartCoroutine(OnFlashMaterial());

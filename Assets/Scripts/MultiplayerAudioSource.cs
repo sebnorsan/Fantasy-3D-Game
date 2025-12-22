@@ -3,29 +3,29 @@ using UnityEngine;
 
 public class MultiplayerAudioSource : MonoBehaviour
 {
-	[SerializeField] private bool playOnAwake = true;
+    public AudioToPlay ownerAudio;
+    public AudioToPlay nonownerAudio;
 
-    public AudioSource ownerAudioSource;
-    public AudioSource nonownerAudioSource;
-
-	private void OnValidate()
+	public void Play(bool isOwner)
 	{
-		if (!Application.isEditor) return;
-
-		ownerAudioSource.playOnAwake = false;
-		nonownerAudioSource.playOnAwake = false;
- 	}
-	private void Start()
-	{
-		if (playOnAwake)
-			Play();
+		if (isOwner)
+			AudioManagement.instance.PlayThisSound(ownerAudio);
+		else
+			AudioManagement.instance.PlayThisSound(nonownerAudio);
 	}
-	public void Play()
+	public void Stop(bool isOwner)
 	{
-
+		if (isOwner)
+			AudioManagement.instance.PlayThisSound(ownerAudio);
+		else
+			AudioManagement.instance.PlayThisSound(nonownerAudio);
 	}
-	public void Stop()
-	{
 
+	private void OnDrawGizmos()
+	{
+		Gizmos.color = Color.green;
+		Gizmos.DrawWireSphere(transform.position, nonownerAudio.minDistance);
+		Gizmos.color = Color.blue;
+		Gizmos.DrawWireSphere(transform.position, nonownerAudio.maxDistance);
 	}
 }

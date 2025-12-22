@@ -171,6 +171,7 @@ public class PlayerDamagable : AbstractDamagable
 		if (IsOwner)
 		{
 			OwnerPlayerShake();
+			AudioManagement.instance.PlayThisSound("Damage", "PlayerDamage");
 		}
 	}
 

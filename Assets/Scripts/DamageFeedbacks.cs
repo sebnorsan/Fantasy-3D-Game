@@ -22,11 +22,15 @@ public class DamageFeedback : MonoBehaviour
 		if (flashMaterial == null)
 			flashMaterial = Resources.Load<Material>("Materials/FlashMaterial");
 	}
-	public void PlayDamageParticle(ArrowEffect[] arrowEffects)
+	public void PlayDamageParticle(ArrowEffect[] arrowEffects, bool owner = false)
 	{
 		ParticleSystem pfxToPlay = GetHitParticles(arrowEffects);
 
 		var pfx = Instantiate(pfxToPlay, transform.position, Quaternion.identity);
+
+		var source = pfx.GetComponent<MultiplayerAudioSource>();
+		source?.Play(owner);
+
 		Destroy(pfx, 5f);
 	}
 	public ParticleSystem GetHitParticles(ArrowEffect[] arrowEffects)
