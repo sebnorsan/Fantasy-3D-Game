@@ -31,15 +31,25 @@ public abstract class AbstractEnemyAttack : NetworkBehaviour
 	//------------------------
 	public void StartAttack()
 	{
+		if (!NetworkManager.Singleton.IsServer) return;
+
 		if (attackCoroutine == null)
 			attackCoroutine = StartCoroutine(AttackNumerator());
 	}
 
 	public void StopAttack()
 	{
+		if (!NetworkManager.Singleton.IsServer) return;
+
 		if (attackCoroutine != null)
+		{
 			StopCoroutine(attackCoroutine);
+			attackCoroutine = null; // <-- important
+		}
+
+		eRef.enemyAnimator.A_SetWalk(true); // optional: so they resume moving
 	}
+
 	//------------------------
 	protected virtual IEnumerator AttackNumerator()
 	{

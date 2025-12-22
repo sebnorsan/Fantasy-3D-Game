@@ -21,6 +21,10 @@ public class EnemyLevelling : MonoBehaviour
     [SerializeField] private float atkspdMultiplier = 0.03f;
     [SerializeField] private float sizeMultiplier = 0.1f;
 
+    [Space(2)]
+
+    [SerializeField] private float decayPerLevel = .01f;
+
     [Space(6)]
 
     [SerializeField] private Color startColor;
@@ -39,16 +43,31 @@ public class EnemyLevelling : MonoBehaviour
     {
         if (lvl != -1)
             currentLevel = lvl;
+        if (currentLevel > 100)
+        {
+			currentLevel = 100;
+            return;
+		}
 
-        eRef.enemyMultipliers.SetPermanentMultiplier(Multiplier.Damage, dmgMultiplier * currentLevel);
-        eRef.enemyMultipliers.SetPermanentMultiplier(Multiplier.Health, healthMultiplier * currentLevel);
-        eRef.enemyMultipliers.SetPermanentMultiplier(Multiplier.Speed, speedMultiplier * currentLevel);
-        eRef.enemyMultipliers.SetPermanentMultiplier(Multiplier.AtkSpd, atkspdMultiplier * currentLevel);
+		float decay = Mathf.Pow(1f - decayPerLevel, currentLevel);
+		float levelFactor = currentLevel * decay;
 
-        SetSize();
+		eRef.enemyMultipliers.SetPermanentMultiplier(Multiplier.Damage, dmgMultiplier * levelFactor);
+        eRef.enemyMultipliers.SetPermanentMultiplier(Multiplier.Health, healthMultiplier * levelFactor);
+        eRef.enemyMultipliers.SetPermanentMultiplier(Multiplier.Speed, speedMultiplier * levelFactor);
+        eRef.enemyMultipliers.SetPermanentMultiplier(Multiplier.AtkSpd, atkspdMultiplier * levelFactor);
+
+        SetColor();
+        SetSize(levelFactor);
     }
-    private void SetSize()
+    private void SetSize(float levelFactor)
     {
-        scaleToSize.localScale = initialSize * (1 + (sizeMultiplier * currentLevel));
+        scaleToSize.localScale = initialSize * (1 + (sizeMultiplier * levelFactor));
     }
+    private void SetColor()
+    {
+		float t = Mathf.InverseLerp(0f, 100f, currentLevel);
+		Color c = Color.Lerp(startColor, endColor, t);
+		eRef.enemyGraphics.SetMatColor(c);
+	}
 }

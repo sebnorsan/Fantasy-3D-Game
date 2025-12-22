@@ -16,4 +16,11 @@ public abstract class AbstractEnemy : NetworkBehaviour
 	{
 		EnemyLODManager.instance?.enemies.Add(lod_anim);
 	}
+	public void AlertOfTargetDeath(EnemyTarget eTarget)
+	{
+		if (eRef.enemyTarget = eTarget)
+		{
+			eRef.enemyNavigation.TargetSlain();
+		}
+	}
 }

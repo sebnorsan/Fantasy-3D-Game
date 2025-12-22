@@ -228,6 +228,8 @@ public class PlayerDamagable : AbstractDamagable
 
 	private IEnumerator DeathCamFlow(ulong killerClientId)
 	{
+		pRef.playerCam.GetComponent<AudioListener>().enabled = false;
+
 		var dCam = Instantiate(
 			deathCam,
 			pRef.playerCam.transform.position,
@@ -246,6 +248,8 @@ public class PlayerDamagable : AbstractDamagable
 		yield return new WaitForSeconds(1);
 		ScreenSummoner.SummonScreen(Color.black, 1f, false);
 		Destroy(dCam);
+
+		pRef.playerCam.GetComponent<AudioListener>().enabled = true;
 
 		EventManager.instance.TeleportPlayer(
 			pRef.playerController,

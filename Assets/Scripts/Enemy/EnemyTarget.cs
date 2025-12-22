@@ -95,6 +95,10 @@ public class EnemyTarget : NetworkBehaviour
 		// run lose FX/anim on all clients + host
 		DieClientRpc();
 
+		var enems = FindObjectsByType<AbstractEnemy>(FindObjectsSortMode.None);
+		foreach (var e in enems)
+			e.AlertOfTargetDeath(this);
+
 		// server destroys / despawns the crystal
 		if (TryGetComponent(out NetworkObject nwo) && nwo.IsSpawned)
 			nwo.Despawn(true);

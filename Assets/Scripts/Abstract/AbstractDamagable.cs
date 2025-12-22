@@ -186,7 +186,7 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 			}
 		}
 	}
-	protected virtual void DespawnObject()
+	public virtual void DespawnObject()
 	{
 		if (TryGetComponent(out NetworkObject nwo) && nwo.IsSpawned)
 			nwo.Despawn(true);

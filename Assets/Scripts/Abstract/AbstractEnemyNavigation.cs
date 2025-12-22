@@ -3,6 +3,8 @@ using UnityEngine.AI;
 using UnityEngine;
 using Unity.Netcode.Components;
 using System.Collections;
+using UnityEditor.VisionOS;
+using NUnit.Framework.Constraints;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public abstract class AbstractEnemyNavigation : NetworkBehaviour
@@ -17,7 +19,10 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 	private Vector3 targetDestination;
 	private EnemyTarget targetScript;
 
+	[Space(5)]
+
 	[SerializeField] private float speed = 3.5f;
+	[SerializeField] private float victoryTime = 5f;
 
 	[Header("Knockback Settings")]
 	private float originalSpeed;
@@ -35,6 +40,29 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 		originalAcceleration = agent.acceleration;
 
 		InitializeEnemy();
+	}
+	public void TargetSlain()
+	{
+		StartCoroutine(TargetSlainFlow());
+	}
+	private IEnumerator TargetSlainFlow()
+	{
+		eRef.enemyAttack.StopAttack();
+		eRef.enemyAnimator.A_SetWalk(false);
+
+		yield return new WaitForSeconds(Random.Range(0, 1.2f));
+
+		eRef.enemyAnimator.A_SetVictory(true);
+		eRef.enemyAnimator.A_SetTarget(targetNotExist: GetTargets() == null);
+
+		yield return new WaitForSeconds(victoryTime);
+
+		eRef.enemyAnimator.A_SetVictory(false);
+
+		yield return new WaitForSeconds(.8f);
+
+		InitializeEnemy();
+
 	}
 	public void SetSpeedMultiplier()
 	{
@@ -58,7 +86,7 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 
 	protected virtual void InitializeDestination()
 	{
-		var enemyTargets = FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None);
+		var enemyTargets = GetTargets();
 		int randomTarget = Random.Range(0, enemyTargets.Length);
 
 		eRef.enemyTarget = enemyTargets[randomTarget];
@@ -73,7 +101,15 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 		targetDestination = targetPos.position + offset;
 		agent.SetDestination(targetDestination);
 	}
+	private EnemyTarget[] GetTargets()
+	{
+		var et = FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None);
 
+		if (et.Length > 0)
+			return et;
+		else
+			return null;
+	}
 	public void DoKnockback(Vector3 hitPoint)
 	{
 		if (currKnockbackCoroutine != null)
