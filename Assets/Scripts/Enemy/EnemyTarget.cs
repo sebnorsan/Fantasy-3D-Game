@@ -33,6 +33,20 @@ public class EnemyTarget : NetworkBehaviour
 
 	private Coroutine currFlashCoroutine;
 
+	public static readonly List<EnemyTarget> All = new();
+
+	private void OnEnable()
+	{
+		if (!All.Contains(this))
+			All.Add(this);
+	}
+
+	private void OnDisable()
+	{
+		All.Remove(this);
+	}
+
+
 	private void OnValidate()
 	{
 		if (!Application.isEditor || Application.isPlaying) return;
@@ -95,11 +109,8 @@ public class EnemyTarget : NetworkBehaviour
 		// run lose FX/anim on all clients + host
 		DieClientRpc();
 
-		var enems = FindObjectsByType<AbstractEnemy>(FindObjectsSortMode.None);
-		foreach (var e in enems)
-		{
+		foreach (var e in AbstractEnemy.All)
 			e.AlertOfTargetDeath();
-		}
 
 		// server destroys / despawns the crystal
 		if (TryGetComponent(out NetworkObject nwo) && nwo.IsSpawned)

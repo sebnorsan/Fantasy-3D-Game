@@ -1,4 +1,5 @@
 using EZCameraShake;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -29,10 +30,20 @@ public class PlayerReferences : NetworkBehaviour
     public LayerMask groundLayerMask;
     public LayerMask headLayerMask;
 
+	public static readonly List<PlayerReferences> All = new();
+
 	public override void OnNetworkSpawn()
 	{
+		base.OnNetworkSpawn();
+		if (!All.Contains(this)) All.Add(this);
+
 		if (IsOwner)
 			playerCharacterController.enabled = false;
+	}
+
+	private void OnDisable()
+	{
+		All.Remove(this);
 	}
 
 	#region InitialPlayerCheck

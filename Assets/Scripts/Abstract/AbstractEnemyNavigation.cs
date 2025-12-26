@@ -36,11 +36,30 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 	private void Start()
 	{
 		if (!agent) agent = GetComponent<NavMeshAgent>();
-		
-		originalAcceleration = agent.acceleration;
 
+		// BIG performance win for crowds
+		agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+		agent.autoRepath = false;
+
+		originalAcceleration = agent.acceleration;
 		InitializeEnemy();
 	}
+
+
+	public override void OnNetworkSpawn()
+	{
+		base.OnNetworkSpawn();
+
+		if (!IsServer)
+		{
+			agent.enabled = false;   // client doesn't pathfind
+			return;
+		}
+
+		originalAcceleration = agent.acceleration;
+		InitializeEnemy();
+	}
+
 	public void TargetSlain()
 	{
 		StartCoroutine(TargetSlainFlow());
@@ -49,9 +68,11 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 	{
 		yield return new WaitForSeconds(Random.Range(0, 1.2f));
 
+		float sSpd = speed;
+		speed = 0;
+
 		eRef.enemyAttack.StopAttack();
 		eRef.enemyAnimator.A_SetWalk(false);
-		speed = 0;
 
 		yield return new WaitForSeconds(Random.Range(0, 1.2f));
 
@@ -65,6 +86,8 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 		eRef.enemyAnimator.A_SetVictory(false);
 
 		yield return new WaitForSeconds(Random.Range(1, 3.2f));
+
+		speed = sSpd;
 
 		if (!targetGot)
 			InitializeEnemy();
@@ -83,6 +106,8 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 	}
 	protected virtual void InitializeEnemy()
 	{
+		if (!IsServer) return;
+
 		eRef.enemyAnimator.A_SetWalk(true);
 
 		SetSpeedMultiplier();
@@ -92,11 +117,13 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 
 	protected virtual void InitializeDestination()
 	{
-		var enemyTargets = GetTargets();
-		int randomTarget = Random.Range(0, enemyTargets.Length);
+		if (!IsServer) return;
 
-		eRef.enemyTarget = enemyTargets[randomTarget];
-		targetScript = eRef.enemyTarget;
+		var all = EnemyTarget.All;
+		if (all.Count == 0) return;
+
+		targetScript = all[Random.Range(0, all.Count)];
+		eRef.enemyTarget = targetScript;
 
 		targetPos = targetScript.transform;
 
@@ -118,6 +145,8 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 	}
 	public void DoKnockback(Vector3 hitPoint)
 	{
+		if (!IsServer) return;
+
 		if (currKnockbackCoroutine != null)
 			StopCoroutine(currKnockbackCoroutine);
 		currKnockbackCoroutine = StartCoroutine(OnKnockback(hitPoint));
