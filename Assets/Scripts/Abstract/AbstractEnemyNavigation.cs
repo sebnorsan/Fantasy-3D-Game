@@ -47,21 +47,27 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 	}
 	private IEnumerator TargetSlainFlow()
 	{
+		yield return new WaitForSeconds(Random.Range(0, 1.2f));
+
 		eRef.enemyAttack.StopAttack();
 		eRef.enemyAnimator.A_SetWalk(false);
+		speed = 0;
 
 		yield return new WaitForSeconds(Random.Range(0, 1.2f));
 
+		bool targetGot = GetTargets() == null;
+
 		eRef.enemyAnimator.A_SetVictory(true);
-		eRef.enemyAnimator.A_SetTarget(targetNotExist: GetTargets() == null);
+		eRef.enemyAnimator.A_SetTarget(targetNotExist: targetGot);
 
 		yield return new WaitForSeconds(victoryTime);
 
 		eRef.enemyAnimator.A_SetVictory(false);
 
-		yield return new WaitForSeconds(.8f);
+		yield return new WaitForSeconds(Random.Range(1, 3.2f));
 
-		InitializeEnemy();
+		if (!targetGot)
+			InitializeEnemy();
 
 	}
 	public void SetSpeedMultiplier()

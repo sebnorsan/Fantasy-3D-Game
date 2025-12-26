@@ -97,7 +97,9 @@ public class EnemyTarget : NetworkBehaviour
 
 		var enems = FindObjectsByType<AbstractEnemy>(FindObjectsSortMode.None);
 		foreach (var e in enems)
-			e.AlertOfTargetDeath(this);
+		{
+			e.AlertOfTargetDeath();
+		}
 
 		// server destroys / despawns the crystal
 		if (TryGetComponent(out NetworkObject nwo) && nwo.IsSpawned)
