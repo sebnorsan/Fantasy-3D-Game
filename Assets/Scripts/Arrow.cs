@@ -10,6 +10,10 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Arrow : MonoBehaviour
 {
+	private PlayerReferences pRef;
+
+	[Space(5)]
+
 	[Header("Damage & Effects")]
 	public float arrowDamage = 1;
 	public ArrowEffect[] arrowEffects;
@@ -27,13 +31,6 @@ public class Arrow : MonoBehaviour
 	[SerializeField] private bool isAuthority = false;
 
 	private List<ulong> clientsHit = new List<ulong>();
-
-	private PlayerReferences pRef;
-
-	//Temporary PvP Settings
-
-	[Header("PFX on Arrows")]
-	[SerializeField] private ParticleSystem bigHitFX;
 
 	private void Awake()
 	{
@@ -57,8 +54,6 @@ public class Arrow : MonoBehaviour
 		pRef = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerReferences>();
 
 		arrowEffects = arrowFx;
-
-		ApplyEffects(arrowEffects);
 
 		this.isAuthority = isAuthority;
 
@@ -131,20 +126,6 @@ public class Arrow : MonoBehaviour
 		CheckDamage(collision.gameObject);
 	}
 
-	public void ApplyEffects(ArrowEffect[] arrowEffects)
-	{
-		foreach (var effect in arrowEffects)
-		{
-			switch (effect)
-			{
-				case ArrowEffect.BigHit:
-					bigHitFX.Play();
-					break;
-				default:
-					break;
-			}
-		}
-	}
 	private void CheckDamage(GameObject go)
 	{
 		if (!go.TryGetComponent<IDamagable>(out var dmg))
