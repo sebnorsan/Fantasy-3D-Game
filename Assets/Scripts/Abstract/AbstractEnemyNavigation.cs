@@ -3,7 +3,7 @@ using UnityEngine.AI;
 using UnityEngine;
 using Unity.Netcode.Components;
 using System.Collections;
-using UnityEditor.VisionOS;
+//using UnityEditor.VisionOS;
 using NUnit.Framework.Constraints;
 
 [RequireComponent(typeof(NavMeshAgent))]
