@@ -66,7 +66,7 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 	}
 	private IEnumerator TargetSlainFlow()
 	{
-		yield return new WaitForSeconds(Random.Range(0, 1.2f));
+		yield return new WaitForSeconds(Random.Range(2, 6f));
 
 		float sSpd = speed;
 		speed = 0;
@@ -76,10 +76,10 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 
 		yield return new WaitForSeconds(Random.Range(0, 1.2f));
 
-		bool targetGot = GetTargets() == null;
+		bool isMoreTargets = EnemyTarget.All.Count > 0;
 
 		eRef.enemyAnimator.A_SetVictory(true);
-		eRef.enemyAnimator.A_SetTarget(targetNotExist: targetGot);
+		eRef.enemyAnimator.A_SetTarget(falseForDespawn: !isMoreTargets);
 
 		yield return new WaitForSeconds(victoryTime);
 
@@ -89,7 +89,7 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 
 		speed = sSpd;
 
-		if (!targetGot)
+		if (isMoreTargets)
 			InitializeEnemy();
 
 	}
@@ -134,15 +134,15 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 		targetDestination = targetPos.position + offset;
 		agent.SetDestination(targetDestination);
 	}
-	private EnemyTarget[] GetTargets()
-	{
-		var et = FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None);
+	//private EnemyTarget[] GetTargets()
+	//{
+	//	var et = FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None);
 
-		if (et.Length > 0)
-			return et;
-		else
-			return null;
-	}
+	//	if (et.Length > 0)
+	//		return et;
+	//	else
+	//		return null;
+	//}
 	public void DoKnockback(Vector3 hitPoint)
 	{
 		if (!IsServer) return;

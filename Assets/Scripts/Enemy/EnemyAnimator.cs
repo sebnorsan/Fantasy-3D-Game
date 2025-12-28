@@ -25,9 +25,9 @@ public class EnemyAnimator : MonoBehaviour
 	{
 		anim?.SetBool("Victory", b);
 	}
-	public void A_SetTarget(bool targetNotExist)
+	public void A_SetTarget(bool falseForDespawn)
 	{
-		anim?.SetBool("NoTarget", targetNotExist);
+		anim?.SetBool("NoTarget", falseForDespawn);
 	}
 
 	public void AE_DespawnObject()

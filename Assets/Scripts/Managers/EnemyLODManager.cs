@@ -30,7 +30,7 @@ public class EnemyLODManager : MonoBehaviour
 
 		if (player == null || enemies.Count == 0) return;
 
-		int checksPerFrame = 200;
+		int checksPerFrame = 50;
 
 		for (int i = 0; i < checksPerFrame && enemies.Count > 0; i++)
 		{
