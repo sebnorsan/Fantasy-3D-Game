@@ -51,7 +51,7 @@ public class ExperienceEmitter : MonoBehaviour
 	}
 	private void Initializers()
 	{
-		totalExperience = experiencePerSecond * experienceSeconds;
+		totalExperience = (experiencePerSecond * experienceSeconds) - 1;
 
 		if (pfxSys == null)
 			pfxSys = GetComponent<ParticleSystem>();
@@ -199,20 +199,20 @@ public class ExperienceEmitter : MonoBehaviour
 		main.duration = experienceSeconds;
 
 		// EXACT emission count over time
-		emission.rateOverTime = 0f;
+		emission.rateOverTime = experiencePerSecond;
 
-		int total = Mathf.Max(0, Mathf.RoundToInt(experiencePerSecond * experienceSeconds));
-		if (experiencePerSecond > 0f && total > 0)
-		{
-			float interval = 1f / experiencePerSecond;
+		//int total = Mathf.Max(0, Mathf.RoundToInt(experiencePerSecond * experienceSeconds));
+		//if (experiencePerSecond > 0f && total > 0)
+		//{
+		//	float interval = 1f / experiencePerSecond;
 
-			// Create 1-particle bursts at 0, interval, 2*interval...
-			var bursts = new ParticleSystem.Burst[total];
-			for (int i = 0; i < total; i++)
-				bursts[i] = new ParticleSystem.Burst(i * interval, 1);
+		//	// Create 1-particle bursts at 0, interval, 2*interval...
+		//	var bursts = new ParticleSystem.Burst[total];
+		//	for (int i = 0; i < total; i++)
+		//		bursts[i] = new ParticleSystem.Burst(i * interval, 1);
 
-			emission.SetBursts(bursts);
-		}
+		//	emission.SetBursts(bursts);
+		//}
 
 		// Color
 		if (ExperienceGradient != null)

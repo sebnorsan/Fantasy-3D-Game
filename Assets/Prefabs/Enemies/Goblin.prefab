@@ -377,7 +377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2745228606
+  GlobalObjectIdHash: 2482919236
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1017,19 +1017,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1840146837707681567, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: lengthInSec
-      value: 0.1
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1840146837707681567, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: EmissionModule.m_BurstCount
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1840146837707681567, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.size
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1840146837707681567, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0
+      value: 2.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1840146837707681567, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 1840146837707681567, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: InitialModule.startColor.maxColor.a
@@ -1049,31 +1053,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1840146837707681567, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.data[1].time
-      value: 0.05
+      value: 0.008058018
       objectReference: {fileID: 0}
     - target: {fileID: 1840146837707681567, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.data[2].time
-      value: 0.07782101
+      value: 0.016116036
       objectReference: {fileID: 0}
     - target: {fileID: 1840146837707681567, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.data[3].time
-      value: 0.11673151
+      value: 0.024174053
       objectReference: {fileID: 0}
     - target: {fileID: 1840146837707681567, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.data[4].time
-      value: 0.15564202
+      value: 0.032232072
       objectReference: {fileID: 0}
     - target: {fileID: 1840146837707681567, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.data[5].time
-      value: 0.19455253
+      value: 0.04029009
       objectReference: {fileID: 0}
     - target: {fileID: 1840146837707681567, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.data[6].time
-      value: 0.23346302
+      value: 0.048348106
       objectReference: {fileID: 0}
     - target: {fileID: 1840146837707681567, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.data[7].time
-      value: 0.27237353
+      value: 0.056406125
       objectReference: {fileID: 0}
     - target: {fileID: 3799509777670253325, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1121,11 +1125,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5672309024096546526, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: totalExperience
-      value: 2
+      value: 1.0999999
       objectReference: {fileID: 0}
     - target: {fileID: 5672309024096546526, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: experienceSeconds
-      value: 0.1
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5672309024096546526, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
+      propertyPath: experiencePerSecond
+      value: 2.1
       objectReference: {fileID: 0}
     - target: {fileID: 5672309024096546526, guid: c24e68f242118df4b851af860b7b98a6, type: 3}
       propertyPath: experiencePerParticle
