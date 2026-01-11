@@ -91,7 +91,7 @@ public class PauseMenu : MonoBehaviour
 		// we don't touch settingsPanel here (it remembers last state)
 
 		if (EventManager.instance != null && EventManager.instance.IsCameraPlayerMode())
-			EventManager.instance.ToggleCameraMode();
+			EventManager.instance.CameraModeMenu();
 	}
 
 	private void ToggleClose()
@@ -102,6 +102,6 @@ public class PauseMenu : MonoBehaviour
 			pauseRootPanel.SetActive(false);
 
 		if (EventManager.instance != null && !EventManager.instance.IsCameraPlayerMode())
-			EventManager.instance.ToggleCameraMode();
+			EventManager.instance.CameraModePlayer();
 	}
 }

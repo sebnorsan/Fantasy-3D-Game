@@ -11,6 +11,8 @@ public class EventManager : MonoBehaviour
 	public Animator interactionAnimator;
 	public NetHelper netHelper;
 
+	private int camMenuAmount = 0;
+
 	public void Awake()
 	{
 		if (instance != null)
@@ -90,14 +92,23 @@ public class EventManager : MonoBehaviour
 			return true;
 		else return false;
 	}
-	public void ToggleCameraMode()
+	public void CameraModePlayer()
 	{
-		Cursor.visible = !Cursor.visible;
+		if (camMenuAmount > 0)
+		{
+			camMenuAmount--;
+			return;
+		}
 
-		if (Cursor.lockState == CursorLockMode.Confined)
-			Cursor.lockState = CursorLockMode.Locked;
-		else
-			Cursor.lockState = CursorLockMode.Confined;
+		Cursor.visible = false;
+		Cursor.lockState = CursorLockMode.Locked;
+	}
+	public void CameraModeMenu()
+	{
+		Cursor.visible = true;
+		Cursor.lockState = CursorLockMode.Confined;
+
+		camMenuAmount++;
 	}
 	public void TeleportPlayer(PlayerController player, Vector3 tpPos, bool resetDir = true)
 	{

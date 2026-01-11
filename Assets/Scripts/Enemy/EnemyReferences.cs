@@ -10,6 +10,7 @@ public class EnemyReferences : MonoBehaviour
 	public EnemyMultipliers enemyMultipliers;
 	public EnemyLevelling enemyLevel;
 	public EnemyGraphics enemyGraphics;
+	public ExperienceEmitter experienceEmitter;
 	//---Set during runtime---
 	[HideInInspector] public EnemyTarget enemyTarget = null;
 }

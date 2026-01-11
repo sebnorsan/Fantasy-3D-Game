@@ -99,7 +99,8 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 	private void DieClientRpc(ulong shooterClientId)
 	{
 		EnemyLODManager.instance?.enemies.Remove(eRef.enemy.lod_anim);
-		GameManager.instance?.AddXp(eRef.enemy.xpDrop);
+		//GameManager.instance?.AddXp(eRef.enemy.xpDrop);
+		eRef.experienceEmitter.StartEmit();
 	}
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	protected override void DieParticlesClientRpc()
@@ -117,9 +118,6 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 		if (deathParticles != null)
 		{
 			var pfx = Instantiate(deathParticles.gameObject, transform.position, Quaternion.identity);
-			var text = pfx.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-			if (text != null)
-				text.text = $"+{eRef.enemy.xpDrop}xp";
 			Destroy(pfx, 5);
 		}
 	}

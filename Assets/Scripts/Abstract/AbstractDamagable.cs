@@ -1,6 +1,5 @@
 using Unity.Netcode;
 using UnityEngine;
-using static Steamworks.InventoryItem;
 
 public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 {

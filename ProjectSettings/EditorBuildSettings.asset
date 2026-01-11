@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GameSeneBlockout.unity
     guid: 39de5e3813c08f54daf34ff2664d363a
+  - enabled: 1
+    path: Assets/_Recovery/0.unity
+    guid: c3a349edd1795e4449bf45a7c97a36c2
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
