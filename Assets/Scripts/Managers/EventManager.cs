@@ -97,7 +97,9 @@ public class EventManager : MonoBehaviour
 		if (camMenuAmount > 0)
 		{
 			camMenuAmount--;
-			return;
+
+			if (camMenuAmount > 0)
+				return;
 		}
 
 		Cursor.visible = false;

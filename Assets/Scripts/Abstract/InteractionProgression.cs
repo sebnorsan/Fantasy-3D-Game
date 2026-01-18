@@ -1,4 +1,5 @@
 using EZCameraShake;
+using Unity.Netcode;
 using UnityEngine;
 
 public abstract class InteractionProgression : MonoBehaviour
@@ -16,7 +17,7 @@ public abstract class InteractionProgression : MonoBehaviour
 	public virtual void StartProgression()
 	{
 		if (shake == null)
-			shake = CameraShaker.Instance.StartShake(mag, rough, timeTillCompletion);
+			shake = NetworkManager.Singleton?.LocalClient.PlayerObject.GetComponentInChildren<PlayerReferences>().cameraShaker.StartShake(mag, rough, timeTillCompletion);
 
 		InteractionProgressBar.instance.StartAnimation(timeTillCompletion);
 		Invoke(nameof(FinishAnimation), timeTillCompletion);
@@ -39,11 +40,5 @@ public abstract class InteractionProgression : MonoBehaviour
 		CancelProgression();
 
 		InteractionProgressBar.instance.anim.SetTrigger("Finish");
-	}
-	protected virtual void Update()
-	{
-		if (progressionStarted)
-			if (Input.GetKeyUp(KeyCode.E))
-				CancelProgression();
 	}
 }

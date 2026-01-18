@@ -76,6 +76,14 @@ public class InteractionHandler : MonoBehaviour
 
 			objectInteracting = null;
 		}
+
+		if (Input.GetKeyUp(pInput.interactionKey) && objectInteracting != null)
+		{
+			if (objectInteracting.TryGetComponent<InteractionProgression>(out var prog))
+				prog.CancelProgression();
+
+			objectInteracting = null;
+		}
 	}
 	private bool TryGetFirstValidHit(Ray ray, out RaycastHit bestHit)
 	{

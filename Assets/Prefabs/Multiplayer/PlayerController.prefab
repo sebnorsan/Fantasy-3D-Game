@@ -5657,7 +5657,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pRef: {fileID: 930708363686757887}
   pInput: {fileID: 5742270511285517812}
-  maxDistance: 30
+  maxDistance: 8
   sphereRadius: 0.2
   ignoreLayers:
     serializedVersion: 2

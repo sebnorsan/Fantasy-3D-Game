@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System;
 
 public class UpgradeCard : MonoBehaviour
 {
@@ -13,27 +12,43 @@ public class UpgradeCard : MonoBehaviour
     [SerializeField] private TextMeshProUGUI title;
     [SerializeField] private TextMeshProUGUI secondary;
 
+    [Space(5)]
+
+    [SerializeField] private Button cardButton;
+
+    private PlayerUpgrades pUpg;
+
 #if UNITY_EDITOR
     private void OnValidate()
 	{
         if (Application.isPlaying) return;
 
-        SetScriptableObject();
+        SetScriptableObject(upgCardSO);
 	}
 #endif
-	
-	private void SetScriptableObject()
-    {
-        if (upgCardSO == null) return;
+	private void Start()
+	{
+        pUpg = GetComponentInParent<PlayerUpgrades>();
 
-        logo.texture = upgCardSO.SO_logo;
-        title.text = upgCardSO.SO_title;
-        secondary.text = upgCardSO.SO_secondary;
+        Initialize();
+	}
+    private void Initialize()
+    {
+		cardButton?.onClick.AddListener(SelectThisCard);
+	}
+	public void SetScriptableObject(UpgradeCardSO c)
+    {
+        if (c == null) return;
+
+        upgCardSO = c;
+
+        logo.texture = c.SO_logo;
+        title.text = c.SO_title;
+        secondary.text = c.SO_secondary;
     }
 
-    public void ChooseCard()
+    private void SelectThisCard()
     {
-        foreach (var mUpg in upgCardSO.multiUpgrades)
-            PlayerManager.m_pRef.playerMultipliers.ApplyPermanentMultiplier(mUpg.multiplier, mUpg.percentageUpgrade);
+        pUpg.UseCard(upgCardSO);
     }
 }

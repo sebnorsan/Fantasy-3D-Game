@@ -8,6 +8,7 @@ public class ExperienceEmitter : MonoBehaviour
 {
 	[SerializeField] private bool playOnStart = false;
 	[SerializeField] private bool deparentOnEmit = false;
+	[SerializeField] private bool destroyAfter = false;
 
 	[Space(5)]
 
@@ -134,6 +135,11 @@ public class ExperienceEmitter : MonoBehaviour
 	}
 	public void StartEmit()
     {
+		float desDelay = experienceSeconds + pfxSys.main.startLifetime.constant;
+
+		if (destroyAfter)
+			Destroy(gameObject, desDelay);
+
 		var savedScale = transform.lossyScale;
 
 		if (deparentOnEmit)

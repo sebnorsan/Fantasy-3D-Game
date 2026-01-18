@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68bb1d8b7f1d87244ac4e7e0a77bd741, type: 3}
+  m_Name: 20jump
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeCardSO
+  SO_logo: {fileID: 2800000, guid: 24743680055304b4880cd96cb7763292, type: 3}
+  SO_title: Rabbit Jump
+  SO_secondary: 20%
+  multiUpgrades:
+  - multiplier: 3
+    percentageUpgrade: 20
