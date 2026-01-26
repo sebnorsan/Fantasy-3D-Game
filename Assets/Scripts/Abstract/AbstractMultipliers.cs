@@ -12,6 +12,8 @@ public abstract class AbstractMultipliers : MonoBehaviour
 	public float attackSpeedMultiplier = 100;
 	public float projectileSizeMultiplier = 100;
 	public float projectileSpeedMultiplier = 100;
+	public float knockbackMultiplier = 100;
+	public float experienceMultiplier = 100;
 
 	public float GetDamageMulti(float baseVal) => baseVal * (damageMultiplier / 100);
 	public float GetHealthMulti(float baseVal) => baseVal * (healthMultiplier / 100);
@@ -20,10 +22,10 @@ public abstract class AbstractMultipliers : MonoBehaviour
 	public float GetAttackSpeedMulti(float baseVal) => baseVal * (attackSpeedMultiplier / 100);
 	public float GetProjectileSizeMulti(float baseVal) => baseVal * (projectileSizeMultiplier / 100);
 	public float GetProjectileSpeedMulti(float baseVal) => baseVal * (projectileSpeedMultiplier / 100);
-
+	public float GetKnockbackMulti(float baseVal) => baseVal * (knockbackMultiplier / 100);
+	public float GetExperienceMulti(float baseVal) => baseVal * (experienceMultiplier / 100);
 
 	protected List<Coroutine> currentTempMults = new List<Coroutine>();
-
 
 	private void OnValidate()
 	{
@@ -34,12 +36,14 @@ public abstract class AbstractMultipliers : MonoBehaviour
 		if (Application.isPlaying && Application.isEditor)
 			ApplyValues();
 	}
+
 	public float ApplyInverseMultiplier(float baseVal, float percentMultiplier)
 	{
 		float m = percentMultiplier / 100f;
 		if (m <= 0.0001f) m = 0.0001f;
 		return baseVal / m;
 	}
+
 	public void SetPermanentMultiplier(Multiplier type, float multiplier)
 	{
 		SetMultiplier(type, multiplier);
@@ -56,107 +60,75 @@ public abstract class AbstractMultipliers : MonoBehaviour
 	private IEnumerator TempMultiplierRemover(Multiplier type, float amount, float resetTime)
 	{
 		yield return new WaitForSeconds(resetTime);
-
 		RemoveMultiplier(type, amount);
 	}
+
 	private void SetMultiplier(Multiplier type, float multiplier)
 	{
 		float percent = 100 + (100 * multiplier);
 
 		switch (type)
 		{
-			case Multiplier.Damage:
-				damageMultiplier = percent;
-				break;
-			case Multiplier.Health:
-				healthMultiplier = percent;
-				break;
-			case Multiplier.Speed:
-				speedMultiplier = percent;
-				break;
-			case Multiplier.Jump:
-				jumpMultiplier = percent;
-				break;
-			case Multiplier.AtkSpd:
-				attackSpeedMultiplier = percent;
-				break;
-			case Multiplier.PrjSize:
-				projectileSizeMultiplier = percent;
-				break;
-			case Multiplier.PrjSpeed:
-				projectileSpeedMultiplier = percent;
-				break;
-			default:
-				break;
+			case Multiplier.Damage: damageMultiplier = percent; break;
+			case Multiplier.Health: healthMultiplier = percent; break;
+			case Multiplier.Speed: speedMultiplier = percent; break;
+			case Multiplier.Jump: jumpMultiplier = percent; break;
+			case Multiplier.AtkSpd: attackSpeedMultiplier = percent; break;
+			case Multiplier.PrjSize: projectileSizeMultiplier = percent; break;
+			case Multiplier.PrjSpeed: projectileSpeedMultiplier = percent; break;
+			case Multiplier.Knockback: knockbackMultiplier = percent; break;
+			case Multiplier.Experience: experienceMultiplier = percent; break;
+
+			default: break;
 		}
 
 		ApplyValues();
 	}
+
 	private void AddMultiplier(Multiplier type, float percent)
 	{
 		switch (type)
 		{
-			case Multiplier.Damage:
-				damageMultiplier += percent;
-				break;
-			case Multiplier.Health:
-				healthMultiplier += percent;
-				break;
-			case Multiplier.Speed:
-				speedMultiplier += percent;
-				break;
-			case Multiplier.Jump:
-				jumpMultiplier += percent;
-				break;
-			case Multiplier.AtkSpd:
-				attackSpeedMultiplier += percent;
-				break;
-			case Multiplier.PrjSize:
-				projectileSizeMultiplier += percent;
-				break;
-			case Multiplier.PrjSpeed:
-				projectileSpeedMultiplier += percent;
-				break;
-			default:
-				break;
+			case Multiplier.Damage: damageMultiplier += percent; break;
+			case Multiplier.Health: healthMultiplier += percent; break;
+			case Multiplier.Speed: speedMultiplier += percent; break;
+			case Multiplier.Jump: jumpMultiplier += percent; break;
+			case Multiplier.AtkSpd: attackSpeedMultiplier += percent; break;
+			case Multiplier.PrjSize: projectileSizeMultiplier += percent; break;
+			case Multiplier.PrjSpeed: projectileSpeedMultiplier += percent; break;
+			case Multiplier.Knockback: knockbackMultiplier += percent; break;
+			case Multiplier.Experience: experienceMultiplier += percent; break;
+
+			default: break;
 		}
 
 		ApplyValues();
 	}
+
 	private void RemoveMultiplier(Multiplier type, float percent)
 	{
 		switch (type)
 		{
 			case Multiplier.Damage:
-				damageMultiplier -= percent;
-				damageMultiplier = Mathf.Max(1f, damageMultiplier);
-				break;
+				damageMultiplier -= percent; damageMultiplier = Mathf.Max(1f, damageMultiplier); break;
 			case Multiplier.Health:
-				healthMultiplier -= percent;
-				healthMultiplier = Mathf.Max(1f, healthMultiplier);
-				break;
+				healthMultiplier -= percent; healthMultiplier = Mathf.Max(1f, healthMultiplier); break;
 			case Multiplier.Speed:
-				speedMultiplier -= percent;
-				speedMultiplier = Mathf.Max(1f, speedMultiplier);
-				break;
+				speedMultiplier -= percent; speedMultiplier = Mathf.Max(1f, speedMultiplier); break;
 			case Multiplier.Jump:
-				jumpMultiplier -= percent;
-				jumpMultiplier = Mathf.Max(1f, jumpMultiplier);
-				break;
+				jumpMultiplier -= percent; jumpMultiplier = Mathf.Max(1f, jumpMultiplier); break;
 			case Multiplier.AtkSpd:
-				attackSpeedMultiplier -= percent;
-				attackSpeedMultiplier = Mathf.Max(1f, attackSpeedMultiplier);
-				break;
+				attackSpeedMultiplier -= percent; attackSpeedMultiplier = Mathf.Max(1f, attackSpeedMultiplier); break;
 			case Multiplier.PrjSize:
-				projectileSizeMultiplier -= percent;
-				projectileSizeMultiplier = Mathf.Max(1f, projectileSizeMultiplier);
-				break;
+				projectileSizeMultiplier -= percent; projectileSizeMultiplier = Mathf.Max(1f, projectileSizeMultiplier); break;
 			case Multiplier.PrjSpeed:
-				projectileSpeedMultiplier -= percent;
-				projectileSpeedMultiplier = Mathf.Max(1f, projectileSpeedMultiplier);
-				break;
-			default:
-				break;
+				projectileSpeedMultiplier -= percent; projectileSpeedMultiplier = Mathf.Max(1f, projectileSpeedMultiplier); break;
+			case Multiplier.Knockback:
+				knockbackMultiplier -= percent; knockbackMultiplier = Mathf.Max(1f, knockbackMultiplier); break;
+			case Multiplier.Experience:
+				experienceMultiplier -= percent; experienceMultiplier = Mathf.Max(1f, experienceMultiplier); break;
+
+			default: break;
 		}
 
 		ApplyValues();
@@ -164,6 +136,7 @@ public abstract class AbstractMultipliers : MonoBehaviour
 
 	protected abstract void ApplyValues();
 }
+
 public enum Multiplier
 {
 	Damage,
@@ -172,5 +145,7 @@ public enum Multiplier
 	Jump,
 	AtkSpd,
 	PrjSize,
-	PrjSpeed
+	PrjSpeed,
+	Knockback,
+	Experience
 }

@@ -9,7 +9,9 @@ public class PlayerExperience : MonoBehaviour
 	[Header("XP")]
 	[SerializeField] private int currentXp = 0;
 	[SerializeField] private int xpToLevelUp = 10;
-	public int xpMultiplier = 1;
+	[SerializeField] private int xpMultiplier = 1;
+
+	[SerializeField] private float levelUpMultiplier = 1.5f;
 
 	[Header("Level")]
 	[SerializeField] private int currLevel = 0;
@@ -42,7 +44,7 @@ public class PlayerExperience : MonoBehaviour
 		if (currentXp < xpToLevelUp) return;
 
 		currentXp -= xpToLevelUp;
-		xpToLevelUp *= 2;
+		xpToLevelUp = Mathf.RoundToInt(xpToLevelUp * levelUpMultiplier);
 
 		currLevel++;
 		GainSkillPoint(1);

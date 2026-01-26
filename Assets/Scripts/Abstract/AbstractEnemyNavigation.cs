@@ -143,15 +143,15 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 	//	else
 	//		return null;
 	//}
-	public void DoKnockback(Vector3 hitPoint)
+	public void DoKnockback(Vector3 hitPoint, float knockbackMultiplier)
 	{
 		if (!IsServer) return;
 
 		if (currKnockbackCoroutine != null)
 			StopCoroutine(currKnockbackCoroutine);
-		currKnockbackCoroutine = StartCoroutine(OnKnockback(hitPoint));
+		currKnockbackCoroutine = StartCoroutine(OnKnockback(hitPoint, knockbackMultiplier));
 	}
-	protected virtual IEnumerator OnKnockback(Vector3 hitPoint)
+	protected virtual IEnumerator OnKnockback(Vector3 hitPoint, float knockbackMultiplier)
 	{
 		#region Init
 		if (!IsServer)
@@ -171,11 +171,11 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 		Vector3 dir = (transform.position - hitPoint).normalized;
 
 		// Set a far destination in the knockback direction
-		Vector3 dest = transform.position + dir * 10f;
+		Vector3 dest = transform.position + dir * 100f;
 		agent.SetDestination(dest);
 
 		// Apply high initial knockback speed
-		agent.speed = knockbackForce;
+		agent.speed = knockbackForce * knockbackMultiplier;
 
 		// Smoothly reduce speed to 0 over knockbackDuration
 		float elapsed = 0f;
@@ -188,7 +188,7 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 		{
 			elapsed += Time.deltaTime;
 			float t = elapsed / knockbackDuration;
-			agent.speed = Mathf.Lerp(knockbackForce, 0f, t);
+			agent.speed = Mathf.Lerp(knockbackForce * knockbackMultiplier, 0f, t);
 
 			if (netTransform != null)
 			{

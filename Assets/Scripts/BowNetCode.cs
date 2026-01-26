@@ -22,14 +22,14 @@ public class BowNetCode : NetworkBehaviour
 		arrow.Initialize(dmg, spd, size, dir, shooterPos: Vector3.zero, shooterClientId, false, arrowEffects);
 	}
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-	public void HitServerRpc(ulong targetNetId, float amount, Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
+	public void HitServerRpc(ulong targetNetId, float amount, Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects, float knockbackMultiplier)
 	{
 		var target = NetworkManager.Singleton.SpawnManager.SpawnedObjects[targetNetId];
 
 		if (target.TryGetComponent<AbstractDamagable>(out var dmg))
 		{
 			dmg.SetLastHitBy(shooterClientId);
-			dmg.TakeDamage(amount, hitPoint, arrowEffects);
+			dmg.TakeDamage(amount, hitPoint, arrowEffects, knockbackMultiplier);
 		}
 	}
 }

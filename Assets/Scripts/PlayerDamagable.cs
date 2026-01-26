@@ -126,16 +126,16 @@ public class PlayerDamagable : AbstractDamagable
 	}
 	public void KillPlayer()
 	{
-		TakeDamage(currentHealth, transform.position, null);
+		TakeDamage(currentHealth, transform.position, null, 0);
 	}
-	protected override void HandleKnockback(Vector3 hitPoint)
+	protected override void HandleKnockback(Vector3 hitPoint, float knockbackMultiplier)
 	{
 		Vector3 dir = (transform.position - hitPoint);
 		dir.y = 0f;
 		if (dir.sqrMagnitude > 0.001f)
 		{
 			dir.Normalize();
-			ApplyKnockbackOwnerRpc(dir * knockbackStrength);
+			ApplyKnockbackOwnerRpc(dir * (knockbackStrength * knockbackMultiplier));
 		}
 	}
 	protected override float DamageSet(float amount)

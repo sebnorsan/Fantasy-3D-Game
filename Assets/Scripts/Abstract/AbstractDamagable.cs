@@ -1,3 +1,4 @@
+using Unity.Hierarchy;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -130,13 +131,13 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 	protected virtual void OnPlayDamageAnimation() { }
 
 	// Call this from TakeDamage (server-side)
-	protected virtual void HandleKnockback(Vector3 hitPoint) { }
+	protected virtual void HandleKnockback(Vector3 hitPoint, float knockbackMultiplier) { }
 
 	// Extra client-side logic when damage rpc arrives (shake, extra anim, etc.)
 	protected virtual void OnDamageEffectsClient(Vector3 hitPoint, ulong shooterClientId, bool isShooter) { }
 
 	// IDamagable must still be implemented by the real types
-	public virtual void TakeDamage(float amount, Vector3 hitPoint, ArrowEffect[] arrowEffects)
+	public virtual void TakeDamage(float amount, Vector3 hitPoint, ArrowEffect[] arrowEffects, float knockbackMultiplier)
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
@@ -144,7 +145,7 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 		syncedHealth.Value = currentHealth;
 
 		ApplyCurrentEffects(arrowEffects);
-		HandleKnockback(hitPoint);
+		HandleKnockback(hitPoint, knockbackMultiplier);
 		DamageEffectsClientRpc(hitPoint, lastHitByClientId, arrowEffects);
 		CheckForDeath();
 	}

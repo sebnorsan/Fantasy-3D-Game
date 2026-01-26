@@ -149,7 +149,15 @@ public class ExperienceEmitter : MonoBehaviour
 
 		pfxSys.Play();
     }
-    
+	public void ChangeEmission(float expPerParticleAdd, float totalExperienceToAdd)
+	{
+		experiencePerParticle += Mathf.RoundToInt(expPerParticleAdd);
+		totalExperience = Mathf.Max(0f, totalExperience + totalExperienceToAdd);
+		experiencePerSecond += totalExperienceToAdd / experienceSeconds;
+
+		Initializers();
+	}
+
 
 	private void OnParticleTrigger()
 	{
@@ -163,7 +171,7 @@ public class ExperienceEmitter : MonoBehaviour
 		// XP per particle collected
 		PlayerManager.instance.playerExp.AddXp(count * experiencePerParticle);
 
-		Debug.Log("Collected particle with value: " + experiencePerParticle);
+		//Debug.Log("Collected particle with value: " + experiencePerParticle);
 
 		for (int i = 0; i < count; i++)
 		{

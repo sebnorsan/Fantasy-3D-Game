@@ -147,6 +147,6 @@ public class Arrow : MonoBehaviour
 		}
 
 		// tell server if this arrow was big
-		pRef.bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint, shooterClientId, arrowEffects);
+		pRef.bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint, shooterClientId, arrowEffects, pRef.playerMultipliers.GetKnockbackMulti(1));
 	}
 }
