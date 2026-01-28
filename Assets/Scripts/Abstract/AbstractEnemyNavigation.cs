@@ -33,37 +33,30 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 
 	private Coroutine currKnockbackCoroutine;
 
-	private void Awake()
+	private void Start()
 	{
 		if (!agent) agent = GetComponent<NavMeshAgent>();
 
-		// Important: prevents client-side agent init errors during NGO InstantiateNetworkPrefab
-		if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer)
-			agent.enabled = false;
+		// BIG performance win for crowds
+		agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+		agent.autoRepath = false;
+
+		originalAcceleration = agent.acceleration;
+		InitializeEnemy();
 	}
 
 	public override void OnNetworkSpawn()
 	{
 		base.OnNetworkSpawn();
 
-		if (!IsServer) return;
-
-		agent.enabled = true;
-		agent.Warp(transform.position); // keeps internal agent pos in sync
+		if (IsServer)
+			return;
+		else
+			agent.enabled = true;
 
 		originalAcceleration = agent.acceleration;
 		InitializeEnemy();
 	}
-
-	private void Start()
-	{
-		// Avoid double init (Start + OnNetworkSpawn)
-		if (!IsServer) return;
-
-		agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
-		agent.autoRepath = false;
-	}
-
 
 	public void TargetSlain()
 	{
@@ -111,7 +104,7 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 	}
 	protected virtual void InitializeEnemy()
 	{
-		if (!IsServer) return;
+		if (!IsServer || !agent.enabled) return;
 
 		eRef.enemyAnimator.A_SetWalk(true);
 
