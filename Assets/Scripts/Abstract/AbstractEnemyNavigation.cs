@@ -35,24 +35,12 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 
 	private void Awake()
 	{
-		if (!NetworkManager.Singleton.IsServer)
-		{
-			agent.enabled = false;   // client doesn't pathfind
-			return;
-		}
-	}
-	private void Start()
-	{
 		if (!agent) agent = GetComponent<NavMeshAgent>();
 
-		// BIG performance win for crowds
-		agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
-		agent.autoRepath = false;
-
-		originalAcceleration = agent.acceleration;
-		InitializeEnemy();
+		// Important: prevents client-side agent init errors during NGO InstantiateNetworkPrefab
+		if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer)
+			agent.enabled = false;
 	}
-
 
 	public override void OnNetworkSpawn()
 	{
@@ -60,9 +48,22 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 
 		if (!IsServer) return;
 
+		agent.enabled = true;
+		agent.Warp(transform.position); // keeps internal agent pos in sync
+
 		originalAcceleration = agent.acceleration;
 		InitializeEnemy();
 	}
+
+	private void Start()
+	{
+		// Avoid double init (Start + OnNetworkSpawn)
+		if (!IsServer) return;
+
+		agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+		agent.autoRepath = false;
+	}
+
 
 	public void TargetSlain()
 	{
