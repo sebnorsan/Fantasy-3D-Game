@@ -25,7 +25,7 @@ public class EnemyWaveTimer : NetworkBehaviour
 		}
 
 		ClearTimerClientRpc();
-		downTimeTimerFinished.Invoke();
+		downTimeTimerFinished?.Invoke();
 
 		// Countdown finished, tell everyone to play wave intro animation
 		//StartWaveAnimation();
