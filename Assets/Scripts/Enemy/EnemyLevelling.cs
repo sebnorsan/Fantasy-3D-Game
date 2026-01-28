@@ -53,19 +53,26 @@ public class EnemyLevelling : NetworkBehaviour
 	}
 	public void CheckAndAssignLevel(int currentWave, int tierFirstSpawned)
     {
-        if (initialSize == Vector3.zero)
+		AssignClientRpc(currentWave, tierFirstSpawned);
+    }
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+    private void AssignClientRpc(int currentWave, int tierFirstSpawned)
+    {
+		if (!NetworkManager.Singleton.IsServer) return;
+
+		if (initialSize == Vector3.zero)
 			initialSize = scaleToSize.localScale;
 
 		int extraLevels_Waves = (extraLevelPerWave * currentWave) - (extraLevelPerWave * tierFirstSpawned);
-        int extraLevel_Range = Random.Range(1, levelAssignRange + 1);
+		int extraLevel_Range = Random.Range(1, levelAssignRange + 1);
 
-        int levelToSet = extraLevels_Waves + extraLevel_Range;
+		int levelToSet = extraLevels_Waves + extraLevel_Range;
 
-        if (levelToSet > 100)
-            levelToSet = 100;
+		if (levelToSet > 100)
+			levelToSet = 100;
 
-        SetLevel(levelToSet);
-    }
+		SetLevel(levelToSet);
+	}
 
 	private void OnValidate()
 	{
