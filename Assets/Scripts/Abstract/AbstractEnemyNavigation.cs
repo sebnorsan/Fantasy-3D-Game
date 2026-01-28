@@ -33,6 +33,14 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 
 	private Coroutine currKnockbackCoroutine;
 
+	private void Awake()
+	{
+		if (!NetworkManager.Singleton.IsServer)
+		{
+			agent.enabled = false;   // client doesn't pathfind
+			return;
+		}
+	}
 	private void Start()
 	{
 		if (!agent) agent = GetComponent<NavMeshAgent>();
@@ -50,11 +58,7 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 	{
 		base.OnNetworkSpawn();
 
-		if (!IsServer)
-		{
-			agent.enabled = false;   // client doesn't pathfind
-			return;
-		}
+		if (!IsServer) return;
 
 		originalAcceleration = agent.acceleration;
 		InitializeEnemy();
