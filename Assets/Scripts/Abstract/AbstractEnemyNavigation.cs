@@ -171,7 +171,7 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 		Vector3 dir = (transform.position - hitPoint).normalized;
 
 		// Set a far destination in the knockback direction
-		Vector3 dest = transform.position + dir * 1000f;
+		Vector3 dest = transform.position + dir * 100f;
 		agent.SetDestination(dest);
 
 		// Apply high initial knockback speed
