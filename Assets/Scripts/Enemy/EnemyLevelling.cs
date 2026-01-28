@@ -46,11 +46,18 @@ public class EnemyLevelling : NetworkBehaviour
 
     [SerializeField] private TMPro.TextMeshProUGUI levelText;
 
-	private void Start()
+	private void Awake()
 	{
-		if (initialSize == Vector3.zero)
+		if (scaleToSize != null && initialSize == Vector3.zero)
 			initialSize = scaleToSize.localScale;
 	}
+
+	public override void OnNetworkSpawn()
+	{
+		if (scaleToSize != null && initialSize == Vector3.zero)
+			initialSize = scaleToSize.localScale;
+	}
+
 	public void CheckAndAssignLevel(int currentWave, int tierFirstSpawned)
     {
 		AssignClientRpc(currentWave, tierFirstSpawned);
@@ -90,6 +97,9 @@ public class EnemyLevelling : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
     private void SetLevelClientRpc(int lvl = -1)
     {
+		if (scaleToSize != null && initialSize == Vector3.zero)
+			initialSize = scaleToSize.localScale;
+
 		if (lvl != -1)
 			currentLevel = lvl;
 		if (currentLevel > 100)
