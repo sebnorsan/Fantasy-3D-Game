@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -14,6 +15,7 @@ public abstract class AbstractEnemy : NetworkBehaviour
 	public int xpDrop = 1;
 
 	public static readonly List<AbstractEnemy> All = new();
+	public static Action enemyHasDied;
 
 	private void OnEnable()
 	{
@@ -24,6 +26,7 @@ public abstract class AbstractEnemy : NetworkBehaviour
 	private void OnDisable()
 	{
 		All.Remove(this);
+		enemyHasDied?.Invoke();
 	}
 
 

@@ -104,10 +104,12 @@ public class EnemyWaveController : NetworkBehaviour
 	private void OnEnable()
 	{
 		EnemyWaveTimer.downTimeTimerFinished += StartNextWave;
+		AbstractEnemy.enemyHasDied += CheckForFinish;
 	}
 	private void OnDisable()
 	{
 		EnemyWaveTimer.downTimeTimerFinished -= StartNextWave;
+		AbstractEnemy.enemyHasDied -= CheckForFinish;
 	}
 
 	public int GetNextWave() => _currentWave + 1;
@@ -122,7 +124,7 @@ public class EnemyWaveController : NetworkBehaviour
 	{
 		if (_spawnRoutine == null)
 			if (Input.GetKeyDown(KeyCode.O))
-				StartWave(GetNextWave());
+				StartNextWave();
 	}
 	private void StartNextWave()
 	{
@@ -207,14 +209,8 @@ public class EnemyWaveController : NetworkBehaviour
 	/// </summary>
 	private void CheckForFinish()
 	{
-		var e = FindFirstObjectByType<AbstractEnemy>();
-
-		if (e != null)
-		{
-			Invoke(nameof(CheckForFinish), .1f);
-			//Debug.Log($"An enemy with the name {e.name} is still alive!");
+		if (AbstractEnemy.All.Count > 0)
 			return;
-		}
 
 		WaveFinish();
 		CancelInvoke();
