@@ -67,7 +67,6 @@ public class EnemyWaveController : NetworkBehaviour
 	[Header("DEFAULT VALUE IS -1")]
 	[SerializeField] private int _currentWave = -1;
 	private int[] _remainingThisWave;
-	private int _remainingTotal;
 	private Coroutine _spawnRoutine;
 
 	private EnemySpawnPoint[] _spawnPointsThisWave;
@@ -173,7 +172,6 @@ public class EnemyWaveController : NetworkBehaviour
 			Debug.LogWarning($"Wave {waveIndex + 1}: No spawn points match spawnPointsAvailable!");
 
 		_remainingThisWave = wave.enemyTierSpawnAmount.ToArray();
-		_remainingTotal = _remainingThisWave.Sum();
 
 		Debug.Log($"Wave {waveIndex + 1} started: total enemies = {_remainingThisWave.Sum()}");
 
@@ -214,41 +212,26 @@ public class EnemyWaveController : NetworkBehaviour
 			if (!NetworkManager.Singleton.IsServer)
 				yield break; // safety
 
-			yield return new WaitForSeconds(UnityEngine.Random.Range(
-				enemyWaves[_currentWave].minSpawnInterval,
-				enemyWaves[_currentWave].maxSpawnInterval));
+			yield return new WaitForSeconds(UnityEngine.Random.Range(enemyWaves[_currentWave].minSpawnInterval, enemyWaves[_currentWave].maxSpawnInterval));
 
-			if (_remainingThisWave == null || _remainingTotal <= 0)
-			{
-				Debug.Log("No more enemies to spawn");
-				CheckForFinish();
+			if (_remainingThisWave == null || _remainingThisWave.Sum() == 0)
 				yield break;
-			}
 
-			// Try up to 5 times to get ONE successful spawn this tick
-			bool spawnedThisTick = false;
-			for (int i = 0; i < 5 && !spawnedThisTick; i++)
-			{
-				int before = _remainingTotal;
-				TrySpawnOne();
-				spawnedThisTick = _remainingTotal < before;
-			}
+			TrySpawnOne();
 		}
 	}
-
-
 	private void TrySpawnOne()
 	{
 		if (!NetworkManager.Singleton.IsServer)
 			return;
-
 		if (_remainingThisWave == null || _remainingThisWave.Length == 0)
 			return;
-
+		if (enemySpawnPoints == null || enemySpawnPoints.Length == 0)
+			return;
 		if (_spawnPointsThisWave == null || _spawnPointsThisWave.Length == 0)
 			return;
 
-		// pick a random tier with remaining > 0
+		//Makes a new Array, and sets the up where count is how many enemies are left, and idx is what tier that enemy is.
 		var available = _remainingThisWave
 			.Select((count, idx) => new { count, idx })
 			.Where(x => x.count > 0)
@@ -269,66 +252,115 @@ public class EnemyWaveController : NetworkBehaviour
 		// pick random prefab in tier
 		var prefab = tier.enemyPrefabs[UnityEngine.Random.Range(0, tier.enemyPrefabs.Length)];
 
-		// try a few positions so we don't stall if one is invalid
-		const int positionAttempts = 8;
+		var sp = _spawnPointsThisWave[UnityEngine.Random.Range(0, _spawnPointsThisWave.Length)];
 
-		for (int i = 0; i < positionAttempts; i++)
-		{
-			// pick random spawn point
-			var sp = _spawnPointsThisWave[UnityEngine.Random.Range(0, _spawnPointsThisWave.Length)];
-			if (sp == null || sp.spawnPoint == null)
-				continue;
+		Vector3 offset = UnityEngine.Random.insideUnitSphere * sp.spawnRadius;
+		offset.y = 0;
+		Vector3 candidate = sp.spawnPoint.position + offset;
 
-			// --- Debug_EnemySpawner-style position finding ---
-			if (!TryGetSpawnPosition(sp.spawnPoint.position, sp.spawnRadius, out var spawnPos))
-				continue;
-
-			// SERVER spawns networked enemy
-			var inst = Instantiate(prefab, spawnPos, Quaternion.identity);
-			var nwo = inst.GetComponent<NetworkObject>();
-
-			if (nwo == null)
-			{
-				Debug.LogWarning($"Spawned enemy '{prefab.name}' has no NetworkObject! Destroying instance.");
-				Destroy(inst);
-				continue;
-			}
-
-			nwo.Spawn();
-
-			// keep levelling EXACTLY the same way as before
-			var lvl = inst.GetComponent<EnemyLevelling>();
-			if (lvl != null)
-				lvl.CheckAndAssignLevel(_currentWave, GetWaveTierIsFirstSpawned(tierIdx));
-
-			_remainingThisWave[tierIdx]--;
-			_remainingTotal--;
-			return;
-		}
-	}
-	private bool TryGetSpawnPosition(Vector3 origin, float radius, out Vector3 position)
-	{
-		position = default;
-
-		Vector3 offset = UnityEngine.Random.insideUnitSphere * radius;
-		offset.y = 0f;
-
-		Vector3 candidate = origin + offset;
-
-		// obstacle collision check (Debug_EnemySpawner style)
+		// obstacle collision check
 		if (Physics.CheckSphere(candidate, 0.5f, obstacleMask))
-			return false;
+			return;
 
-		// NavMesh sample (Debug_EnemySpawner style)
+		// NavMesh sample
 		if (NavMesh.SamplePosition(candidate, out var hit, maxNavSampleDistance, NavMesh.AllAreas))
 		{
-			position = hit.position;
-			return true;
+			// SERVER spawns networked enemy
+			var inst = Instantiate(prefab, hit.position, Quaternion.identity);
+			var nwo = inst.GetComponent<NetworkObject>();
+			if (nwo != null)
+				nwo.Spawn();
+			else
+			{
+				Debug.LogWarning($"Spawned enemy '{prefab.name}' has no NetworkObject!");
+				return;
+			}
+
+			_remainingThisWave[tierIdx]--;
 		}
-
-		return false;
 	}
+	//private bool TrySpawnOne()
+	//{
+	//	if (!NetworkManager.Singleton.IsServer)
+	//		return false;
 
+	//	if (_remainingThisWave == null || _remainingThisWave.Length == 0)
+	//		return false;
+
+	//	if (enemySpawnPoints == null || enemySpawnPoints.Length == 0)
+	//		return false;
+
+	//	if (_spawnPointsThisWave == null || _spawnPointsThisWave.Length == 0)
+	//		return false;
+
+	//	// pick a random tier with remaining > 0
+	//	var available = _remainingThisWave
+	//		.Select((count, idx) => new { count, idx })
+	//		.Where(x => x.count > 0)
+	//		.ToArray();
+
+	//	if (available.Length == 0)
+	//		return false;
+
+	//	int tierIdx = available[UnityEngine.Random.Range(0, available.Length)].idx;
+
+	//	if (tierIdx < 0 || tierIdx >= enemyTiers.Length)
+	//		return false;
+
+	//	var tier = enemyTiers[tierIdx];
+	//	if (tier.enemyPrefabs == null || tier.enemyPrefabs.Length == 0)
+	//		return false;
+
+	//	// pick random prefab in tier
+	//	var prefab = tier.enemyPrefabs[UnityEngine.Random.Range(0, tier.enemyPrefabs.Length)];
+
+	//	// try a few positions so we don't stall if one is invalid
+	//	const int positionAttempts = 8;
+
+	//	for (int i = 0; i < positionAttempts; i++)
+	//	{
+	//		// pick random spawn point
+	//		var sp = _spawnPointsThisWave[UnityEngine.Random.Range(0, _spawnPointsThisWave.Length)];
+
+	//		if (sp == null || sp.spawnPoint == null)
+	//			continue;
+
+	//		Vector3 offset = UnityEngine.Random.insideUnitSphere * sp.spawnRadius;
+	//		offset.y = 0f;
+	//		Vector3 candidate = sp.spawnPoint.position + offset;
+
+	//		// obstacle collision check (skip if mask is Nothing / 0)
+	//		if (obstacleMask.value != 0 && Physics.CheckSphere(candidate, 0.5f, obstacleMask))
+	//			continue;
+
+	//		// NavMesh sample
+	//		if (!NavMesh.SamplePosition(candidate, out var hit, maxNavSampleDistance, NavMesh.AllAreas))
+	//			continue;
+
+	//		// SERVER spawns networked enemy
+	//		var inst = Instantiate(prefab, hit.position, Quaternion.identity);
+	//		var nwo = inst.GetComponent<NetworkObject>();
+
+	//		if (nwo == null)
+	//		{
+	//			Debug.LogWarning($"Spawned enemy '{prefab.name}' has no NetworkObject! Destroying instance.");
+	//			Destroy(inst);
+	//			continue;
+	//		}
+
+	//		nwo.Spawn();
+
+	//		var lvl = inst.GetComponent<EnemyLevelling>();
+	//		if (lvl != null)
+	//			lvl.CheckAndAssignLevel(_currentWave, GetWaveTierIsFirstSpawned(tierIdx));
+
+	//		_remainingThisWave[tierIdx]--;
+	//		return true;
+	//	}
+
+	//	// couldn't find a valid position this tick
+	//	return false;
+	//}
 	private void OnDrawGizmos()
 	{
 		Gizmos.color = new Color(1f, 0f, 0f, 0.6f);
