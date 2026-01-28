@@ -7,9 +7,8 @@ using System.Collections;
 public class PlayerExperience : MonoBehaviour
 {
 	[Header("XP")]
-	[SerializeField] private int currentXp = 0;
+	[SerializeField] private float currentXp = 0;
 	[SerializeField] private int xpToLevelUp = 10;
-	[SerializeField] private int xpMultiplier = 1;
 
 	[SerializeField] private float levelUpMultiplier = 1.5f;
 
@@ -29,14 +28,13 @@ public class PlayerExperience : MonoBehaviour
 	{
 		UpdateXpGraphics();
 	}
-	public void AddXp(int xp)
+	public void AddXp(float xp)
 	{
-		currentXp += xp * xpMultiplier;
+		currentXp += PlayerManager.m_pRef.playerMultipliers.GetExperienceMulti(xp);
 
 		TryLevelUp();
 		UpdateXpGraphics();
 	}
-
 	public bool IsSkillPointAvailable() => skillPointsAvailable >= 1;
 
 	private void TryLevelUp()

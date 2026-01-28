@@ -45,6 +45,15 @@ public class InteractionHandler : MonoBehaviour
 
 		// Visual state (compute once per frame)
 		bool hasHit = TryGetFirstValidHit(ray, out RaycastHit hit);
+
+		//if (hasHit)
+		//{
+		//	Debug.Log($"Hit: {hit.collider.name} (GO: {hit.collider.gameObject.name}) " +
+		//			  $"dist={hit.distance:F2} point={hit.point} normal={hit.normal} " +
+		//			  $"layer={LayerMask.LayerToName(hit.collider.gameObject.layer)} tag={hit.collider.tag}",
+		//			  hit.collider.gameObject);
+		//}
+
 		bool isLooking = hasHit && hit.transform.TryGetComponent<IInteractable>(out var lookInteractable) && lookInteractable.canInteract;
 
 		if (interactionKeyAnimator)
