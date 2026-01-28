@@ -838,6 +838,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  NetworkAnimatorExpanded: 0
+  AuthorityMode: 0
+  m_Animator: {fileID: 440903288752805972}
   TransitionStateInfoList:
   - IsCrossFadeExit: 0
     Layer: 0
@@ -846,7 +849,29 @@ MonoBehaviour:
     TransitionDuration: 0.1
     TriggerNameHash: 1080829965
     TransitionIndex: 1
-  m_Animator: {fileID: 440903288752805972}
+  AnimatorParameterEntries:
+    ParameterEntries:
+    - name: Walking
+      NameHash: 1744665739
+      Synchronize: 1
+      ParameterType: 4
+    - name: Damage
+      NameHash: 375673178
+      Synchronize: 1
+      ParameterType: 9
+    - name: Attack
+      NameHash: 1080829965
+      Synchronize: 1
+      ParameterType: 9
+    - name: Victory
+      NameHash: -1090111034
+      Synchronize: 1
+      ParameterType: 4
+    - name: NoTarget
+      NameHash: -724911917
+      Synchronize: 1
+      ParameterType: 4
+  AnimatorParametersExpanded: 0
 --- !u!114 &7088274710624416125
 MonoBehaviour:
   m_ObjectHideFlags: 0
