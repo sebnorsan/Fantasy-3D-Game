@@ -9235,11 +9235,8 @@ PrefabInstance:
       propertyPath: interactionAnimator
       value: 
       objectReference: {fileID: 607972138}
-    - target: {fileID: 7396626512906889687, guid: ae38728ec08a5d14bb20428b8aac5a29, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7396626512906889687, guid: ae38728ec08a5d14bb20428b8aac5a29, type: 3}
     m_RemovedGameObjects:
     - {fileID: 4517815863565047177, guid: ae38728ec08a5d14bb20428b8aac5a29, type: 3}
     m_AddedGameObjects: []
