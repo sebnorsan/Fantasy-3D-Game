@@ -252,31 +252,46 @@ public class EnemyWaveController : NetworkBehaviour
 		// pick random prefab in tier
 		var prefab = tier.enemyPrefabs[UnityEngine.Random.Range(0, tier.enemyPrefabs.Length)];
 
-		var sp = _spawnPointsThisWave[UnityEngine.Random.Range(0, _spawnPointsThisWave.Length)];
+		const int positionAttempts = 8;
 
-		Vector3 offset = UnityEngine.Random.insideUnitSphere * sp.spawnRadius;
-		offset.y = 0;
-		Vector3 candidate = sp.spawnPoint.position + offset;
-
-		// obstacle collision check
-		if (Physics.CheckSphere(candidate, 0.5f, obstacleMask))
-			return;
-
-		// NavMesh sample
-		if (NavMesh.SamplePosition(candidate, out var hit, maxNavSampleDistance, NavMesh.AllAreas))
+		for (int i = 0; i < positionAttempts; i++)
 		{
-			// SERVER spawns networked enemy
-			var inst = Instantiate(prefab, hit.position, Quaternion.identity);
-			var nwo = inst.GetComponent<NetworkObject>();
-			if (nwo != null)
-				nwo.Spawn();
-			else
+			var sp = _spawnPointsThisWave[UnityEngine.Random.Range(0, _spawnPointsThisWave.Length)];
+
+			if (sp == null || sp.spawnPoint == null)
+				continue;
+
+				Vector3 offset = UnityEngine.Random.insideUnitSphere * sp.spawnRadius;
+			offset.y = 0;
+			Vector3 candidate = sp.spawnPoint.position + offset;
+
+			// obstacle collision check
+			if (Physics.CheckSphere(candidate, 0.5f, obstacleMask))
+				continue;
+
+			// NavMesh sample
+			if (NavMesh.SamplePosition(candidate, out var hit, maxNavSampleDistance, NavMesh.AllAreas))
 			{
-				Debug.LogWarning($"Spawned enemy '{prefab.name}' has no NetworkObject!");
+				// SERVER spawns networked enemy
+				var inst = Instantiate(prefab, hit.position, Quaternion.identity);
+				var nwo = inst.GetComponent<NetworkObject>();
+				if (nwo != null)
+					nwo.Spawn();
+				else
+				{
+					Debug.LogWarning($"Spawned enemy '{prefab.name}' has no NetworkObject!");
+					continue;
+				}
+
+				var lvl = inst.GetComponent<EnemyLevelling>();
+				if (lvl != null)
+					lvl.CheckAndAssignLevel(_currentWave, GetWaveTierIsFirstSpawned(tierIdx));
+
+				_remainingThisWave[tierIdx]--;
 				return;
 			}
 
-			_remainingThisWave[tierIdx]--;
+			return;
 		}
 	}
 	//private bool TrySpawnOne()
