@@ -20,15 +20,15 @@ public class EnemyViewCulling : MonoBehaviour
 			extraAnimators = GetComponentsInChildren<Animator>(includeInactive: true);
 	}
 
-	void OnBecameVisible()
-	{
-		SetClientActive(true);
-	}
+	//void OnBecameVisible()
+	//{
+	//	SetClientActive(true);
+	//}
 
-	void OnBecameInvisible()
-	{
-		SetClientActive(false);
-	}
+	//void OnBecameInvisible()
+	//{
+	//	SetClientActive(false);
+	//}
 
 	void SetClientActive(bool active)
 	{
