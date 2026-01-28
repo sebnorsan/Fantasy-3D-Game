@@ -16,11 +16,8 @@ public class EnemyWaveVisuals : NetworkBehaviour
 	private Material runtimeSkybox;
 	private Coroutine transitionRoutine;
 
-	private WaveVisualType currentVisualType;
-
 	private static readonly int CubemapTransitionID = Shader.PropertyToID("_CubemapTransition");
 
-	public bool IsDownTime() => currentVisualType == WaveVisualType.Night;
 	public override void OnNetworkSpawn()
 	{
 		if (skyboxMaterial == null)
@@ -32,14 +29,14 @@ public class EnemyWaveVisuals : NetworkBehaviour
 		RenderSettings.skybox = runtimeSkybox;
 	}
 
-	public void SetVisualType(WaveVisualType visualType, float dur)
+	public void SetVisualType(GameStateType visualType, float dur)
 	{
 		if (!NetworkManager.IsServer) return;
 
 		SetVisualTypeClientRpc(visualType, dur);
 	}
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void SetVisualTypeClientRpc(WaveVisualType visualType, float dur)
+	private void SetVisualTypeClientRpc(GameStateType visualType, float dur)
 	{
 		if (runtimeSkybox == null) return;
 
@@ -51,15 +48,15 @@ public class EnemyWaveVisuals : NetworkBehaviour
 		transitionRoutine = StartCoroutine(ChangeWaveVisualMode(visualType, dur));
 	}
 
-	private IEnumerator ChangeWaveVisualMode(WaveVisualType visualType, float dur)
+	private IEnumerator ChangeWaveVisualMode(GameStateType visualType, float dur)
 	{
-		currentVisualType = visualType;
+		GameStateManager.SetCurrentGameState(visualType);
 
 		float startValue = runtimeSkybox.GetFloat(CubemapTransitionID);
-		float targetValue = (visualType == WaveVisualType.Night) ? 1f : 0f;
+		float targetValue = (visualType == GameStateType.Night) ? 1f : 0f;
 
 		float startLightValue = dirLight.intensity;
-		float targetLightValue = (visualType == WaveVisualType.Night) ? nightIntensity : dayIntensity;
+		float targetLightValue = (visualType == GameStateType.Night) ? nightIntensity : dayIntensity;
 
 		float t = 0f;
 		while (t < dur)
@@ -81,8 +78,4 @@ public class EnemyWaveVisuals : NetworkBehaviour
 	}
 }
 
-public enum WaveVisualType
-{
-	Morning,
-	Night
-}
+

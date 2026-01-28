@@ -24,6 +24,9 @@ public class EventManager : MonoBehaviour
 	private void Start()
 	{
 		netHelper = GetComponent<NetHelper>();
+
+		if (interactionAnimator == null)
+			Debug.LogError("Interaction Animator is not assigned");
 	}
 
 	#region ===== Activate-Deactivate-GameObject/Colliders =====

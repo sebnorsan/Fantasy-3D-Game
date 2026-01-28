@@ -136,8 +136,8 @@ public class EnemyWaveController : NetworkBehaviour
 		if (!NetworkManager.Singleton.IsServer)
 			return;
 
-		if (enemyWaveVisuals.IsDownTime())
-			enemyWaveVisuals.SetVisualType(WaveVisualType.Morning, 3f);
+		if (GameStateManager.GetCurrentGameState() == GameStateType.Night)
+			enemyWaveVisuals.SetVisualType(GameStateType.Morning, 3f);
 
 		_currentWave = waveIndex;
 
@@ -195,7 +195,7 @@ public class EnemyWaveController : NetworkBehaviour
 			StopCoroutine(_spawnRoutine);
 
 		enemyWaveTimer.StartDownTimeTimer(enemyWaves[_currentWave].enemyDownTime);
-		enemyWaveVisuals.SetVisualType(WaveVisualType.Night, 3f);
+		enemyWaveVisuals.SetVisualType(GameStateType.Night, 3f);
 
 		Debug.Log($"Wave {_currentWave + 1} complete.");
 
