@@ -602,7 +602,6 @@ GameObject:
   - component: {fileID: 5810947158280776280}
   - component: {fileID: 7065662842040489496}
   - component: {fileID: 440903288752805972}
-  - component: {fileID: 8630723966367710834}
   - component: {fileID: -5819705572486460096}
   - component: {fileID: 2437505393328859429}
   - component: {fileID: 1277491528084641670}
@@ -638,7 +637,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7256944004361502440}
-  - {fileID: 554870033918973275}
   - {fileID: 5754897234042762816}
   - {fileID: 1799213221600001738}
   m_Father: {fileID: 0}
@@ -718,24 +716,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!205 &8630723966367710834
-LODGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3070977239302808498}
-  serializedVersion: 2
-  m_LocalReferencePoint: {x: 0, y: 0, z: 0}
-  m_Size: 1
-  m_FadeMode: 0
-  m_AnimateCrossFading: 0
-  m_LastLODIsBillboard: 0
-  m_LODs:
-  - screenRelativeHeight: 0.013323506
-    fadeTransitionWidth: 0
-    renderers: []
-  m_Enabled: 1
 --- !u!114 &-5819705572486460096
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -908,7 +888,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   eRef: {fileID: 7088274710624416125}
-  lod_anim: {fileID: 6789067440576598229}
+  lod_anim: {fileID: 0}
   xpDrop: 1
 --- !u!114 &6417466505740927892
 MonoBehaviour:
@@ -2090,82 +2070,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -70, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &8338707685864320836
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 554870033918973275}
-  - component: {fileID: 6789067440576598229}
-  - component: {fileID: 400154082143239777}
-  m_Layer: 11
-  m_Name: Culling
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &554870033918973275
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8338707685864320836}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8864574165799043315}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6789067440576598229
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8338707685864320836}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a82c8d3cdf041349be4642ee20911ee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimatorLOD
-  blinkAnimator: {fileID: 4245414219368997270}
-  enemyAnimator: {fileID: 440903288752805972}
-  spawnAnimationTime: 1.5
-  nearDist: 25
-  midDist: 75
-  farDist: 150
-  framesPerUpdate: 1
---- !u!114 &400154082143239777
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8338707685864320836}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df5470103c259e74690352ab559e8d5b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  renderers:
-  - {fileID: 6215152226707891547}
-  - {fileID: 4371237967362697861}
-  - {fileID: 8661901004868796739}
-  animatorLOD: {fileID: 6789067440576598229}
-  extraAnimators:
-  - {fileID: 4245414219368997270}
-  - {fileID: 440903288752805972}
-  extraClientLogic:
-  - {fileID: 0}
-  - {fileID: 920353816357705695}
-  - {fileID: 1277491528084641670}
 --- !u!1 &8385252748624161420
 GameObject:
   m_ObjectHideFlags: 0
