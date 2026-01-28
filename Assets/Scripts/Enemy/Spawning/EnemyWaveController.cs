@@ -276,9 +276,9 @@ public class EnemyWaveController : NetworkBehaviour
 				return;
 			}
 
-			var lvl = inst.GetComponent<EnemyLevelling>();
-			if (lvl != null)
-				lvl.CheckAndAssignLevel(_currentWave, GetWaveTierIsFirstSpawned(tierIdx));
+			//var lvl = inst.GetComponent<EnemyLevelling>();
+			//if (lvl != null)
+			//	lvl.CheckAndAssignLevel(_currentWave, GetWaveTierIsFirstSpawned(tierIdx));
 
 			_remainingThisWave[tierIdx]--;
 		}
