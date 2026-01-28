@@ -463,6 +463,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  NetworkAnimatorExpanded: 0
+  AuthorityMode: 0
+  m_Animator: {fileID: 2113065143638126602}
   TransitionStateInfoList:
   - IsCrossFadeExit: 0
     Layer: 0
@@ -492,7 +495,21 @@ MonoBehaviour:
     TransitionDuration: 0.2
     TriggerNameHash: -147590425
     TransitionIndex: 0
-  m_Animator: {fileID: 2113065143638126602}
+  AnimatorParameterEntries:
+    ParameterEntries:
+    - name: Answer
+      NameHash: -579776749
+      Synchronize: 1
+      ParameterType: 9
+    - name: HangUp
+      NameHash: -147590425
+      Synchronize: 1
+      ParameterType: 9
+    - name: Call
+      NameHash: 1824292864
+      Synchronize: 1
+      ParameterType: 9
+  AnimatorParametersExpanded: 0
 --- !u!1 &1059146008675930060
 GameObject:
   m_ObjectHideFlags: 0
@@ -22927,6 +22944,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  NetworkAnimatorExpanded: 0
+  AuthorityMode: 0
+  m_Animator: {fileID: 7790377399799966768}
   TransitionStateInfoList:
   - IsCrossFadeExit: 0
     Layer: 0
@@ -22935,7 +22955,21 @@ MonoBehaviour:
     TransitionDuration: 0
     TriggerNameHash: -1316629574
     TransitionIndex: 0
-  m_Animator: {fileID: 7790377399799966768}
+  AnimatorParameterEntries:
+    ParameterEntries:
+    - name: Load
+      NameHash: -2060170461
+      Synchronize: 1
+      ParameterType: 4
+    - name: Shoot
+      NameHash: -1316629574
+      Synchronize: 1
+      ParameterType: 9
+    - name: Reset
+      NameHash: -1856204727
+      Synchronize: 1
+      ParameterType: 9
+  AnimatorParametersExpanded: 0
 --- !u!114 &1675141792546304797
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23543,7 +23577,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2771618475
+  GlobalObjectIdHash: 222003529
   InScenePlacedSourceGlobalObjectIdHash: 2771618475
   DeferredDespawnTick: 0
   Ownership: 1
@@ -24000,6 +24034,8 @@ MonoBehaviour:
   attackSpeedMultiplier: 100
   projectileSizeMultiplier: 100
   projectileSpeedMultiplier: 100
+  knockbackMultiplier: 100
+  experienceMultiplier: 100
   pRef: {fileID: 930708363686757887}
 --- !u!114 &6234475594236647715
 MonoBehaviour:
@@ -24320,8 +24356,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  TransitionStateInfoList: []
+  NetworkAnimatorExpanded: 0
+  AuthorityMode: 0
   m_Animator: {fileID: 2021122553746785438}
+  TransitionStateInfoList: []
+  AnimatorParameterEntries:
+    ParameterEntries:
+    - name: Walking
+      NameHash: 1744665739
+      Synchronize: 1
+      ParameterType: 4
+    - name: Jump
+      NameHash: 125937960
+      Synchronize: 1
+      ParameterType: 9
+    - name: Land
+      NameHash: 137525990
+      Synchronize: 1
+      ParameterType: 9
+    - name: InAir
+      NameHash: 861170204
+      Synchronize: 1
+      ParameterType: 4
+    - name: TakeDamage
+      NameHash: -339413771
+      Synchronize: 1
+      ParameterType: 9
+    - name: Crouching
+      NameHash: -2032366093
+      Synchronize: 1
+      ParameterType: 4
+  AnimatorParametersExpanded: 0
 --- !u!1 &8588383917548274506
 GameObject:
   m_ObjectHideFlags: 0

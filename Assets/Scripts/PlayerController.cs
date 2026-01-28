@@ -118,38 +118,7 @@ public class PlayerController : NetworkBehaviour
 	public ulong MyId => NetworkObject.OwnerClientId;
 
 	#endregion
-	#region Network Lifecycle
-
-	public override void OnNetworkSpawn()
-	{
-		if (!IsOwner)
-		{
-			gameObject.layer = LayerMask.NameToLayer("OtherGameController");
-
-			foreach (var c in GetComponentsInChildren<Camera>(true))
-				c.enabled = false;
-
-			foreach (var a in GetComponentsInChildren<AudioListener>(true))
-				a.enabled = false;
-
-			DisableIfExists<MovementEffects>();
-			DisableIfExists<HandsSmooth>();
-			DisableIfExists<HeadBob>();
-			DisableIfExists<InteractionHandler>();
-			DisableIfExists<HandsHolder>();
-			DisableIfExists<CameraShaker>();
-			DisableIfExists<CopyRotationOfObject>();
-		}
-	}
-
-	private void DisableIfExists<T>() where T : Behaviour
-	{
-		var comps = GetComponentsInChildren<T>(true);
-		foreach (var comp in comps)
-			comp.enabled = false;
-	}
-
-	#endregion
+	
 
 	#region Unity Lifecycle
 

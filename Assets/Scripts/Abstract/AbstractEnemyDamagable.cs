@@ -191,7 +191,7 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 
 		DieClientRpc(lastHitByClientId);
 		StopAllCoroutines();
-		DespawnObject();
+		StartCoroutine(DespawnNextFrame());
 	}
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]

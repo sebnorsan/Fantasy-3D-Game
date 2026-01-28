@@ -1,3 +1,4 @@
+using EvolveGames;
 using EZCameraShake;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -32,6 +33,8 @@ public class PlayerReferences : NetworkBehaviour
 
 	public static readonly List<PlayerReferences> All = new();
 
+	#region Network Lifecycle
+
 	public override void OnNetworkSpawn()
 	{
 		base.OnNetworkSpawn();
@@ -39,8 +42,35 @@ public class PlayerReferences : NetworkBehaviour
 
 		if (IsOwner)
 			playerCharacterController.enabled = false;
+		if (!IsOwner)
+		{
+			gameObject.layer = LayerMask.NameToLayer("OtherGameController");
+
+			foreach (var c in GetComponentsInChildren<Camera>(true))
+				c.enabled = false;
+
+			foreach (var a in GetComponentsInChildren<AudioListener>(true))
+				a.enabled = false;
+
+			DisableIfExists<MovementEffects>();
+			DisableIfExists<HandsSmooth>();
+			DisableIfExists<HeadBob>();
+			DisableIfExists<InteractionHandler>();
+			DisableIfExists<HandsHolder>();
+			DisableIfExists<CameraShaker>();
+			DisableIfExists<CopyRotationOfObject>();
+			DisableIfExists<ParticleSystemForceField>();
+		}
 	}
 
+	private void DisableIfExists<T>() where T : Behaviour
+	{
+		var comps = GetComponentsInChildren<T>(true);
+		foreach (var comp in comps)
+			comp.enabled = false;
+	}
+
+	#endregion
 	private void OnDisable()
 	{
 		All.Remove(this);

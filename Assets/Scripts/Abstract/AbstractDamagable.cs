@@ -1,7 +1,6 @@
-using Unity.Hierarchy;
 using Unity.Netcode;
 using UnityEngine;
-
+using System.Collections;
 public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 {
 	[Header("Common Damage Feedback")]
@@ -185,6 +184,11 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 				lastHitByClientId = ulong.MaxValue;
 			}
 		}
+	}
+	protected IEnumerator DespawnNextFrame()
+	{
+		yield return null;
+		DespawnObject();
 	}
 	public virtual void DespawnObject()
 	{
