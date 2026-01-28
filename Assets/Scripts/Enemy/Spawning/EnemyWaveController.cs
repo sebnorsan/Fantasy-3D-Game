@@ -220,151 +220,89 @@ public class EnemyWaveController : NetworkBehaviour
 			TrySpawnOne();
 		}
 	}
-	private void TrySpawnOne()
+
+	private bool TrySpawnOne()
 	{
 		if (!NetworkManager.Singleton.IsServer)
-			return;
-		if (_remainingThisWave == null || _remainingThisWave.Length == 0)
-			return;
-		if (enemySpawnPoints == null || enemySpawnPoints.Length == 0)
-			return;
-		if (_spawnPointsThisWave == null || _spawnPointsThisWave.Length == 0)
-			return;
+			return false;
 
-		//Makes a new Array, and sets the up where count is how many enemies are left, and idx is what tier that enemy is.
+		if (_remainingThisWave == null || _remainingThisWave.Length == 0)
+			return false;
+
+		if (enemySpawnPoints == null || enemySpawnPoints.Length == 0)
+			return false;
+
+		if (_spawnPointsThisWave == null || _spawnPointsThisWave.Length == 0)
+			return false;
+
+		// pick a random tier with remaining > 0
 		var available = _remainingThisWave
 			.Select((count, idx) => new { count, idx })
 			.Where(x => x.count > 0)
 			.ToArray();
 
 		if (available.Length == 0)
-			return;
+			return false;
 
 		int tierIdx = available[UnityEngine.Random.Range(0, available.Length)].idx;
 
 		if (tierIdx < 0 || tierIdx >= enemyTiers.Length)
-			return;
+			return false;
 
 		var tier = enemyTiers[tierIdx];
 		if (tier.enemyPrefabs == null || tier.enemyPrefabs.Length == 0)
-			return;
+			return false;
 
 		// pick random prefab in tier
 		var prefab = tier.enemyPrefabs[UnityEngine.Random.Range(0, tier.enemyPrefabs.Length)];
 
-		var sp = _spawnPointsThisWave[UnityEngine.Random.Range(0, _spawnPointsThisWave.Length)];
+		// try a few positions so we don't stall if one is invalid
+		const int positionAttempts = 8;
 
-		Vector3 offset = UnityEngine.Random.insideUnitSphere * sp.spawnRadius;
-		offset.y = 0;
-		Vector3 candidate = sp.spawnPoint.position + offset;
-
-		// obstacle collision check
-		if (Physics.CheckSphere(candidate, 0.5f, obstacleMask))
-			return;
-
-		// NavMesh sample
-		if (NavMesh.SamplePosition(candidate, out var hit, maxNavSampleDistance, NavMesh.AllAreas))
+		for (int i = 0; i < positionAttempts; i++)
 		{
+			// pick random spawn point
+			var sp = _spawnPointsThisWave[UnityEngine.Random.Range(0, _spawnPointsThisWave.Length)];
+
+			if (sp == null || sp.spawnPoint == null)
+				continue;
+
+			Vector3 offset = UnityEngine.Random.insideUnitSphere * sp.spawnRadius;
+			offset.y = 0f;
+			Vector3 candidate = sp.spawnPoint.position + offset;
+
+			// obstacle collision check (skip if mask is Nothing / 0)
+			if (obstacleMask.value != 0 && Physics.CheckSphere(candidate, 0.5f, obstacleMask))
+				continue;
+
+			// NavMesh sample
+			if (!NavMesh.SamplePosition(candidate, out var hit, maxNavSampleDistance, NavMesh.AllAreas))
+				continue;
+
 			// SERVER spawns networked enemy
 			var inst = Instantiate(prefab, hit.position, Quaternion.identity);
 			var nwo = inst.GetComponent<NetworkObject>();
-			if (nwo != null)
-				nwo.Spawn();
-			else
+
+			if (nwo == null)
 			{
-				Debug.LogWarning($"Spawned enemy '{prefab.name}' has no NetworkObject!");
-				return;
+				Debug.LogWarning($"Spawned enemy '{prefab.name}' has no NetworkObject! Destroying instance.");
+				Destroy(inst);
+				continue;
 			}
+
+			nwo.Spawn();
 
 			//var lvl = inst.GetComponent<EnemyLevelling>();
 			//if (lvl != null)
 			//	lvl.CheckAndAssignLevel(_currentWave, GetWaveTierIsFirstSpawned(tierIdx));
 
 			_remainingThisWave[tierIdx]--;
+			return true;
 		}
+
+		// couldn't find a valid position this tick
+		return false;
 	}
-	//private bool TrySpawnOne()
-	//{
-	//	if (!NetworkManager.Singleton.IsServer)
-	//		return false;
-
-	//	if (_remainingThisWave == null || _remainingThisWave.Length == 0)
-	//		return false;
-
-	//	if (enemySpawnPoints == null || enemySpawnPoints.Length == 0)
-	//		return false;
-
-	//	if (_spawnPointsThisWave == null || _spawnPointsThisWave.Length == 0)
-	//		return false;
-
-	//	// pick a random tier with remaining > 0
-	//	var available = _remainingThisWave
-	//		.Select((count, idx) => new { count, idx })
-	//		.Where(x => x.count > 0)
-	//		.ToArray();
-
-	//	if (available.Length == 0)
-	//		return false;
-
-	//	int tierIdx = available[UnityEngine.Random.Range(0, available.Length)].idx;
-
-	//	if (tierIdx < 0 || tierIdx >= enemyTiers.Length)
-	//		return false;
-
-	//	var tier = enemyTiers[tierIdx];
-	//	if (tier.enemyPrefabs == null || tier.enemyPrefabs.Length == 0)
-	//		return false;
-
-	//	// pick random prefab in tier
-	//	var prefab = tier.enemyPrefabs[UnityEngine.Random.Range(0, tier.enemyPrefabs.Length)];
-
-	//	// try a few positions so we don't stall if one is invalid
-	//	const int positionAttempts = 8;
-
-	//	for (int i = 0; i < positionAttempts; i++)
-	//	{
-	//		// pick random spawn point
-	//		var sp = _spawnPointsThisWave[UnityEngine.Random.Range(0, _spawnPointsThisWave.Length)];
-
-	//		if (sp == null || sp.spawnPoint == null)
-	//			continue;
-
-	//		Vector3 offset = UnityEngine.Random.insideUnitSphere * sp.spawnRadius;
-	//		offset.y = 0f;
-	//		Vector3 candidate = sp.spawnPoint.position + offset;
-
-	//		// obstacle collision check (skip if mask is Nothing / 0)
-	//		if (obstacleMask.value != 0 && Physics.CheckSphere(candidate, 0.5f, obstacleMask))
-	//			continue;
-
-	//		// NavMesh sample
-	//		if (!NavMesh.SamplePosition(candidate, out var hit, maxNavSampleDistance, NavMesh.AllAreas))
-	//			continue;
-
-	//		// SERVER spawns networked enemy
-	//		var inst = Instantiate(prefab, hit.position, Quaternion.identity);
-	//		var nwo = inst.GetComponent<NetworkObject>();
-
-	//		if (nwo == null)
-	//		{
-	//			Debug.LogWarning($"Spawned enemy '{prefab.name}' has no NetworkObject! Destroying instance.");
-	//			Destroy(inst);
-	//			continue;
-	//		}
-
-	//		nwo.Spawn();
-
-	//		var lvl = inst.GetComponent<EnemyLevelling>();
-	//		if (lvl != null)
-	//			lvl.CheckAndAssignLevel(_currentWave, GetWaveTierIsFirstSpawned(tierIdx));
-
-	//		_remainingThisWave[tierIdx]--;
-	//		return true;
-	//	}
-
-	//	// couldn't find a valid position this tick
-	//	return false;
-	//}
 	private void OnDrawGizmos()
 	{
 		Gizmos.color = new Color(1f, 0f, 0f, 0.6f);
