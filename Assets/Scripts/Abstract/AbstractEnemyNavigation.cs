@@ -3,8 +3,7 @@ using UnityEngine.AI;
 using UnityEngine;
 using Unity.Netcode.Components;
 using System.Collections;
-//using UnityEditor.VisionOS;
-using NUnit.Framework.Constraints;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public abstract class AbstractEnemyNavigation : NetworkBehaviour
@@ -17,7 +16,7 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 
 	private Transform targetPos;
 	private Vector3 targetDestination;
-	private EnemyTarget targetScript;
+	private Coroutine playerTargetCoroutine;
 
 	[Space(5)]
 
@@ -33,6 +32,14 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 
 	private Coroutine currKnockbackCoroutine;
 
+	private void OnDisable()
+	{
+		if (!IsServer) return;
+
+		if (eRef.enemyTarget != null)
+			eRef.enemyTarget.targetSlain -= TargetSlain;
+		GameStateManager.gameStateChanged -= InitializeDestination;
+	}
 	private void Start()
 	{
 		if (!agent) agent = GetComponent<NavMeshAgent>();
@@ -58,13 +65,13 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 		InitializeEnemy();
 	}
 
-	public void TargetSlain()
+	private void TargetSlain()
 	{
 		StartCoroutine(TargetSlainFlow());
 	}
 	private IEnumerator TargetSlainFlow()
 	{
-		yield return new WaitForSeconds(Random.Range(2, 6f));
+		yield return new WaitForSeconds(Random.Range(.2f, 1f));
 
 		float sSpd = speed;
 		speed = 0;
@@ -107,8 +114,10 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 		if (!IsServer || !agent.enabled) return;
 
 		eRef.enemyAnimator.A_SetWalk(true);
-
 		SetSpeedMultiplier();
+
+		GameStateManager.gameStateChanged -= InitializeDestination;
+		GameStateManager.gameStateChanged += InitializeDestination;
 
 		InitializeDestination();
 	}
@@ -117,21 +126,151 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 	{
 		if (!IsServer) return;
 
+		if (GameStateManager.GetCurrentGameState() == GameStateType.Morning)
+		{
+			ClearPlayerTarget();
+			TargetDest();
+		}
+		else
+		{
+			ClearEnemyTarget();
+			PlayerDest();
+		}
+	}
+	private void ClearEnemyTarget()
+	{
+		if (eRef.enemyTarget != null)
+			eRef.enemyTarget.targetSlain -= TargetSlain;
+
+		targetPos = null;
+		eRef.enemyTarget = null;
+	}
+	private void ClearPlayerTarget()
+	{
+		if (playerTargetCoroutine != null)
+		{
+			StopCoroutine(playerTargetCoroutine);
+			playerTargetCoroutine = null;
+			eRef.playerTarget = null;
+		}
+
+		agent.isStopped = false;
+		eRef.enemyAttack.StopAttack();
+	}
+	private void TargetDest()
+	{
+		ClearEnemyTarget();
+
 		var all = EnemyTarget.All;
-		if (all.Count == 0) return;
+		if (all.Count == 0)
+		{
+			TargetSlain();
+			return;
+		}
 
-		targetScript = all[Random.Range(0, all.Count)];
-		eRef.enemyTarget = targetScript;
+		eRef.enemyTarget = all[Random.Range(0, all.Count)];
 
-		targetPos = targetScript.transform;
+		eRef.enemyTarget.targetSlain += TargetSlain;
 
-		float destinationRadius = targetScript.GetColliderRadius();
+		targetPos = eRef.enemyTarget.transform;
+
+		float destinationRadius = eRef.enemyTarget.GetColliderRadius();
 		Vector2 randomCircle = Random.insideUnitCircle.normalized * destinationRadius;
 		Vector3 offset = new Vector3(randomCircle.x, 0, randomCircle.y);
 
 		targetDestination = targetPos.position + offset;
 		agent.SetDestination(targetDestination);
 	}
+	private void PlayerDest()
+	{
+		if (playerTargetCoroutine != null)
+			StopCoroutine(playerTargetCoroutine);
+
+		eRef.enemyTarget = null;
+
+		playerTargetCoroutine = StartCoroutine(TargetPlayer());
+	}
+	private IEnumerator TargetPlayer()
+	{
+		if (!IsServer) yield break;
+
+		PlayerReferences pRef = null;
+
+		WaitForSeconds waitTime = new WaitForSeconds(.25f);
+
+		while (GameStateManager.GetCurrentGameState() != GameStateType.Morning)
+		{
+			if (isKnockingBack) continue;
+
+			// re-pick if missing / dead-ish / etc.
+			if (pRef == null || !pRef.playerController.canMove)
+			{
+				pRef = FindBestPlayer();
+				eRef.playerTarget = pRef?.playerDamagable;
+			}
+
+			if (pRef == null)
+			{
+				eRef.enemyAttack.StopAttack();
+				agent.isStopped = false;
+				yield return waitTime;
+				continue;
+			}
+
+			targetPos = pRef.transform;
+			targetDestination = targetPos.position;
+
+			float attackRange = Mathf.Max(agent.stoppingDistance, 1.5f);
+			float sqr = (targetPos.position - transform.position).sqrMagnitude;
+
+			if (sqr <= attackRange * attackRange)
+			{
+				agent.isStopped = true;
+				eRef.enemyAnimator.A_ResetCancelAttack();
+				eRef.enemyAttack.StartAttack();
+			}
+			else
+			{
+				agent.isStopped = false;
+				eRef.enemyAttack.StopAttack();
+				eRef.enemyAnimator.A_CancelAttack();
+				agent.SetDestination(targetPos.position);
+			}
+
+			yield return waitTime;
+		}
+
+		// cleanup if morning hits
+		agent.isStopped = false;
+		eRef.enemyAttack.StopAttack();
+		playerTargetCoroutine = null;
+	}
+	private PlayerReferences FindBestPlayer()
+	{
+		var players = FindObjectsByType<PlayerReferences>(FindObjectsSortMode.None);
+
+		PlayerReferences best = null;
+		float bestDist = float.MaxValue;
+
+		foreach (var pc in players)
+		{
+			if (pc == null) continue;
+			if (!pc.playerController.canMove) continue;
+
+			// only real network-spawned players
+			if (!pc.TryGetComponent(out NetworkObject nwo) || !nwo.IsSpawned) continue;
+
+			float d = (pc.transform.position - transform.position).sqrMagnitude;
+			if (d < bestDist)
+			{
+				bestDist = d;
+				best = pc;
+			}
+		}
+
+		return best;
+	}
+	
 	//private EnemyTarget[] GetTargets()
 	//{
 	//	var et = FindObjectsByType<EnemyTarget>(FindObjectsSortMode.None);
@@ -149,11 +288,14 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 			StopCoroutine(currKnockbackCoroutine);
 		currKnockbackCoroutine = StartCoroutine(OnKnockback(hitPoint, knockbackMultiplier));
 	}
+	private bool isKnockingBack = false;
 	protected virtual IEnumerator OnKnockback(Vector3 hitPoint, float knockbackMultiplier)
 	{
 		#region Init
 		if (!IsServer)
 			yield break;
+
+		isKnockingBack = true;
 
 		eRef.enemyAnimator.A_SetWalk(false);
 
@@ -169,7 +311,7 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 		Vector3 dir = (transform.position - hitPoint).normalized;
 
 		// Set a far destination in the knockback direction
-		Vector3 dest = transform.position + dir * 100f;
+		Vector3 dest = transform.position + dir * 10f;
 		agent.SetDestination(dest);
 
 		// Apply high initial knockback speed
@@ -228,6 +370,8 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 		agent.speed = originalSpeed;
 		agent.SetDestination(targetDestination); // Resume behavior
 		eRef.enemyAnimator.A_SetWalk(true);
+
+		isKnockingBack = false;
 		#endregion
 	}
 }

@@ -199,7 +199,11 @@ public class EnemyWaveController : NetworkBehaviour
 	/// </summary>
 	private void CheckForFinish()
 	{
-		if (AbstractEnemy.All.Count > 0)
+		int enemiesRemaining = 0;
+		foreach (int count in _remainingThisWave)
+			enemiesRemaining += count;
+
+		if (AbstractEnemy.All.Count > 0 || enemiesRemaining > 0)
 			return;
 
 		WaveFinish();

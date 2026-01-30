@@ -1973,6 +1973,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4891067815844761176, guid: ae38728ec08a5d14bb20428b8aac5a29, type: 3}
+      propertyPath: changeStateKey
+      value: 57
+      objectReference: {fileID: 0}
     - target: {fileID: 5194553417701145113, guid: ae38728ec08a5d14bb20428b8aac5a29, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0

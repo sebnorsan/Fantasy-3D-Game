@@ -13,4 +13,5 @@ public class EnemyReferences : MonoBehaviour
 	public ExperienceEmitter experienceEmitter;
 	//---Set during runtime---
 	[HideInInspector] public EnemyTarget enemyTarget = null;
+	[HideInInspector] public PlayerDamagable playerTarget = null;
 }
