@@ -3,6 +3,7 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class EnemyTarget : NetworkBehaviour
 {
@@ -34,6 +35,8 @@ public class EnemyTarget : NetworkBehaviour
 	private Coroutine currFlashCoroutine;
 
 	public static readonly List<EnemyTarget> All = new();
+
+	public Action targetSlain;
 
 	private void OnEnable()
 	{
@@ -109,8 +112,10 @@ public class EnemyTarget : NetworkBehaviour
 		// run lose FX/anim on all clients + host
 		DieClientRpc();
 
-		foreach (var e in AbstractEnemy.All)
-			e.AlertOfTargetDeath();
+		//foreach (var e in AbstractEnemy.All)
+		//	e.AlertOfTargetDeath();
+
+		targetSlain?.Invoke();
 
 		// server destroys / despawns the crystal
 		if (TryGetComponent(out NetworkObject nwo) && nwo.IsSpawned)

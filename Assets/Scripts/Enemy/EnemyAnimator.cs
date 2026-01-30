@@ -17,6 +17,14 @@ public class EnemyAnimator : MonoBehaviour
 	{
 		anim?.SetBool("Walking", b);
 	}
+	public void A_ResetCancelAttack()
+	{
+		anim?.ResetTrigger("AttackCancel");
+	}
+	public void A_CancelAttack()
+	{
+		anim?.SetTrigger("AttackCancel");
+	}
 	public void A_Attack()
 	{
 		anim?.SetTrigger("Attack");
