@@ -22074,17 +22074,17 @@ MonoBehaviour:
   - minSpawnInterval: 0.1
     maxSpawnInterval: 4
     enemyTierSpawnAmount: 0f000000
-    enemyDownTime: 10
+    enemyDownTime: 60
     spawnPointsAvailable: 01000000
   - minSpawnInterval: 0.1
     maxSpawnInterval: 3
     enemyTierSpawnAmount: 28000000
-    enemyDownTime: 20
+    enemyDownTime: 120
     spawnPointsAvailable: 0100000000000000
   - minSpawnInterval: 0.1
     maxSpawnInterval: 2
     enemyTierSpawnAmount: c8000000
-    enemyDownTime: 30
+    enemyDownTime: 180
     spawnPointsAvailable: 010000000000000004000000
   enemySpawnPoints:
   - spawnPointType: 0
