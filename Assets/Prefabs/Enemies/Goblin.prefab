@@ -748,7 +748,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2482919236
+  GlobalObjectIdHash: 2745228606
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -853,7 +853,7 @@ MonoBehaviour:
     Layer: 0
     OriginatingState: -596015043
     DestinationState: -93582298
-    TransitionDuration: 0.05
+    TransitionDuration: 0
     TriggerNameHash: 503280164
     TransitionIndex: 1
   AnimatorParameterEntries:

@@ -200,7 +200,11 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 
 		while (GameStateManager.GetCurrentGameState() != GameStateType.Morning)
 		{
-			if (isKnockingBack) continue;
+			if (isKnockingBack)
+			{
+				yield return new WaitForSeconds(.1f);
+				continue;
+			}
 
 			// re-pick if missing / dead-ish / etc.
 			if (pRef == null || !pRef.playerController.canMove)

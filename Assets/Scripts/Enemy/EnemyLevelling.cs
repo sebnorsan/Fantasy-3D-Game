@@ -84,7 +84,9 @@ public class EnemyLevelling : NetworkBehaviour
 	private void OnValidate()
 	{
         if (Application.isPlaying && Application.isEditor)
-            SetLevel();
+			if (NetworkManager.Singleton)
+				if (NetworkManager.Singleton.IsServer)
+					SetLevel();
 	}
 	
 	private void SetLevel(int lvl = -1)
