@@ -135,6 +135,11 @@ public class NightEnemies : NetworkBehaviour
 			}
 
 			nwo.Spawn();
+
+			var lvl = inst.GetComponent<EnemyLevelling>();
+			if (lvl != null)
+				lvl.CheckAndAssignLevel(EnemyWaveController.instance.GetCurrentWave(), 0);
+
 			_aliveByClient[clientId].Add(nwo);
 			return true;
 		}

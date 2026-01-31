@@ -80,6 +80,7 @@ public class EnemyWaveController : NetworkBehaviour
 		Forest
 	}
 
+	public int GetCurrentWave() => _currentWave;
 	private bool IsSpawnPointAllowed(IslandSpawnPoints type, IslandSpawnPoints[] allowed)
 	{
 		if (allowed == null || allowed.Length == 0) return true; // fallback = allow all
@@ -103,11 +104,15 @@ public class EnemyWaveController : NetworkBehaviour
 
 	private void OnEnable()
 	{
+		if (!NetworkManager.Singleton.IsServer) return;
+
 		EnemyWaveTimer.downTimeTimerFinished += StartNextWave;
 		AbstractEnemy.enemyHasDied += CheckForFinish;
 	}
 	private void OnDisable()
 	{
+		if (!NetworkManager.Singleton.IsServer) return;
+
 		EnemyWaveTimer.downTimeTimerFinished -= StartNextWave;
 		AbstractEnemy.enemyHasDied -= CheckForFinish;
 	}
