@@ -14,6 +14,9 @@ public abstract class AbstractMultipliers : MonoBehaviour
 	public float projectileSpeedMultiplier = 100;
 	public float knockbackMultiplier = 100;
 	public float experienceMultiplier = 100;
+	public float luckMultiplier = 100;
+	public float critChanceMultiplier = 100;
+	public float critDamageMultiplier = 100;
 
 	public float GetDamageMulti(float baseVal) => baseVal * (damageMultiplier / 100);
 	public float GetHealthMulti(float baseVal) => baseVal * (healthMultiplier / 100);
@@ -24,6 +27,9 @@ public abstract class AbstractMultipliers : MonoBehaviour
 	public float GetProjectileSpeedMulti(float baseVal) => baseVal * (projectileSpeedMultiplier / 100);
 	public float GetKnockbackMulti(float baseVal) => baseVal * (knockbackMultiplier / 100);
 	public float GetExperienceMulti(float baseVal) => baseVal * (experienceMultiplier / 100);
+	public float GetLuckMulti(float baseVal) => baseVal * (luckMultiplier / 100);
+	public float GetCritChanceMulti(float baseVal) => baseVal * (critChanceMultiplier / 100);
+	public float GetCritDamageMulti(float baseVal) => baseVal * (critDamageMultiplier / 100);
 
 	protected List<Coroutine> currentTempMults = new List<Coroutine>();
 
@@ -79,6 +85,10 @@ public abstract class AbstractMultipliers : MonoBehaviour
 			case Multiplier.Knockback: knockbackMultiplier = percent; break;
 			case Multiplier.Experience: experienceMultiplier = percent; break;
 
+			case Multiplier.Luck: luckMultiplier = percent; break;
+			case Multiplier.CritChance: critChanceMultiplier = percent; break;
+			case Multiplier.CritDamage: critDamageMultiplier = percent; break;
+
 			default: break;
 		}
 
@@ -98,6 +108,10 @@ public abstract class AbstractMultipliers : MonoBehaviour
 			case Multiplier.PrjSpeed: projectileSpeedMultiplier += percent; break;
 			case Multiplier.Knockback: knockbackMultiplier += percent; break;
 			case Multiplier.Experience: experienceMultiplier += percent; break;
+
+			case Multiplier.Luck: luckMultiplier += percent; break;
+			case Multiplier.CritChance: critChanceMultiplier += percent; break;
+			case Multiplier.CritDamage: critDamageMultiplier += percent; break;
 
 			default: break;
 		}
@@ -128,6 +142,13 @@ public abstract class AbstractMultipliers : MonoBehaviour
 			case Multiplier.Experience:
 				experienceMultiplier -= percent; experienceMultiplier = Mathf.Max(1f, experienceMultiplier); break;
 
+			case Multiplier.Luck:
+				luckMultiplier -= percent; luckMultiplier = Mathf.Max(1f, luckMultiplier); break;
+			case Multiplier.CritChance:
+				critChanceMultiplier -= percent; critChanceMultiplier = Mathf.Max(1f, critChanceMultiplier); break;
+			case Multiplier.CritDamage:
+				critDamageMultiplier -= percent; critDamageMultiplier = Mathf.Max(1f, critDamageMultiplier); break;
+
 			default: break;
 		}
 
@@ -147,5 +168,8 @@ public enum Multiplier
 	PrjSize,
 	PrjSpeed,
 	Knockback,
-	Experience
+	Experience,
+	Luck,
+	CritChance,
+	CritDamage
 }

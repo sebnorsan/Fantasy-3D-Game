@@ -19,27 +19,15 @@ public class PlayerUpgrades : MonoBehaviour
 
 	[Space(6)]
 
-	[SerializeField] private UpgCardField[] cardLib;
+	[SerializeField] private List<UpgradeCardSO> cardLib;
 
-	[Serializable]
-	public class UpgCardField
-	{
-		public UpgradeCardSO card;
-		/// <summary>
-		/// Higher weight = that card gets picked more often
-		/// Lower weight = that card gets picked less often
-		/// Weight 0 (or negative) = it basically never gets picked
-		/// 
-		/// e.g.
-		/// Common 60
-		/// Rare 30
-		/// Epic 10
-		/// 
-		/// </summary>
-		public float weight = 1f;
-	}
+	[Space(6)]
+
+	[SerializeField] private UpgradeCardSO[] baseCardLib;
+
 	private void Start()
 	{
+		SetBaseCards();
 		ResetCards();
 	}
 	private void Update()
@@ -79,33 +67,73 @@ public class PlayerUpgrades : MonoBehaviour
 	{
 		ResetActiveCardList();
 
-		foreach (UpgradeCard c in upgCards)
+		// Build a valid, unique pool (no nulls / no <=0 weight)
+		var pool = new List<UpgradeCardSO>();
+		var seen = new HashSet<UpgradeCardSO>();
+
+		for (int i = 0; i < cardLib.Count; i++)
 		{
-			var picked = GetWeightedRandomCard();
+			var c = cardLib[i];
+			if (c == null) continue;
+			if (c.baseWeight <= 0f) continue;
+
+			if (seen.Add(c))
+				pool.Add(c);
+		}
+
+		bool allowDuplicates = pool.Count < upgCards.Count;
+
+		foreach (UpgradeCard card in upgCards)
+		{
+			UpgradeCardSO picked = GetWeightedRandomCard(pool);
 			if (picked != null)
-				c.SetScriptableObject(picked);
+			{
+				card.SetScriptableObject(picked);
+
+				if (!allowDuplicates)
+					pool.Remove(picked); // prevents duplicates in this roll
+			}
 		}
 	}
-	private UpgradeCardSO GetWeightedRandomCard()
+	private void SetBaseCards()
 	{
+		AddCardToLibrary(baseCardLib);
+	}
+	public void AddCardToLibrary(UpgradeCardSO uCardSO)
+	{
+		cardLib.Add(uCardSO);
+	}
+	public void AddCardToLibrary(UpgradeCardSO[] uCardSO)
+	{
+		foreach (var c in uCardSO)
+			cardLib.Add(c);
+	}
+	public void RemoveCardFromLibrary(UpgradeCardSO uCardSO)
+	{
+		cardLib.Remove(uCardSO);
+	}
+	private UpgradeCardSO GetWeightedRandomCard(List<UpgradeCardSO> source)
+	{
+		if (source == null || source.Count == 0) return null;
+
 		float totalWeight = 0f;
 
-		for (int i = 0; i < cardLib.Length; i++)
+		for (int i = 0; i < source.Count; i++)
 		{
-			if (cardLib[i].card == null) continue;
-			if (cardLib[i].weight <= 0f) continue;
+			if (source[i] == null) continue;
+			if (source[i].baseWeight <= 0f) continue;
 
-			totalWeight += cardLib[i].weight;
+			totalWeight += source[i].baseWeight;
 		}
 
-		// Fallback: if all weights are 0/invalid, just pick any valid card
+		// Fallback: if all weights are 0/invalid, just pick any non-null card
 		if (totalWeight <= 0f)
 		{
-			for (int tries = 0; tries < cardLib.Length; tries++)
+			for (int tries = 0; tries < source.Count; tries++)
 			{
-				int r = UnityEngine.Random.Range(0, cardLib.Length);
-				if (cardLib[r].card != null)
-					return cardLib[r].card;
+				int r = UnityEngine.Random.Range(0, source.Count);
+				if (source[r] != null)
+					return source[r];
 			}
 			return null;
 		}
@@ -113,14 +141,14 @@ public class PlayerUpgrades : MonoBehaviour
 		float roll = UnityEngine.Random.value * totalWeight;
 		float sum = 0f;
 
-		for (int i = 0; i < cardLib.Length; i++)
+		for (int i = 0; i < source.Count; i++)
 		{
-			if (cardLib[i].card == null) continue;
-			if (cardLib[i].weight <= 0f) continue;
+			if (source[i] == null) continue;
+			if (source[i].baseWeight <= 0f) continue;
 
-			sum += cardLib[i].weight;
+			sum += source[i].baseWeight;
 			if (roll <= sum)
-				return cardLib[i].card;
+				return source[i];
 		}
 
 		return null;
@@ -132,6 +160,10 @@ public class PlayerUpgrades : MonoBehaviour
 
 		foreach (var mUpg in c.multiUpgrades)
 			PlayerManager.m_pRef.playerMultipliers.ApplyPermanentMultiplier(mUpg.multiplier, mUpg.percentageUpgrade);
+
+		if (!c.invincible)
+			RemoveCardFromLibrary(c);
+		AddCardToLibrary(c.cardsToAddToLib);
 
 		ResetCards();
 	}

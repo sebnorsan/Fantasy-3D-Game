@@ -18,3 +18,6 @@ MonoBehaviour:
   multiUpgrades:
   - multiplier: 0
     percentageUpgrade: 100
+  baseWeight: 5
+  invincible: 0
+  cardsToAddToLib: []

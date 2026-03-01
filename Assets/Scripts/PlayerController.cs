@@ -77,6 +77,8 @@ public class PlayerController : NetworkBehaviour
 	[HideInInspector] public float inputVertical;
 	[HideInInspector] public float inputHorizontal;
 
+	private int currentExtraJumps = 0;
+
 	private float initialWalkingSpeed;
 	private float runningValue;
 	private float initialCrouchHeight;
@@ -374,8 +376,11 @@ public class PlayerController : NetworkBehaviour
 	}
 	private void HandleJumpingInput()
 	{
-		if (Input.GetKey(pInput.jumpKey) && canMove && (isGrounded || coyoteActive))
+		if (Input.GetKey(pInput.jumpKey) && canMove && (isGrounded || coyoteActive || currentExtraJumps > 0))
 		{
+			if (!isGrounded || !coyoteActive)
+				currentExtraJumps--;
+
 			pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Halo);
 			pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Stripe);
 
@@ -552,6 +557,8 @@ public class PlayerController : NetworkBehaviour
 		new HashSet<global::AbstractEvent>();
 	private void init_EnteringGrounded()
 	{
+		currentExtraJumps = pRef.playerMultipliers.GetExtraJumps();
+
 		//slight delay as enteringgrounded happens immediatly when groundCheck enters ground radius
 		pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Halo, true, .05f);
 

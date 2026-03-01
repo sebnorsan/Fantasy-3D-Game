@@ -11158,6 +11158,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 690159300152888974, guid: ae38728ec08a5d14bb20428b8aac5a29, type: 3}
+      propertyPath: cardLib.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1204383490296320020, guid: ae38728ec08a5d14bb20428b8aac5a29, type: 3}
       propertyPath: m_NavMeshData
       value: 
@@ -14541,7 +14545,7 @@ GameObject:
   - component: {fileID: 616736257}
   - component: {fileID: 616736258}
   m_Layer: 0
-  m_Name: Spawnpoint (1)
+  m_Name: Spawnpoint (1) (Debug)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

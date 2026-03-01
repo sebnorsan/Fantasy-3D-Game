@@ -338,7 +338,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   currentXp: 0
   xpToLevelUp: 10
-  xpMultiplier: 1
+  levelUpMultiplier: 1.5
   currLevel: 1
   skillPointsAvailable: 0
   xpSlider: {fileID: 2603469816357168857}
@@ -635,17 +635,12 @@ MonoBehaviour:
   anim: {fileID: 217804782235159815}
   upgradeCard: {fileID: 5236929332602937046, guid: e4e3c40902592fe4cafd6ad120e59e68, type: 3}
   cardParent: {fileID: 3266476133008837853}
-  cardLib:
-  - card: {fileID: 11400000, guid: 19f77a2cf3841cf4c9016d0ccaf9d8a6, type: 2}
-    weight: 60
-  - card: {fileID: 11400000, guid: fea468c1d690067478da7b9716c54d2a, type: 2}
-    weight: 40
-  - card: {fileID: 11400000, guid: 5635e00931327b84d8222b867938a332, type: 2}
-    weight: 15
-  - card: {fileID: 11400000, guid: 60bfc0f8c24003c4c8ec551291972195, type: 2}
-    weight: 20
-  - card: {fileID: 11400000, guid: 2c8fdc92bbbbc8a4285e5629deb59541, type: 2}
-    weight: 60
+  cardLib: []
+  baseCardLib:
+  - {fileID: 11400000, guid: c7d3a5d386d16a049873226248622aea, type: 2}
+  - {fileID: 11400000, guid: a18aa7157a581f540a5a90d7a6191f3c, type: 2}
+  - {fileID: 11400000, guid: 5284f39d6841f794a97c6bad05f63773, type: 2}
+  - {fileID: 11400000, guid: 6522e91c038b3004fa7432de235b56b6, type: 2}
 --- !u!1 &4288904270522008324
 GameObject:
   m_ObjectHideFlags: 0

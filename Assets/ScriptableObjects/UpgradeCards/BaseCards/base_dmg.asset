@@ -10,14 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 68bb1d8b7f1d87244ac4e7e0a77bd741, type: 3}
-  m_Name: 40dmg
+  m_Name: base_dmg
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeCardSO
   SO_logo: {fileID: 2800000, guid: 24743680055304b4880cd96cb7763292, type: 3}
-  SO_title: Better Damage
-  SO_secondary: 40%
+  SO_title: Base Damage
+  SO_secondary: 20%
   multiUpgrades:
   - multiplier: 0
-    percentageUpgrade: 40
-  baseWeight: 35
-  invincible: 0
-  cardsToAddToLib: []
+    percentageUpgrade: 20
+  baseWeight: 80
+  invincible: 1
+  cardsToAddToLib:
+  - {fileID: 11400000, guid: 19f77a2cf3841cf4c9016d0ccaf9d8a6, type: 2}
+  - {fileID: 11400000, guid: fea468c1d690067478da7b9716c54d2a, type: 2}
+  - {fileID: 11400000, guid: 5635e00931327b84d8222b867938a332, type: 2}

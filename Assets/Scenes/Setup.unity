@@ -734,8 +734,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneToLoad: LobbyScene
-  directlyToGame: 0
-  directSceneToLoad: PvP-Scene
+  directlyToGame: 1
+  directSceneToLoad: SampleScene
 --- !u!4 &1584682221
 Transform:
   m_ObjectHideFlags: 0
