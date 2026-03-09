@@ -23479,6 +23479,7 @@ GameObject:
   - component: {fileID: 7628524721557430775}
   - component: {fileID: 6574249655433990806}
   - component: {fileID: 6234475594236647715}
+  - component: {fileID: 4597968635513800963}
   m_Layer: 3
   m_Name: PlayerController
   m_TagString: GameController
@@ -23747,6 +23748,7 @@ MonoBehaviour:
   playerCam: {fileID: 5855688573525650132}
   playerPvP: {fileID: 4818609617636790534}
   playerMultipliers: {fileID: 6574249655433990806}
+  playerPermanents: {fileID: 0}
   crouchCamPoint: {fileID: 2556143203140004230}
   bowScript: {fileID: 1227791032311695380}
   bowEffects: {fileID: 8675364865469383676}
@@ -24057,6 +24059,18 @@ MonoBehaviour:
   bigHitParticle: {fileID: 5024009746357069192, guid: 924af94442fdddd469b8f564bf1f980b, type: 3}
   flashDuration: 0.1
   flashMaterial: {fileID: 2100000, guid: 1cbe87e2f738d164b9dd99a5c2f5e8fe, type: 2}
+--- !u!114 &4597968635513800963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7758727492805073096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 323221c35f87b0540983d9174aea53ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
 --- !u!1 &7973304527205840717
 GameObject:
   m_ObjectHideFlags: 0

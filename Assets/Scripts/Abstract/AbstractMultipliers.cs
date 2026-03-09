@@ -169,7 +169,36 @@ public enum Multiplier
 	PrjSpeed,
 	Knockback,
 	Experience,
+
 	Luck,
 	CritChance,
-	CritDamage
+	CritDamage,
+
+	DodgeChance,
+	HealthRegenTime,
+	HealthRegenAmount,
+	PickupRadius,
+	BurnChance,
+	BurnDamage,
+	BurnTime,
+	FreezeChance,
+	FreezeDuration,
+	LightningChance,
+	LightningDamage,
+	LightningChainCount,
+	LightningRange,
+	ExplosionDamage,
+	ExplosionRadius,
+	ExplosionKnockback,
+	BounceRange,
+	BounceDamageFallOff,
+	
+	DamageToFlying,
+	DamageFromBehind,
+	StationaryDamage,
+	AfterKillSpd,
+	//Chance to reflect projectiles
+	ReflectionChance,
+	HealingOrbChance,
+	HealingOrbAmount,
 }

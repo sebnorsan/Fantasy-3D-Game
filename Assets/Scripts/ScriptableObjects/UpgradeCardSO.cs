@@ -42,4 +42,15 @@ public class UpgradeCardSO : ScriptableObject
 		public Multiplier multiplier;
 		public float percentageUpgrade = 20;
 	}
+	[Serializable]
+	public class UpgradeFlat
+	{
+		public FlatMultipliers multiplier;
+		public int flatMultiplier = 0;
+	}
+	[Serializable]
+	public class UpgradePermanent
+	{
+		public PermanentUpgrades permanent;
+	}
 }

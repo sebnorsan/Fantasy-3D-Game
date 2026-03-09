@@ -1,5 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Identifiers;
 
 public class BowNetCode : NetworkBehaviour
 {
@@ -7,19 +8,19 @@ public class BowNetCode : NetworkBehaviour
 	[SerializeField] private GameObject arrowPrefab;
 
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-	public void SpawnArrowVisualServerRpc(Vector3 pos, Quaternion rot, Vector3 dir, float dmg, float spd, float size, ulong shooterClientId, ArrowEffect[] arrowEffects)
+	public void SpawnArrowVisualServerRpc(string identifier, Vector3 pos, Quaternion rot, Vector3 dir, float dmg, float spd, float size, ulong shooterClientId, ArrowEffect[] arrowEffects)
 	{
-		SpawnArrowVisualClientRpc(pos, rot, dir, dmg, spd, size, shooterClientId, arrowEffects);
+		SpawnArrowVisualClientRpc(identifier, pos, rot, dir, dmg, spd, size, shooterClientId, arrowEffects);
 	}
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	public void SpawnArrowVisualClientRpc(Vector3 pos, Quaternion rot, Vector3 dir, float dmg, float spd, float size, ulong shooterClientId, ArrowEffect[] arrowEffects)
+	public void SpawnArrowVisualClientRpc(string identifier, Vector3 pos, Quaternion rot, Vector3 dir, float dmg, float spd, float size, ulong shooterClientId, ArrowEffect[] arrowEffects)
 	{
 		if (NetworkManager.Singleton.LocalClientId == shooterClientId) return;
 
 		var arrowObj = Instantiate(arrowPrefab, pos, rot);
 		var arrow = arrowObj.GetComponent<Arrow>();
 
-		arrow.Initialize(dmg, spd, size, dir, shooterPos: Vector3.zero, shooterClientId, false, arrowEffects);
+		arrow.Initialize(identifier, dmg, spd, size, dir, shooterPos: Vector3.zero, shooterClientId, false, arrowEffects);
 	}
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
 	public void HitServerRpc(ulong targetNetId, float amount, Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects, float knockbackMultiplier)

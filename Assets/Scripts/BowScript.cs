@@ -123,13 +123,15 @@ public class BowScript : MonoBehaviour
 			dmg *= 5;
 		}
 
-		arrow.Initialize(dmg, spd, size, shootDir,
+		string id = System.Guid.NewGuid().ToString();
+
+		arrow.Initialize(id, dmg, spd, size, shootDir,
 			pRef.playerController.transform.position,
 			shooterId,
 			true,
 			pRef.bowEffects.activeArrowEffects.Value.ToArray());
 
-		pRef.bowNetCode.SpawnArrowVisualServerRpc(pos, rot, shootDir, dmg, spd, size, shooterId, pRef.bowEffects.activeArrowEffects.Value.ToArray());
+		pRef.bowNetCode.SpawnArrowVisualServerRpc(id, pos, rot, shootDir, dmg, spd, size, shooterId, pRef.bowEffects.activeArrowEffects.Value.ToArray());
 
 		pRef.bowEffects.UpdateEffects();
 	}
