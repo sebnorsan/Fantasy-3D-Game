@@ -10037,8 +10037,8 @@ MonoBehaviour:
   initialSpeed: 150
   dropGravity: 4
   lifeTime: 10
+  firePfx: {fileID: 190083787443836156}
   isAuthority: 0
-  bigHitFX: {fileID: 190083787443836156}
 --- !u!1 &6750712160851407486
 GameObject:
   m_ObjectHideFlags: 0

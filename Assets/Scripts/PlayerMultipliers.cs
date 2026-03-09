@@ -17,5 +17,6 @@ public class PlayerMultipliers : AbstractMultipliers
 	protected override void ApplyValues()
     {
 		pRef.playerDamagable.SetHealthMultiplier();
+		//Set pickup size inside the particle force field
 	}
 }

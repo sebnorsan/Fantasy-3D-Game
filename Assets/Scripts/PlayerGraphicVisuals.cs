@@ -106,28 +106,28 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 		);
 	}
 
-	public void PlayParticle(PlayerPfxToPlay pfx, bool play = true, float delay = 0f)
+	public void PlayParticle(PlayerPfxToPlay pfx, bool play = true, float delay = 0f, bool reset = false)
 	{
 		StartCoroutine(PlayParticleIE(pfx, play, delay));
 	}
-	private IEnumerator PlayParticleIE(PlayerPfxToPlay pfx, bool play = true, float delay = 0f)
+	private IEnumerator PlayParticleIE(PlayerPfxToPlay pfx, bool play = true, float delay = 0f, bool reset = false)
 	{
 		yield return new WaitForSeconds(delay);
 
-		PlayParticleFunctionality(pfx, play);
-		PlayParticleServerRpc(pfx, play);
+		PlayParticleFunctionality(pfx, play, reset);
+		PlayParticleServerRpc(pfx, play, reset);
 	}
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-	private void PlayParticleServerRpc(PlayerPfxToPlay pfx, bool play)
+	private void PlayParticleServerRpc(PlayerPfxToPlay pfx, bool play, bool reset = false)
 	{
 		PlayParticleClientRpc(pfx, play);
 	}
 	[Rpc(SendTo.NotOwner, InvokePermission = RpcInvokePermission.Server)]
-	private void PlayParticleClientRpc(PlayerPfxToPlay pfx, bool play)
+	private void PlayParticleClientRpc(PlayerPfxToPlay pfx, bool play, bool reset = false)
 	{
 		PlayParticleFunctionality(pfx, play);
 	}
-	private void PlayParticleFunctionality(PlayerPfxToPlay pfx, bool play)
+	private void PlayParticleFunctionality(PlayerPfxToPlay pfx, bool play, bool reset = false)
 	{
 		ParticleSystem pfxToPlay = null;
 
@@ -153,6 +153,11 @@ public class PlayerGraphicVisuals : NetworkBehaviour
 		{
 			if (!pfxToPlay.isPlaying)
 				pfxToPlay.Play();
+			else if (reset)
+			{
+				pfxToPlay.Stop();
+				pfxToPlay.Play();
+			}
 		}
 		else
 		{

@@ -24036,6 +24036,10 @@ MonoBehaviour:
   projectileSpeedMultiplier: 100
   knockbackMultiplier: 100
   experienceMultiplier: 100
+  luckMultiplier: 100
+  critChanceMultiplier: 100
+  critDamageMultiplier: 100
+  extraJump: 0
   pRef: {fileID: 930708363686757887}
 --- !u!114 &6234475594236647715
 MonoBehaviour:

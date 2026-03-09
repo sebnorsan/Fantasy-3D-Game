@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -22,6 +18,9 @@ public class Arrow : MonoBehaviour
 	public float initialSpeed = 30f;
 	public float dropGravity = 1f;
 	public float lifeTime = 10f;
+
+	[Header("PFX on Arrows")]
+	[SerializeField] private ParticleSystem firePfx;
 
 	private readonly Quaternion modelCorrection = Quaternion.Euler(90f, 0f, 0f);
 	private Vector3 initPlayerPos;
@@ -55,6 +54,8 @@ public class Arrow : MonoBehaviour
 
 		arrowEffects = arrowFx;
 
+		ApplyEffects(arrowEffects);
+
 		this.isAuthority = isAuthority;
 
 		shooterClientId = clientShooting;
@@ -76,7 +77,20 @@ public class Arrow : MonoBehaviour
 		ShakeShooter();
 		EnableTrailAfterDelay(0.03f);
 	}
-	
+	private void ApplyEffects(ArrowEffect[] arrowEffects) 
+	{ 
+		foreach (var effect in arrowEffects) 
+		{ 
+			switch (effect) 
+			{ 
+				case ArrowEffect.BigHit: 
+					firePfx.Play(); 
+					break; 
+				default: 
+					break; 
+			} 
+		} 
+	}
 	private IEnumerator LifeTimer()
 	{
 		yield return new WaitForSeconds(lifeTime);

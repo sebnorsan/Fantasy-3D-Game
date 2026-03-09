@@ -134,11 +134,12 @@ public class UpgradeCard : MonoBehaviour
 		foreach (Transform child in cardAddVisualParent.transform)
 			Destroy(child.gameObject);
 
-		foreach (var cAdd in upgCardSO.cardsToAddToLib)
-		{
-			var obj = Instantiate(cardAddVisual, cardAddVisualParent);
-			obj.GetComponent<RawImage>().color = GetRarityColor(cAdd.baseWeight);
-		}
+		if (upgCardSO.cardsToAddToLib != null)
+			foreach (var cAdd in upgCardSO.cardsToAddToLib)
+			{
+				var obj = Instantiate(cardAddVisual, cardAddVisualParent);
+				obj.GetComponent<RawImage>().color = GetRarityColor(cAdd.baseWeight);
+			}
 	}
 	private Color GetRarityColor(float weight)
 	{

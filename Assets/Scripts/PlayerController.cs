@@ -376,26 +376,33 @@ public class PlayerController : NetworkBehaviour
 	}
 	private void HandleJumpingInput()
 	{
-		if (Input.GetKey(pInput.jumpKey) && canMove && (isGrounded || coyoteActive || currentExtraJumps > 0))
+		if (Input.GetKeyDown(pInput.jumpKey) && canMove && !isGrounded && !coyoteActive && currentExtraJumps > 0)
 		{
 			if (!isGrounded || !coyoteActive)
 				currentExtraJumps--;
 
-			pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Halo);
-			pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Stripe);
-
-			if (coyoteActive)
-				StopCoyote();
-
-			moveDirection.y = pRef.playerMultipliers.GetJumpMulti(jumpSpeed);
-
-			PlayMovementSound("Slide", .65f, 1.35f);
-
-			footsteps.StopFootsteps();
-			footstepStopPending = false;
-
-			pRef.playerAnimator.A_Jump();
+			DoJump();
 		}
+
+		if (Input.GetKey(pInput.jumpKey) && canMove && (isGrounded || coyoteActive))
+			DoJump();
+	}
+	private void DoJump()
+	{
+		pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Halo, reset: true);
+		pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Stripe, reset: true);
+
+		if (coyoteActive)
+			StopCoyote();
+
+		moveDirection.y = pRef.playerMultipliers.GetJumpMulti(jumpSpeed);
+
+		PlayMovementSound("Slide", .65f, 1.35f);
+
+		footsteps.StopFootsteps();
+		footstepStopPending = false;
+
+		pRef.playerAnimator.A_Jump();
 	}
 	private void HandleCrouchingInput()
 	{
