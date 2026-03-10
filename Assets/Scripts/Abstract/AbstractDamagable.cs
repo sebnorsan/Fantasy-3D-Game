@@ -13,7 +13,7 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 	[SerializeField] protected ParticleSystem deathParticles;
 
 	[Space(15)]
-	public float maxHealth = 100;
+	[SerializeField] protected float heldMaxHealth = 100;
 	[SerializeField] protected float currentHealth = 100;
 
 	[SerializeField] protected NetworkVariable<float> syncedHealth = new(
@@ -25,7 +25,7 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 
 	private void Start()
 	{
-		baseHealth = maxHealth;
+		baseHealth = heldMaxHealth;
 	}
 	public override void OnNetworkSpawn()
 	{
@@ -36,10 +36,10 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 		if (IsServer)
 		{
 			if (baseHealth <= 0f) // only init once
-				baseHealth = maxHealth;  // store ORIGINAL max
+				baseHealth = heldMaxHealth;  // store ORIGINAL max
 
-			maxHealth = baseHealth;
-			currentHealth = maxHealth;
+			heldMaxHealth = baseHealth;
+			currentHealth = heldMaxHealth;
 			syncedHealth.Value = currentHealth;
 		}
 

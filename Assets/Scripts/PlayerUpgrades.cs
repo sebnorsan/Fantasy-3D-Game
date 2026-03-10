@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Unity.VisualScripting;
 public class PlayerUpgrades : MonoBehaviour
 {
 	[SerializeField] private KeyCode openKey;
@@ -119,12 +120,7 @@ public class PlayerUpgrades : MonoBehaviour
 		float totalWeight = 0f;
 
 		for (int i = 0; i < source.Count; i++)
-		{
-			if (source[i] == null) continue;
-			if (source[i].baseWeight <= 0f) continue;
-
-			totalWeight += source[i].baseWeight;
-		}
+			totalWeight += GetLuckAdjustedWeight(source[i]);
 
 		// Fallback: if all weights are 0/invalid, just pick any non-null card
 		if (totalWeight <= 0f)
@@ -143,23 +139,47 @@ public class PlayerUpgrades : MonoBehaviour
 
 		for (int i = 0; i < source.Count; i++)
 		{
-			if (source[i] == null) continue;
-			if (source[i].baseWeight <= 0f) continue;
+			float w = GetLuckAdjustedWeight(source[i]);
+			if (w <= 0f) continue;
 
-			sum += source[i].baseWeight;
+			sum += w;
 			if (roll <= sum)
 				return source[i];
 		}
 
 		return null;
 	}
+	private float GetLuckAdjustedWeight(UpgradeCardSO c)
+	{
+		if (c == null) return 0f;
+		if (c.baseWeight <= 0f) return 0f;
+
+		// 100 => 1.0 (no change), 200 => 2.0 (luckier)
+		float luck = 1;
+		if (PlayerManager.m_pRef != null)
+			luck = PlayerManager.m_pRef.playerMultipliers.GetLuckMulti(1);
+		luck = Mathf.Max(0.05f, luck);
+
+		// luck=1 => exponent=1 (normal)
+		// luck>1 => exponent<1 (rare weights become relatively bigger)
+		// luck<1 => exponent>1 (more common-heavy)
+		float exponent = 1f / luck;
+
+		return Mathf.Pow(c.baseWeight, exponent);
+	}
 	public void UseCard(UpgradeCardSO c)
 	{
 		if (!PlayerManager.instance.playerExp.TrySpendSkillPoint())
 			return;
 
-		foreach (var mUpg in c.multiUpgrades)
+		foreach (var mUpg in c.upgradeMultiplier)
 			PlayerManager.m_pRef.playerMultipliers.ApplyPermanentMultiplier(mUpg.multiplier, mUpg.percentageUpgrade);
+		foreach (var pUpg in c.upgradePermanents)
+			PlayerManager.m_pRef.playerPermanents.SetPermanentUpgrade(pUpg.permanent);
+		foreach (var fUpg in c.upgradeFlat)
+			PlayerManager.m_pRef.playerPermanents.ApplyPermanentFlatMultiplier(fUpg.multiplier, fUpg.flatMultiplier);
+		foreach (var sComp in c.setSynergiesOnUpgrade)
+			PlayerManager.m_pRef.playerPermanents.SetSynergyComponent(sComp.synergyComponent);
 
 		if (!c.invincible)
 			RemoveCardFromLibrary(c);

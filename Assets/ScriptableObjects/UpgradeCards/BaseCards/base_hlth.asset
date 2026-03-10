@@ -15,9 +15,12 @@ MonoBehaviour:
   SO_logo: {fileID: 2800000, guid: f6267c3993750420a9c67837202747cf, type: 3}
   SO_title: Base Health
   SO_secondary: 20%
-  multiUpgrades:
+  upgradeMultiplier:
   - multiplier: 1
     percentageUpgrade: 20
+  upgradeFlat: []
+  upgradePermanents: []
+  setSynergiesOnUpgrade: []
   baseWeight: 80
   invincible: 1
   cardsToAddToLib: []

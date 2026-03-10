@@ -53,7 +53,7 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 	{
 		if (healthSlider == null) return;
 
-		healthSlider.maxValue = maxHealth;
+		healthSlider.maxValue = heldMaxHealth;
 		healthSlider.value = syncedHealth.Value;
 		displayedHealth = syncedHealth.Value;
 	}
@@ -132,18 +132,18 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 
 	private void ApplyHealthMultiplierServer()
 	{
-		float oldMax = maxHealth;
+		float oldMax = heldMaxHealth;
 
-		maxHealth = GetMaxHealth();
-		float deltaMax = maxHealth - oldMax;
+		heldMaxHealth = GetMaxHealth();
+		float deltaMax = heldMaxHealth - oldMax;
 
 		if (deltaMax > 0f)
 			currentHealth += deltaMax;
 
-		currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+		currentHealth = Mathf.Clamp(currentHealth, 0f, heldMaxHealth);
 		syncedHealth.Value = currentHealth;
 
-		SyncMaxHealthClientRpc(maxHealth);
+		SyncMaxHealthClientRpc(heldMaxHealth);
 	}
 
 	private float GetMaxHealth() => eRef.enemyMultipliers.GetHealthMulti(baseHealth);
@@ -151,7 +151,7 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void SyncMaxHealthClientRpc(float newMax)
 	{
-		maxHealth = newMax;
+		heldMaxHealth = newMax;
 		SetHealthBar();
 	}
 
@@ -161,7 +161,7 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 	}
 
 	protected override float DamageSet(float amount) => Mathf.Max(0, syncedHealth.Value - amount);
-	protected override float HealSet(float amount) => Mathf.Clamp(currentHealth + amount, 0, maxHealth);
+	protected override float HealSet(float amount) => Mathf.Clamp(currentHealth + amount, 0, heldMaxHealth);
 
 	protected override void HandleKnockback(Vector3 hitPoint, float knockbackMultiplier)
 	{

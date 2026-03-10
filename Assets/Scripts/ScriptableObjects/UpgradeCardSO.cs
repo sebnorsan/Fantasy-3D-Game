@@ -8,7 +8,12 @@ public class UpgradeCardSO : ScriptableObject
 	public string SO_title = "Title";
 	public string SO_secondary = "20% / Description";
 
-	public UpgradeMulti[] multiUpgrades;
+	public UpgradeMulti[] upgradeMultiplier;
+	public UpgradeFlat[] upgradeFlat;
+	public UpgradePermanent[] upgradePermanents;
+
+	//Synergy component to activate when picking certain card
+	public SetSynergyComponent[] setSynergiesOnUpgrade;
 
 	[Space(5)]
 
@@ -45,12 +50,17 @@ public class UpgradeCardSO : ScriptableObject
 	[Serializable]
 	public class UpgradeFlat
 	{
-		public FlatMultipliers multiplier;
-		public int flatMultiplier = 0;
+		public FlatMultiplier multiplier;
+		public float flatMultiplier = 0;
 	}
 	[Serializable]
 	public class UpgradePermanent
 	{
 		public PermanentUpgrades permanent;
+	}
+	[Serializable]
+	public class SetSynergyComponent
+	{
+		public SynergyComponent synergyComponent;
 	}
 }

@@ -23660,7 +23660,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   dmgFeedback: {fileID: 6234475594236647715}
   deathParticles: {fileID: 3548588485384254794, guid: 3a1bfe20f1684bc4ca15eb061cba3362, type: 3}
-  maxHealth: 10
+  heldMaxHealth: 100
   currentHealth: 100
   syncedHealth:
     m_InternalValue: 0
@@ -23748,7 +23748,7 @@ MonoBehaviour:
   playerCam: {fileID: 5855688573525650132}
   playerPvP: {fileID: 4818609617636790534}
   playerMultipliers: {fileID: 6574249655433990806}
-  playerPermanents: {fileID: 0}
+  playerPermanents: {fileID: 4597968635513800963}
   crouchCamPoint: {fileID: 2556143203140004230}
   bowScript: {fileID: 1227791032311695380}
   bowEffects: {fileID: 8675364865469383676}
@@ -24071,6 +24071,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 323221c35f87b0540983d9174aea53ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  pRef: {fileID: 930708363686757887}
+  maxHealthBase: 100
+  maxHealthMultiplier: 0
 --- !u!1 &7973304527205840717
 GameObject:
   m_ObjectHideFlags: 0

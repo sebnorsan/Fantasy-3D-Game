@@ -1,10 +1,7 @@
-using System.Collections.Generic;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
-using static Steamworks.InventoryItem;
-using UnityEngine.Rendering;
 
 public class PlayerDamagable : AbstractDamagable
 {
@@ -30,7 +27,6 @@ public class PlayerDamagable : AbstractDamagable
 
 	private Vector3 deathPosition = new Vector3(9999, 9999, 9999);
 
-
 	public void SetHealthMultiplier()
 	{
 		if (!IsServer)
@@ -51,26 +47,26 @@ public class PlayerDamagable : AbstractDamagable
 
 	private void ApplyHealthMultiplierServer()
 	{
-		float oldMax = maxHealth;
+		float oldMax = heldMaxHealth;
 
-		maxHealth = GetMaxHealth();
-		float deltaMax = maxHealth - oldMax;
+		heldMaxHealth = GetMaxHealth();
+		float deltaMax = heldMaxHealth - oldMax;
 
 		if (deltaMax > 0f)
 			currentHealth += deltaMax;
 
-		currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+		currentHealth = Mathf.Clamp(currentHealth, 0f, heldMaxHealth);
 
 		syncedHealth.Value = currentHealth;
-		SyncMaxHealthClientRpc(maxHealth);
+		SyncMaxHealthClientRpc(heldMaxHealth);
 	}
 
-	private float GetMaxHealth() => pRef.playerMultipliers.GetHealthMulti(baseHealth);
+	private float GetMaxHealth() => pRef.playerMultipliers.GetHealthMulti(pRef.playerPermanents.GetMaxHealthFlat());
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void SyncMaxHealthClientRpc(float newMax)
 	{
-		maxHealth = newMax;
+		heldMaxHealth = newMax;
 		SetHealthBar();
 	}
 	protected override void NetworkSpawn()
@@ -80,6 +76,8 @@ public class PlayerDamagable : AbstractDamagable
 	}
 	private void Start()
 	{
+		heldMaxHealth = pRef.playerPermanents.maxHealthBase;
+
 		ScreenSummoner.SummonScreen(Color.black, 1f, false);
 
 		displayedHealth = currentHealth;
@@ -113,14 +111,14 @@ public class PlayerDamagable : AbstractDamagable
 		// existing multiplayer slider init
 		if (healthSlider != null)
 		{
-			healthSlider.maxValue = maxHealth;
+			healthSlider.maxValue = heldMaxHealth;
 			healthSlider.value = currentHealth;
 		}
 
 		// local HUD slider init (owner only)
 		if (IsOwner && localHealthSlider != null)
 		{
-			localHealthSlider.maxValue = maxHealth;
+			localHealthSlider.maxValue = heldMaxHealth;
 			localHealthSlider.value = currentHealth;
 		}
 	}
@@ -144,7 +142,7 @@ public class PlayerDamagable : AbstractDamagable
 	}
 	protected override float HealSet(float amount)
 	{
-		float healthHolder = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
+		float healthHolder = Mathf.Clamp(currentHealth + amount, 0, heldMaxHealth);
 
 		if (healthHolder > 0)
 		{
@@ -259,7 +257,7 @@ public class PlayerDamagable : AbstractDamagable
 	private IEnumerator DeathFlowServer()
 	{
 		yield return new WaitForSeconds(deathTime);
-		Heal(maxHealth); // still server-side
+		Heal(heldMaxHealth); // still server-side
 	}
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]

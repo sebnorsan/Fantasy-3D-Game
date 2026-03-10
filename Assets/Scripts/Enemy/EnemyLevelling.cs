@@ -116,7 +116,7 @@ public class EnemyLevelling : NetworkBehaviour
 		eRef.enemyMultipliers.SetPermanentMultiplier(Multiplier.Damage, dmgMultiplier * levelFactor);
 		eRef.enemyMultipliers.SetPermanentMultiplier(Multiplier.Health, healthMultiplier * levelFactor);
 		eRef.enemyMultipliers.SetPermanentMultiplier(Multiplier.Speed, speedMultiplier * levelFactor);
-		eRef.enemyMultipliers.SetPermanentMultiplier(Multiplier.AtkSpd, atkspdMultiplier * levelFactor);
+		eRef.enemyMultipliers.SetPermanentMultiplier(Multiplier.AtkSpeed, atkspdMultiplier * levelFactor);
 
         eRef.experienceEmitter.ChangeEmission(extraExpValuePerLevel * currentLevel, extraExpPointsPerLevel * currentLevel);
 

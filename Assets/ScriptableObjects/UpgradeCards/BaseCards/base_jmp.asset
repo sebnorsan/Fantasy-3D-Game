@@ -15,9 +15,13 @@ MonoBehaviour:
   SO_logo: {fileID: 2800000, guid: 49be1bc71f43c4c96b0137ef66f116a2, type: 3}
   SO_title: Base Jump
   SO_secondary: 20%
-  multiUpgrades:
+  upgradeMultiplier:
   - multiplier: 3
     percentageUpgrade: 20
+  upgradeFlat: []
+  upgradePermanents: []
+  setSynergiesOnUpgrade: []
   baseWeight: 80
   invincible: 1
-  cardsToAddToLib: []
+  cardsToAddToLib:
+  - {fileID: 11400000, guid: 2c8fdc92bbbbc8a4285e5629deb59541, type: 2}

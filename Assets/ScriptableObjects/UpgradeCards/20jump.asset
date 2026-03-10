@@ -15,6 +15,12 @@ MonoBehaviour:
   SO_logo: {fileID: 2800000, guid: 24743680055304b4880cd96cb7763292, type: 3}
   SO_title: Rabbit Jump
   SO_secondary: 20%
-  multiUpgrades:
+  upgradeMultiplier:
   - multiplier: 3
     percentageUpgrade: 20
+  upgradeFlat: []
+  upgradePermanents: []
+  setSynergiesOnUpgrade: []
+  baseWeight: 60
+  invincible: 0
+  cardsToAddToLib: []

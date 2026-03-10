@@ -79,14 +79,12 @@ public abstract class AbstractMultipliers : MonoBehaviour
 			case Multiplier.Health: healthMultiplier = percent; break;
 			case Multiplier.Speed: speedMultiplier = percent; break;
 			case Multiplier.Jump: jumpMultiplier = percent; break;
-			case Multiplier.AtkSpd: attackSpeedMultiplier = percent; break;
-			case Multiplier.PrjSize: projectileSizeMultiplier = percent; break;
-			case Multiplier.PrjSpeed: projectileSpeedMultiplier = percent; break;
+			case Multiplier.AtkSpeed: attackSpeedMultiplier = percent; break;
+			case Multiplier.ProjectileSize: projectileSizeMultiplier = percent; break;
+			case Multiplier.ProjectileSpeed: projectileSpeedMultiplier = percent; break;
 			case Multiplier.Knockback: knockbackMultiplier = percent; break;
 			case Multiplier.Experience: experienceMultiplier = percent; break;
-
 			case Multiplier.Luck: luckMultiplier = percent; break;
-			case Multiplier.CritChance: critChanceMultiplier = percent; break;
 			case Multiplier.CritDamage: critDamageMultiplier = percent; break;
 
 			default: break;
@@ -103,14 +101,13 @@ public abstract class AbstractMultipliers : MonoBehaviour
 			case Multiplier.Health: healthMultiplier += percent; break;
 			case Multiplier.Speed: speedMultiplier += percent; break;
 			case Multiplier.Jump: jumpMultiplier += percent; break;
-			case Multiplier.AtkSpd: attackSpeedMultiplier += percent; break;
-			case Multiplier.PrjSize: projectileSizeMultiplier += percent; break;
-			case Multiplier.PrjSpeed: projectileSpeedMultiplier += percent; break;
+			case Multiplier.AtkSpeed: attackSpeedMultiplier += percent; break;
+			case Multiplier.ProjectileSize: projectileSizeMultiplier += percent; break;
+			case Multiplier.ProjectileSpeed: projectileSpeedMultiplier += percent; break;
 			case Multiplier.Knockback: knockbackMultiplier += percent; break;
 			case Multiplier.Experience: experienceMultiplier += percent; break;
 
 			case Multiplier.Luck: luckMultiplier += percent; break;
-			case Multiplier.CritChance: critChanceMultiplier += percent; break;
 			case Multiplier.CritDamage: critDamageMultiplier += percent; break;
 
 			default: break;
@@ -131,21 +128,18 @@ public abstract class AbstractMultipliers : MonoBehaviour
 				speedMultiplier -= percent; speedMultiplier = Mathf.Max(1f, speedMultiplier); break;
 			case Multiplier.Jump:
 				jumpMultiplier -= percent; jumpMultiplier = Mathf.Max(1f, jumpMultiplier); break;
-			case Multiplier.AtkSpd:
+			case Multiplier.AtkSpeed:
 				attackSpeedMultiplier -= percent; attackSpeedMultiplier = Mathf.Max(1f, attackSpeedMultiplier); break;
-			case Multiplier.PrjSize:
+			case Multiplier.ProjectileSize:
 				projectileSizeMultiplier -= percent; projectileSizeMultiplier = Mathf.Max(1f, projectileSizeMultiplier); break;
-			case Multiplier.PrjSpeed:
+			case Multiplier.ProjectileSpeed:
 				projectileSpeedMultiplier -= percent; projectileSpeedMultiplier = Mathf.Max(1f, projectileSpeedMultiplier); break;
 			case Multiplier.Knockback:
 				knockbackMultiplier -= percent; knockbackMultiplier = Mathf.Max(1f, knockbackMultiplier); break;
 			case Multiplier.Experience:
 				experienceMultiplier -= percent; experienceMultiplier = Mathf.Max(1f, experienceMultiplier); break;
-
 			case Multiplier.Luck:
 				luckMultiplier -= percent; luckMultiplier = Mathf.Max(1f, luckMultiplier); break;
-			case Multiplier.CritChance:
-				critChanceMultiplier -= percent; critChanceMultiplier = Mathf.Max(1f, critChanceMultiplier); break;
 			case Multiplier.CritDamage:
 				critDamageMultiplier -= percent; critDamageMultiplier = Mathf.Max(1f, critDamageMultiplier); break;
 
@@ -164,28 +158,20 @@ public enum Multiplier
 	Health,
 	Speed,
 	Jump,
-	AtkSpd,
-	PrjSize,
-	PrjSpeed,
+	AtkSpeed,
+	ProjectileSize,
+	ProjectileSpeed,
 	Knockback,
 	Experience,
+	GlobalExperience,
 
 	Luck,
-	CritChance,
 	CritDamage,
 
-	DodgeChance,
 	HealthRegenTime,
-	HealthRegenAmount,
+	HealthRegen,
 	PickupRadius,
-	BurnChance,
-	BurnDamage,
-	BurnTime,
-	FreezeChance,
-	FreezeDuration,
-	LightningChance,
 	LightningDamage,
-	LightningChainCount,
 	LightningRange,
 	ExplosionDamage,
 	ExplosionRadius,
@@ -196,9 +182,30 @@ public enum Multiplier
 	DamageToFlying,
 	DamageFromBehind,
 	StationaryDamage,
-	AfterKillSpd,
+	StationaryAttackSpeed,
+	AfterKillSpeed,
+	HealingOrbAmount,
+	ElementalDamage,
+	EntitySize
+}
+public enum Chance
+{
+	HealingOrbChance,
+
 	//Chance to reflect projectiles
 	ReflectionChance,
-	HealingOrbChance,
-	HealingOrbAmount,
+
+	//Chance for enemies to re-freeze once they thaw
+	EnemyFreezeOnThawChance,
+
+	//Chance for doubling projectile per projectile shot (if 3 arrows shot, x percent amount for each arrow to double)
+	DoubleProjectileChance,
+
+	BurnChance,
+	CritChance,
+	LightningKillSummonNewChance,
+	LightningChance,
+	FreezeChance,
+	CritPointChance,
+	DodgeChance,
 }

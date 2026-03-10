@@ -15,9 +15,12 @@ MonoBehaviour:
   SO_logo: {fileID: 2800000, guid: 24743680055304b4880cd96cb7763292, type: 3}
   SO_title: Base Damage
   SO_secondary: 20%
-  multiUpgrades:
+  upgradeMultiplier:
   - multiplier: 0
     percentageUpgrade: 20
+  upgradeFlat: []
+  upgradePermanents: []
+  setSynergiesOnUpgrade: []
   baseWeight: 80
   invincible: 1
   cardsToAddToLib:

@@ -955,7 +955,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   dmgFeedback: {fileID: 5817319669080395596}
   deathParticles: {fileID: 3548588485384254794, guid: 7fb0f6e51e8cdbe4e99603aa917a2d53, type: 3}
-  maxHealth: 5
+  heldMaxHealth: 100
   currentHealth: 5
   syncedHealth:
     m_InternalValue: 0
