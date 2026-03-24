@@ -27,8 +27,13 @@ public class PlayerDamagable : AbstractDamagable
 
 	private Vector3 deathPosition = new Vector3(9999, 9999, 9999);
 
+	private Coroutine regenerationCoroutine;
+
 	public void SetHealthMultiplier()
 	{
+		if (regenerationCoroutine == null && pRef.playerPermanents.GetFlatMultiplier(FlatMultiplier.HealthRegenTime) > 0)
+			regenerationCoroutine = StartCoroutine(HealthRegeneration());
+
 		if (!IsServer)
 		{
 			RequestSetHealthMultiplierServerRpc();
@@ -36,6 +41,14 @@ public class PlayerDamagable : AbstractDamagable
 		}
 
 		ApplyHealthMultiplierServer();
+	}
+	private IEnumerator HealthRegeneration()
+	{
+		while (true)
+		{
+			yield return new WaitForSeconds(pRef.playerPermanents.GetFlatMultiplier(FlatMultiplier.HealthRegenTime));
+			Heal(pRef.playerPermanents.GetFlatMultiplier(FlatMultiplier.HealthRegenAmount));
+		}
 	}
 
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
@@ -61,7 +74,7 @@ public class PlayerDamagable : AbstractDamagable
 		SyncMaxHealthClientRpc(heldMaxHealth);
 	}
 
-	private float GetMaxHealth() => pRef.playerMultipliers.GetHealthMulti(pRef.playerPermanents.GetMaxHealthFlat());
+	private float GetMaxHealth() => pRef.playerMultipliers.GetMulti(pRef.playerPermanents.GetMaxHealthFlat(), Multiplier.Health);
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void SyncMaxHealthClientRpc(float newMax)

@@ -30,7 +30,7 @@ public class PlayerExperience : MonoBehaviour
 	}
 	public void AddXp(float xp)
 	{
-		currentXp += PlayerManager.m_pRef.playerMultipliers.GetExperienceMulti(xp);
+		currentXp += PlayerManager.m_pRef.playerMultipliers.GetMulti(xp, Multiplier.Experience);
 
 		TryLevelUp();
 		UpdateXpGraphics();

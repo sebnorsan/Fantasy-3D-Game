@@ -146,7 +146,7 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 		SyncMaxHealthClientRpc(heldMaxHealth);
 	}
 
-	private float GetMaxHealth() => eRef.enemyMultipliers.GetHealthMulti(baseHealth);
+	private float GetMaxHealth() => eRef.enemyMultipliers.GetMulti(baseHealth, Multiplier.Health);
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
 	private void SyncMaxHealthClientRpc(float newMax)

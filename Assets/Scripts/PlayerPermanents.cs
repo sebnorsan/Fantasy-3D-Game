@@ -1,33 +1,109 @@
-using System.Collections.Generic;
-using UnityEngine;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
-using UnityEditor;
+using UnityEngine;
 using System.Linq;
+
+[Serializable]
+public class FlatMultiplierEntry
+{
+	public FlatMultiplier type;
+	public float value = 0;
+}
 
 public class PlayerPermanents : MonoBehaviour
 {
-    [SerializeField] private PlayerReferences pRef;
+	[SerializeField] private PlayerReferences pRef;
 
-	public float maxHealthBase = 100;
-	public float maxHealthMultiplier = 0;
+	public float maxHealthBase = 100f;
 
-	[SerializeField] private List<PermanentUpgrades> activePermanents = new List<PermanentUpgrades>();
-	[SerializeField] private List<SynergyComponent> activeSynergyComponents = new List<SynergyComponent>();
-	[SerializeField] private List<Synergies> activeSynergies = new List<Synergies>();
+	// Kept so your old code can still read it if needed
+	//public float maxHealthMultiplier = 0f;
 
-	public float GetMaxHealthFlat() => maxHealthBase + maxHealthMultiplier;
+	[SerializeField] private List<FlatMultiplierEntry> flatMultiplierList = new();
+	private readonly Dictionary<FlatMultiplier, float> flatMultipliers = new();
 
-	protected List<Coroutine> currentTempMults = new List<Coroutine>();
+	[SerializeField] private List<PermanentUpgrades> activePermanents = new();
+	[SerializeField] private List<SynergyComponent> activeSynergyComponents = new();
+	[SerializeField] private List<Synergies> activeSynergies = new();
+
+	public float GetMaxHealthFlat() => maxHealthBase + GetFlatMultiplier(FlatMultiplier.HealthMax);
+
+	protected List<Coroutine> currentTempMults = new();
+
+	private void Awake()
+	{
+		EnsureFlatMultiplierDefaults();
+		RebuildFlatMultiplierDictionary();
+	}
 
 	private void OnValidate()
 	{
+		EnsureFlatMultiplierDefaults();
+		RebuildFlatMultiplierDictionary();
+
 		if (!NetworkManager.Singleton) return;
 		if (!GetComponent<NetworkObject>()) return;
 		if (!GetComponent<NetworkObject>().IsSpawned) return;
 
 		if (Application.isPlaying && Application.isEditor)
 			ApplyValues();
+	}
+
+	private void EnsureFlatMultiplierDefaults()
+	{
+		foreach (FlatMultiplier type in Enum.GetValues(typeof(FlatMultiplier)))
+		{
+			if (!flatMultiplierList.Exists(x => x.type == type))
+			{
+				flatMultiplierList.Add(new FlatMultiplierEntry
+				{
+					type = type,
+					value = 0
+				});
+			}
+		}
+
+		flatMultiplierList = flatMultiplierList
+			.GroupBy(x => x.type)
+			.Select(x => x.First())
+			.OrderBy(x => x.type)
+			.ToList();
+	}
+
+	private void RebuildFlatMultiplierDictionary()
+	{
+		flatMultipliers.Clear();
+
+		for (int i = 0; i < flatMultiplierList.Count; i++)
+			flatMultipliers[flatMultiplierList[i].type] = flatMultiplierList[i].value;
+	}
+
+	private void SetFlatMultiplierListValue(FlatMultiplier type, float value)
+	{
+		for (int i = 0; i < flatMultiplierList.Count; i++)
+		{
+			if (flatMultiplierList[i].type == type)
+			{
+				flatMultiplierList[i].value = value;
+				return;
+			}
+		}
+
+		flatMultiplierList.Add(new FlatMultiplierEntry
+		{
+			type = type,
+			value = value
+		});
+	}
+
+	public float GetFlatMultiplier(FlatMultiplier type)
+	{
+		if (!flatMultipliers.TryGetValue(type, out float value))
+			return 0;
+
+		return value;
 	}
 
 	public void SetPermanentUpgrade(PermanentUpgrades permanent)
@@ -37,8 +113,8 @@ public class PlayerPermanents : MonoBehaviour
 			activePermanents.Add(permanent);
 			UpdatePermanentChanges(permanent);
 		}
-
 	}
+
 	public bool IsPermanentActive(PermanentUpgrades permanent)
 	{
 		if (!activePermanents.Contains(permanent))
@@ -46,43 +122,27 @@ public class PlayerPermanents : MonoBehaviour
 
 		return true;
 	}
-	
+
 	private void UpdatePermanentChanges(PermanentUpgrades permanent)
 	{
 		switch (permanent)
 		{
 			case PermanentUpgrades.AxeArrows:
-				break;
 			case PermanentUpgrades.ShurikenArrows:
-				break;
 			case PermanentUpgrades.HammerArrows:
-				break;
 			case PermanentUpgrades.BoomerangArrows:
-				break;
 			case PermanentUpgrades.BoomArrows:
-				break;
 			case PermanentUpgrades.NukeArrows:
-				break;
 			case PermanentUpgrades.Inferno:
-				break;
 			case PermanentUpgrades.ExpOnDodge:
-				break;
 			case PermanentUpgrades.ForceField:
-				break;
 			case PermanentUpgrades.ForceFieldExplosion:
-				break;
 			case PermanentUpgrades.NoExplosionDamage:
-				break;
 			case PermanentUpgrades.CritPoint:
-				break;
 			case PermanentUpgrades.SlowZone:
-				break;
 			case PermanentUpgrades.FrostBite:
-				break;
 			case PermanentUpgrades.EnemyKillsGainHp:
-				break;
 			case PermanentUpgrades.Doggy:
-				break;
 			default:
 				break;
 		}
@@ -121,7 +181,6 @@ public class PlayerPermanents : MonoBehaviour
 			if (activeSynergies.Contains(synergy))
 				continue;
 
-			// Skip if this new permanent is not part of this synergy
 			bool usesAddedPermanent = false;
 			foreach (var req in needed)
 			{
@@ -149,6 +208,7 @@ public class PlayerPermanents : MonoBehaviour
 				SetSynergery(synergy);
 		}
 	}
+
 	private void SetSynergery(Synergies synergy)
 	{
 		if (!activeSynergies.Contains(synergy))
@@ -157,233 +217,67 @@ public class PlayerPermanents : MonoBehaviour
 			UpdateSynergyChanges(synergy);
 		}
 	}
+
 	private void UpdateSynergyChanges(Synergies synergy)
 	{
 		switch (synergy)
 		{
 			case Synergies.Ice_Crit:
-				break;
 			case Synergies.Ice_Fire:
-				break;
 			case Synergies.Ice_Fire_Lightning:
-				break;
 			case Synergies.Sniper_Crit:
-				break;
 			case Synergies.ManyArrows_Jump:
-				break;
 			case Synergies.Lucky_Lightning:
-				break;
 			case Synergies.Lucky_Fire:
-				break;
 			case Synergies.Lightning_ManyArrows:
-				break;
 			default:
 				break;
 		}
 	}
+
 	#endregion
 
 	public void SetPermanentFlatMultiplier(FlatMultiplier type, float amount)
 	{
-		SetMultiplier(type, amount);
+		SetFlatMultiplier(type, amount);
 	}
+
 	public void ApplyPermanentFlatMultiplier(FlatMultiplier type, float amount)
 	{
-		AddMultiplier(type, amount);
+		AddFlatMultiplier(type, amount);
 	}
+
 	public void ApplyTemporaryFlatMultiplier(FlatMultiplier type, float amount, float resetTime)
 	{
-		AddMultiplier(type, amount);
+		AddFlatMultiplier(type, amount);
 		currentTempMults.Add(StartCoroutine(TempMultiplierFlatMultiplier(type, amount, resetTime)));
 	}
+
 	private IEnumerator TempMultiplierFlatMultiplier(FlatMultiplier type, float amount, float resetTime)
 	{
 		yield return new WaitForSeconds(resetTime);
-		RemoveMultiplier(type, amount);
+		RemoveFlatMultiplier(type, amount);
 	}
 
-	private void SetMultiplier(FlatMultiplier type, float flatAmount)
+	private void SetFlatMultiplier(FlatMultiplier type, float amount)
 	{
-		//float percent = 100 + (100 * multiplier);
+		// Only HealthMax was clamped in your old code
+		if (type == FlatMultiplier.HealthMax)
+			amount = Mathf.Max(1, amount);
 
-		switch (type)
-		{
-			case FlatMultiplier.AfterKillSpdDuration:
-				break;
-			case FlatMultiplier.ForceFieldRespawn:
-				break;
-			case FlatMultiplier.BounceCount:
-				break;
-			case FlatMultiplier.ExtraJump:
-				break;
-			case FlatMultiplier.Pierce:
-				break;
-			case FlatMultiplier.HealthRegenTime:
-				break;
-			case FlatMultiplier.HealthRegenAmount:
-				break;
-			case FlatMultiplier.FreezeDuration:
-				break;
-			case FlatMultiplier.HealthMax:
-				maxHealthMultiplier = flatAmount;
-				break;
-			case FlatMultiplier.LightningChainCount:
-				break;
-			case FlatMultiplier.FrenzyDuration:
-				break;
-			case FlatMultiplier.LifeStealFlatAmount:
-				break;
-			case FlatMultiplier.CritLifeStealAmount:
-				break;
-			case FlatMultiplier.BounceKillLifeStealAmount:
-				break;
-			case FlatMultiplier.ProjectileCount:
-				break;
-			case FlatMultiplier.StationaryProjectileCount:
-				break;
-			case FlatMultiplier.RandomProjectileCount:
-				break;
-			case FlatMultiplier.BurnDamage:
-				break;
-			case FlatMultiplier.SlowZoneRange:
-				break;
-			case FlatMultiplier.FrostBiteDamage:
-				break;
-			case FlatMultiplier.ExpOnDodgeAmount:
-				break;
-			case FlatMultiplier.ForceFieldAmount:
-				break;
-			case FlatMultiplier.BounceRange:
-				break;
-			case FlatMultiplier.BurnTime:
-				break;
-			default:
-				break;
-		}
-
+		flatMultipliers[type] = amount;
+		SetFlatMultiplierListValue(type, amount);
 		ApplyValues();
 	}
 
-	private void AddMultiplier(FlatMultiplier type, float flatAmount)
+	private void AddFlatMultiplier(FlatMultiplier type, float amount)
 	{
-		switch (type)
-		{
-			case FlatMultiplier.ForceFieldRespawn:
-				break;
-			case FlatMultiplier.AfterKillSpdDuration:
-				break;
-			case FlatMultiplier.BounceCount:
-				break;
-			case FlatMultiplier.ExtraJump:
-				break;
-			case FlatMultiplier.Pierce:
-				break;
-			case FlatMultiplier.HealthRegenTime:
-				break;
-			case FlatMultiplier.HealthRegenAmount:
-				break;
-			case FlatMultiplier.FreezeDuration:
-				break;
-			case FlatMultiplier.HealthMax:
-				maxHealthMultiplier += flatAmount;
-				break;
-			case FlatMultiplier.LightningChainCount:
-				break;
-			case FlatMultiplier.FrenzyDuration:
-				break;
-			case FlatMultiplier.LifeStealFlatAmount:
-				break;
-			case FlatMultiplier.CritLifeStealAmount:
-				break;
-			case FlatMultiplier.BounceKillLifeStealAmount:
-				break;
-			case FlatMultiplier.ProjectileCount:
-				break;
-			case FlatMultiplier.StationaryProjectileCount:
-				break;
-			case FlatMultiplier.RandomProjectileCount:
-				break;
-			case FlatMultiplier.BurnDamage:
-				break;
-			case FlatMultiplier.SlowZoneRange:
-				break;
-			case FlatMultiplier.FrostBiteDamage:
-				break;
-			case FlatMultiplier.ExpOnDodgeAmount:
-				break;
-			case FlatMultiplier.ForceFieldAmount:
-				break;
-			case FlatMultiplier.BounceRange:
-				break;
-			case FlatMultiplier.BurnTime:
-				break;
-			default:
-				break;
-		}
-
-		ApplyValues();
+		SetFlatMultiplier(type, GetFlatMultiplier(type) + amount);
 	}
 
-	private void RemoveMultiplier(FlatMultiplier type, float flatAmount)
+	private void RemoveFlatMultiplier(FlatMultiplier type, float amount)
 	{
-		switch (type)
-		{
-			case FlatMultiplier.ForceFieldRespawn:
-				// forceFieldRespawn -= flatAmount;
-				// forceFieldRespawn = Mathf.Max(1f, forceFieldRespawn);
-				break;
-			case FlatMultiplier.AfterKillSpdDuration:
-				break;
-			case FlatMultiplier.BounceCount:
-				break;
-			case FlatMultiplier.ExtraJump:
-				break;
-			case FlatMultiplier.Pierce:
-				break;
-			case FlatMultiplier.HealthRegenTime:
-				break;
-			case FlatMultiplier.HealthRegenAmount:
-				break;
-			case FlatMultiplier.FreezeDuration:
-				break;
-			case FlatMultiplier.HealthMax:
-				maxHealthMultiplier -= flatAmount;
-				maxHealthMultiplier = Mathf.Max(0, maxHealthMultiplier);
-				break;
-			case FlatMultiplier.LightningChainCount:
-				break;
-			case FlatMultiplier.FrenzyDuration:
-				break;
-			case FlatMultiplier.LifeStealFlatAmount:
-				break;
-			case FlatMultiplier.CritLifeStealAmount:
-				break;
-			case FlatMultiplier.BounceKillLifeStealAmount:
-				break;
-			case FlatMultiplier.ProjectileCount:
-				break;
-			case FlatMultiplier.StationaryProjectileCount:
-				break;
-			case FlatMultiplier.RandomProjectileCount:
-				break;
-			case FlatMultiplier.BurnDamage:
-				break;
-			case FlatMultiplier.SlowZoneRange:
-				break;
-			case FlatMultiplier.FrostBiteDamage:
-				break;
-			case FlatMultiplier.ExpOnDodgeAmount:
-				break;
-			case FlatMultiplier.ForceFieldAmount:
-				break;
-			case FlatMultiplier.BounceRange:
-				break;
-			case FlatMultiplier.BurnTime:
-				break;
-			default: break;
-		}
-
-		ApplyValues();
+		SetFlatMultiplier(type, GetFlatMultiplier(type) - amount);
 	}
 
 	private void ApplyValues()

@@ -1,46 +1,139 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
+[Serializable]
+public struct MultiplierEntry
+{
+	public Multiplier type;
+	public float value;
+}
+
+[Serializable]
+public struct ChanceEntry
+{
+	public Chance type;
+	public float value;
+}
+
 public abstract class AbstractMultipliers : MonoBehaviour
 {
-	public float damageMultiplier = 100;
-	public float healthMultiplier = 100;
-	public float speedMultiplier = 100;
-	public float jumpMultiplier = 100;
-	public float attackSpeedMultiplier = 100;
-	public float projectileSizeMultiplier = 100;
-	public float projectileSpeedMultiplier = 100;
-	public float knockbackMultiplier = 100;
-	public float experienceMultiplier = 100;
-	public float luckMultiplier = 100;
-	public float critChanceMultiplier = 100;
-	public float critDamageMultiplier = 100;
+	[SerializeField] private List<MultiplierEntry> multiplierList = new();
+	[SerializeField] private List<ChanceEntry> chanceList = new();
 
-	public float GetDamageMulti(float baseVal) => baseVal * (damageMultiplier / 100);
-	public float GetHealthMulti(float baseVal) => baseVal * (healthMultiplier / 100);
-	public float GetSpeedMulti(float baseVal) => baseVal * (speedMultiplier / 100);
-	public float GetJumpMulti(float baseVal) => baseVal * (jumpMultiplier / 100);
-	public float GetAttackSpeedMulti(float baseVal) => baseVal * (attackSpeedMultiplier / 100);
-	public float GetProjectileSizeMulti(float baseVal) => baseVal * (projectileSizeMultiplier / 100);
-	public float GetProjectileSpeedMulti(float baseVal) => baseVal * (projectileSpeedMultiplier / 100);
-	public float GetKnockbackMulti(float baseVal) => baseVal * (knockbackMultiplier / 100);
-	public float GetExperienceMulti(float baseVal) => baseVal * (experienceMultiplier / 100);
-	public float GetLuckMulti(float baseVal) => baseVal * (luckMultiplier / 100);
-	public float GetCritChanceMulti(float baseVal) => baseVal * (critChanceMultiplier / 100);
-	public float GetCritDamageMulti(float baseVal) => baseVal * (critDamageMultiplier / 100);
+	protected Dictionary<Multiplier, float> multipliers = new();
+	protected Dictionary<Chance, float> chances = new();
 
-	protected List<Coroutine> currentTempMults = new List<Coroutine>();
+	protected List<Coroutine> currentTempMults = new();
 
 	private void OnValidate()
 	{
-		if (!NetworkManager.Singleton) return;
-		if (!GetComponent<NetworkObject>()) return;
-		if (!GetComponent<NetworkObject>().IsSpawned) return;
+		EnsureDefaults();
+		RebuildDictionaries();
 
-		if (Application.isPlaying && Application.isEditor)
-			ApplyValues();
+		if (!Application.isPlaying) return;
+		if (!NetworkManager.Singleton) return;
+
+		NetworkObject netObj = GetComponent<NetworkObject>();
+		if (!netObj || !netObj.IsSpawned) return;
+
+		ApplyValues();
+	}
+
+	protected virtual void Awake()
+	{
+		//InitializeDefaults();
+		EnsureDefaults();
+		RebuildDictionaries();
+	}
+
+	private void EnsureDefaults()
+	{
+		foreach (Multiplier type in Enum.GetValues(typeof(Multiplier)))
+		{
+			if (!multiplierList.Exists(x => x.type == type))
+				multiplierList.Add(new MultiplierEntry { type = type, value = 100f });
+		}
+
+		foreach (Chance type in Enum.GetValues(typeof(Chance)))
+		{
+			if (!chanceList.Exists(x => x.type == type))
+				chanceList.Add(new ChanceEntry { type = type, value = 0f });
+		}
+	}
+
+	private void RebuildDictionaries()
+	{
+		multipliers.Clear();
+		chances.Clear();
+
+		foreach (var entry in multiplierList)
+			multipliers[entry.type] = Mathf.Max(1f, entry.value);
+
+		foreach (var entry in chanceList)
+			chances[entry.type] = Mathf.Max(0f, entry.value);
+	}
+
+	private void SetMultiplierListValue(Multiplier type, float value)
+	{
+		for (int i = 0; i < multiplierList.Count; i++)
+		{
+			if (multiplierList[i].type == type)
+			{
+				multiplierList[i] = new MultiplierEntry { type = type, value = value };
+				return;
+			}
+		}
+
+		multiplierList.Add(new MultiplierEntry { type = type, value = value });
+	}
+
+	private void SetChanceListValue(Chance type, float value)
+	{
+		for (int i = 0; i < chanceList.Count; i++)
+		{
+			if (chanceList[i].type == type)
+			{
+				chanceList[i] = new ChanceEntry { type = type, value = value };
+				return;
+			}
+		}
+
+		chanceList.Add(new ChanceEntry { type = type, value = value });
+	}
+	//private void InitializeDefaults()
+	//{
+	//	multipliers.Clear();
+	//	chances.Clear();
+
+	//	foreach (Multiplier multiplier in Enum.GetValues(typeof(Multiplier)))
+	//		multipliers[multiplier] = 100f;
+
+	//	foreach (Chance chance in Enum.GetValues(typeof(Chance)))
+	//		chances[chance] = 0f;
+	//}
+
+	public float GetMulti(float baseVal, Multiplier multiplier)
+	{
+		return baseVal * (GetMultiplierPercent(multiplier) / 100f);
+	}
+
+	public float GetMultiplierPercent(Multiplier multiplier)
+	{
+		if (!multipliers.TryGetValue(multiplier, out float value))
+			return 100f;
+
+		return value;
+	}
+
+	public float GetChance(Chance chance)
+	{
+		if (!chances.TryGetValue(chance, out float value))
+			return 0f;
+
+		return value;
 	}
 
 	public float ApplyInverseMultiplier(float baseVal, float percentMultiplier)
@@ -52,101 +145,87 @@ public abstract class AbstractMultipliers : MonoBehaviour
 
 	public void SetPermanentMultiplier(Multiplier type, float multiplier)
 	{
-		SetMultiplier(type, multiplier);
+		SetMultiplier(type, 100f + (100f * multiplier));
 	}
+
 	public void ApplyPermanentMultiplier(Multiplier type, float percent)
 	{
 		AddMultiplier(type, percent);
 	}
+
 	public void ApplyTemporaryMultiplier(Multiplier type, float percent, float resetTime)
 	{
 		AddMultiplier(type, percent);
 		currentTempMults.Add(StartCoroutine(TempMultiplierRemover(type, percent, resetTime)));
 	}
+
 	private IEnumerator TempMultiplierRemover(Multiplier type, float amount, float resetTime)
 	{
 		yield return new WaitForSeconds(resetTime);
 		RemoveMultiplier(type, amount);
 	}
 
-	private void SetMultiplier(Multiplier type, float multiplier)
+	public void SetMultiplier(Multiplier type, float percent)
 	{
-		float percent = 100 + (100 * multiplier);
-
-		switch (type)
-		{
-			case Multiplier.Damage: damageMultiplier = percent; break;
-			case Multiplier.Health: healthMultiplier = percent; break;
-			case Multiplier.Speed: speedMultiplier = percent; break;
-			case Multiplier.Jump: jumpMultiplier = percent; break;
-			case Multiplier.AtkSpeed: attackSpeedMultiplier = percent; break;
-			case Multiplier.ProjectileSize: projectileSizeMultiplier = percent; break;
-			case Multiplier.ProjectileSpeed: projectileSpeedMultiplier = percent; break;
-			case Multiplier.Knockback: knockbackMultiplier = percent; break;
-			case Multiplier.Experience: experienceMultiplier = percent; break;
-			case Multiplier.Luck: luckMultiplier = percent; break;
-			case Multiplier.CritDamage: critDamageMultiplier = percent; break;
-
-			default: break;
-		}
-
+		float finalValue = Mathf.Max(1f, percent);
+		multipliers[type] = finalValue;
+		SetMultiplierListValue(type, finalValue);
 		ApplyValues();
 	}
 
-	private void AddMultiplier(Multiplier type, float percent)
+	public void AddMultiplier(Multiplier type, float percent)
 	{
-		switch (type)
-		{
-			case Multiplier.Damage: damageMultiplier += percent; break;
-			case Multiplier.Health: healthMultiplier += percent; break;
-			case Multiplier.Speed: speedMultiplier += percent; break;
-			case Multiplier.Jump: jumpMultiplier += percent; break;
-			case Multiplier.AtkSpeed: attackSpeedMultiplier += percent; break;
-			case Multiplier.ProjectileSize: projectileSizeMultiplier += percent; break;
-			case Multiplier.ProjectileSpeed: projectileSpeedMultiplier += percent; break;
-			case Multiplier.Knockback: knockbackMultiplier += percent; break;
-			case Multiplier.Experience: experienceMultiplier += percent; break;
-
-			case Multiplier.Luck: luckMultiplier += percent; break;
-			case Multiplier.CritDamage: critDamageMultiplier += percent; break;
-
-			default: break;
-		}
-
+		multipliers[type] = Mathf.Max(1f, GetMultiplierPercent(type) + percent);
 		ApplyValues();
 	}
 
-	private void RemoveMultiplier(Multiplier type, float percent)
+	public void RemoveMultiplier(Multiplier type, float percent)
 	{
-		switch (type)
-		{
-			case Multiplier.Damage:
-				damageMultiplier -= percent; damageMultiplier = Mathf.Max(1f, damageMultiplier); break;
-			case Multiplier.Health:
-				healthMultiplier -= percent; healthMultiplier = Mathf.Max(1f, healthMultiplier); break;
-			case Multiplier.Speed:
-				speedMultiplier -= percent; speedMultiplier = Mathf.Max(1f, speedMultiplier); break;
-			case Multiplier.Jump:
-				jumpMultiplier -= percent; jumpMultiplier = Mathf.Max(1f, jumpMultiplier); break;
-			case Multiplier.AtkSpeed:
-				attackSpeedMultiplier -= percent; attackSpeedMultiplier = Mathf.Max(1f, attackSpeedMultiplier); break;
-			case Multiplier.ProjectileSize:
-				projectileSizeMultiplier -= percent; projectileSizeMultiplier = Mathf.Max(1f, projectileSizeMultiplier); break;
-			case Multiplier.ProjectileSpeed:
-				projectileSpeedMultiplier -= percent; projectileSpeedMultiplier = Mathf.Max(1f, projectileSpeedMultiplier); break;
-			case Multiplier.Knockback:
-				knockbackMultiplier -= percent; knockbackMultiplier = Mathf.Max(1f, knockbackMultiplier); break;
-			case Multiplier.Experience:
-				experienceMultiplier -= percent; experienceMultiplier = Mathf.Max(1f, experienceMultiplier); break;
-			case Multiplier.Luck:
-				luckMultiplier -= percent; luckMultiplier = Mathf.Max(1f, luckMultiplier); break;
-			case Multiplier.CritDamage:
-				critDamageMultiplier -= percent; critDamageMultiplier = Mathf.Max(1f, critDamageMultiplier); break;
+		multipliers[type] = Mathf.Max(1f, GetMultiplierPercent(type) - percent);
+		ApplyValues();
+	}
 
-			default: break;
+	public void SetChance(Chance type, float value)
+	{
+		float finalValue = Mathf.Max(0f, value);
+		chances[type] = finalValue;
+		SetChanceListValue(type, finalValue);
+		ApplyValues();
+	}
+
+	public void AddChance(Chance type, float value)
+	{
+		chances[type] = Mathf.Max(0f, GetChance(type) + value);
+		ApplyValues();
+	}
+
+	public void RemoveChance(Chance type, float value)
+	{
+		chances[type] = Mathf.Max(0f, GetChance(type) - value);
+		ApplyValues();
+	}
+
+	public Chance[] RollAllChances()
+	{
+		List<Chance> hits = new();
+
+		foreach (Chance chance in Enum.GetValues(typeof(Chance)))
+		{
+			if (RollChance(chance))
+				hits.Add(chance);
 		}
 
-		ApplyValues();
+		return hits.ToArray();
+	}
+
+	public bool RollChance(Chance chance)
+	{
+		float value = GetChance(chance);
+
+		if (value <= 0f) return false;
+		if (value >= 100f) return true;
+
+		return UnityEngine.Random.value * 100f < value;
 	}
 
 	protected abstract void ApplyValues();
@@ -168,8 +247,6 @@ public enum Multiplier
 	Luck,
 	CritDamage,
 
-	HealthRegenTime,
-	HealthRegen,
 	PickupRadius,
 	LightningDamage,
 	LightningRange,

@@ -27,11 +27,13 @@ public class PlayerAnimator : NetworkBehaviour
 
 		AnimatorStateInfo bowStateInfo = multiplayerBowAnim.GetCurrentAnimatorStateInfo(0);
 
-		bool affectedByDrawSpeed = false;
-		if (bowStateInfo.IsName("bow_loadIn") || bowStateInfo.IsName("bow_loaded") || bowStateInfo.IsName("bow_shot"))
-			affectedByDrawSpeed = true;
+		//bool affectedByDrawSpeed = false;
+		//if (bowStateInfo.IsName("bow_loadIn") || bowStateInfo.IsName("bow_loaded") || bowStateInfo.IsName("bow_shot"))
+		//	affectedByDrawSpeed = true;
 
-		multiplayerBowAnim.speed = affectedByDrawSpeed ? pRef.playerMultipliers.GetAttackSpeedMulti(pRef.bowScript.arrowDrawSpeed) : 1f;
+		//multiplayerBowAnim.speed = affectedByDrawSpeed ? pRef.playerMultipliers.GetMulti(pRef.bowScript.arrowDrawSpeed, Multiplier.AtkSpeed) : 1f;
+
+		multiplayerBowAnim.speed = pRef.playerMultipliers.GetMulti(pRef.bowScript.arrowDrawSpeed, Multiplier.AtkSpeed);
 
 		AnimatorStateInfo charStateInfo = multiplayerCharacterAnim.GetCurrentAnimatorStateInfo(0);
 

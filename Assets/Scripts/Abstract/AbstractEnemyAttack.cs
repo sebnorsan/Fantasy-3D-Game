@@ -23,7 +23,7 @@ public abstract class AbstractEnemyAttack : NetworkBehaviour
 		if (eRef.playerTarget != null)
 			eRef.playerTarget.TakeDamage(damageToPlayer, transform.position, null, 1);
 		if (eRef.enemyTarget != null)
-			eRef.enemyTarget.TakeDamage(eRef.enemyMultipliers.GetDamageMulti(damageToTarget));
+			eRef.enemyTarget.TakeDamage(eRef.enemyMultipliers.GetMulti(damageToTarget, Multiplier.Damage));
 	}
 	/// <summary>
 	/// These are called from the EnemyTarget script itself,
@@ -56,7 +56,7 @@ public abstract class AbstractEnemyAttack : NetworkBehaviour
 	{
 		eRef.enemyAnimator.A_SetWalk(false);
 		float elapsed = 0f;
-		float delay = eRef.enemyMultipliers.ApplyInverseMultiplier(attackDelay, eRef.enemyMultipliers.attackSpeedMultiplier);
+		float delay = eRef.enemyMultipliers.ApplyInverseMultiplier(attackDelay, eRef.enemyMultipliers.GetMultiplierPercent(Multiplier.AtkSpeed));
 
 		if (eRef.playerTarget != null)
 			eRef.enemyAnimator.A_Attack();

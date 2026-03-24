@@ -157,7 +157,7 @@ public class PlayerUpgrades : MonoBehaviour
 		// 100 => 1.0 (no change), 200 => 2.0 (luckier)
 		float luck = 1;
 		if (PlayerManager.m_pRef != null)
-			luck = PlayerManager.m_pRef.playerMultipliers.GetLuckMulti(1);
+			luck = PlayerManager.m_pRef.playerMultipliers.GetMulti(1, Multiplier.Luck);
 		luck = Mathf.Max(0.05f, luck);
 
 		// luck=1 => exponent=1 (normal)

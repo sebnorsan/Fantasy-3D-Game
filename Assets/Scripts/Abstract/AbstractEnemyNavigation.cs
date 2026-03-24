@@ -106,8 +106,8 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 			return;
 		}
 
-		originalSpeed = eRef.enemyMultipliers.GetSpeedMulti(speed);
-		agent.speed = eRef.enemyMultipliers.GetSpeedMulti(speed);
+		originalSpeed = eRef.enemyMultipliers.GetMulti(speed, Multiplier.Speed);
+		agent.speed = originalSpeed;
 	}
 	protected virtual void InitializeEnemy()
 	{

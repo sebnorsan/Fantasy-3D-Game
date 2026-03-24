@@ -77,6 +77,8 @@ public class PlayerController : NetworkBehaviour
 	[HideInInspector] public float inputVertical;
 	[HideInInspector] public float inputHorizontal;
 
+	public bool IsStationary() => !isMoving && isGrounded;
+
 	private int currentExtraJumps = 0;
 
 	private float initialWalkingSpeed;
@@ -336,7 +338,7 @@ public class PlayerController : NetworkBehaviour
 
 		float verticalSpeed = moveDirection.y;
 
-		Vector3 horizontalMove = desiredMove * pRef.playerMultipliers.GetSpeedMulti(baseSpeed + flySpeedToUse) + knockbackVelocity;
+		Vector3 horizontalMove = desiredMove * pRef.playerMultipliers.GetMulti(baseSpeed + flySpeedToUse, Multiplier.Speed) + knockbackVelocity;
 		moveDirection = new Vector3(horizontalMove.x, verticalSpeed, horizontalMove.z);
 
 		if (pRef.playerCharacterController.enabled)
@@ -395,7 +397,7 @@ public class PlayerController : NetworkBehaviour
 		if (coyoteActive)
 			StopCoyote();
 
-		moveDirection.y = pRef.playerMultipliers.GetJumpMulti(jumpSpeed);
+		moveDirection.y = pRef.playerMultipliers.GetMulti(jumpSpeed, Multiplier.Jump);
 
 		PlayMovementSound("Slide", .65f, 1.35f);
 
@@ -564,7 +566,7 @@ public class PlayerController : NetworkBehaviour
 		new HashSet<global::AbstractEvent>();
 	private void init_EnteringGrounded()
 	{
-		currentExtraJumps = pRef.playerMultipliers.GetExtraJumps();
+		currentExtraJumps = (int)Mathf.Round(pRef.playerPermanents.GetFlatMultiplier(FlatMultiplier.ExtraJump));
 
 		//slight delay as enteringgrounded happens immediatly when groundCheck enters ground radius
 		pRef.playerGraphics.PlayParticle(PlayerPfxToPlay.Halo, true, .05f);

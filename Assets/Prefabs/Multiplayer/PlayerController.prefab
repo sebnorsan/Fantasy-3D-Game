@@ -23477,8 +23477,8 @@ GameObject:
   - component: {fileID: 4818609617636790534}
   - component: {fileID: 8675364865469383676}
   - component: {fileID: 7628524721557430775}
-  - component: {fileID: 6574249655433990806}
   - component: {fileID: 6234475594236647715}
+  - component: {fileID: 6574249655433990806}
   - component: {fileID: 4597968635513800963}
   m_Layer: 3
   m_Name: PlayerController
@@ -24017,32 +24017,6 @@ MonoBehaviour:
   arrowFirePfx:
   - {fileID: 5310890218357641961}
   - {fileID: 8249430700243438875}
---- !u!114 &6574249655433990806
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7758727492805073096}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a4d7b73e1a14dd499c92b7f89b2844a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  damageMultiplier: 100
-  healthMultiplier: 100
-  speedMultiplier: 100
-  jumpMultiplier: 100
-  attackSpeedMultiplier: 100
-  projectileSizeMultiplier: 100
-  projectileSpeedMultiplier: 100
-  knockbackMultiplier: 100
-  experienceMultiplier: 100
-  luckMultiplier: 100
-  critChanceMultiplier: 100
-  critDamageMultiplier: 100
-  extraJump: 0
-  pRef: {fileID: 930708363686757887}
 --- !u!114 &6234475594236647715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24059,6 +24033,99 @@ MonoBehaviour:
   bigHitParticle: {fileID: 5024009746357069192, guid: 924af94442fdddd469b8f564bf1f980b, type: 3}
   flashDuration: 0.1
   flashMaterial: {fileID: 2100000, guid: 1cbe87e2f738d164b9dd99a5c2f5e8fe, type: 2}
+--- !u!114 &6574249655433990806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7758727492805073096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a4d7b73e1a14dd499c92b7f89b2844a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  multiplierList:
+  - type: 0
+    value: 100
+  - type: 1
+    value: 100
+  - type: 2
+    value: 100
+  - type: 3
+    value: 100
+  - type: 4
+    value: 100
+  - type: 5
+    value: 100
+  - type: 6
+    value: 100
+  - type: 7
+    value: 100
+  - type: 8
+    value: 100
+  - type: 9
+    value: 100
+  - type: 10
+    value: 100
+  - type: 11
+    value: 100
+  - type: 12
+    value: 100
+  - type: 13
+    value: 100
+  - type: 14
+    value: 100
+  - type: 15
+    value: 100
+  - type: 16
+    value: 100
+  - type: 17
+    value: 100
+  - type: 18
+    value: 100
+  - type: 19
+    value: 100
+  - type: 20
+    value: 100
+  - type: 21
+    value: 100
+  - type: 22
+    value: 100
+  - type: 23
+    value: 100
+  - type: 24
+    value: 100
+  - type: 25
+    value: 100
+  - type: 26
+    value: 100
+  - type: 27
+    value: 100
+  chanceList:
+  - type: 0
+    value: 0
+  - type: 1
+    value: 0
+  - type: 2
+    value: 0
+  - type: 3
+    value: 0
+  - type: 4
+    value: 0
+  - type: 5
+    value: 0
+  - type: 6
+    value: 0
+  - type: 7
+    value: 0
+  - type: 8
+    value: 0
+  - type: 9
+    value: 0
+  - type: 10
+    value: 0
+  pRef: {fileID: 930708363686757887}
 --- !u!114 &4597968635513800963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24073,7 +24140,58 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   pRef: {fileID: 930708363686757887}
   maxHealthBase: 100
-  maxHealthMultiplier: 0
+  flatMultiplierList:
+  - type: 0
+    value: 0
+  - type: 1
+    value: 0
+  - type: 2
+    value: 0
+  - type: 3
+    value: 0
+  - type: 4
+    value: 0
+  - type: 5
+    value: 0
+  - type: 6
+    value: 0
+  - type: 7
+    value: 0
+  - type: 8
+    value: 0
+  - type: 9
+    value: 0
+  - type: 10
+    value: 0
+  - type: 11
+    value: 0
+  - type: 12
+    value: 0
+  - type: 13
+    value: 0
+  - type: 14
+    value: 0
+  - type: 15
+    value: 0
+  - type: 16
+    value: 0
+  - type: 17
+    value: 0
+  - type: 18
+    value: 0
+  - type: 19
+    value: 0
+  - type: 20
+    value: 0
+  - type: 21
+    value: 0
+  - type: 22
+    value: 0
+  - type: 23
+    value: 0
+  activePermanents: 
+  activeSynergyComponents: 
+  activeSynergies: 
 --- !u!1 &7973304527205840717
 GameObject:
   m_ObjectHideFlags: 0

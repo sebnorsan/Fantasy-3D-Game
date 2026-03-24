@@ -51,7 +51,7 @@ public class UpgradeCardSO : ScriptableObject
 	public class UpgradeFlat
 	{
 		public FlatMultiplier multiplier;
-		public float flatMultiplier = 0;
+		public int flatMultiplier = 0;
 	}
 	[Serializable]
 	public class UpgradePermanent

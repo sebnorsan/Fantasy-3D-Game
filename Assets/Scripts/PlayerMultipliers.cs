@@ -6,17 +6,22 @@ public class PlayerMultipliers : AbstractMultipliers
 {
 	[Space(5)]
 
-	[SerializeField] private int extraJump = 0;
-
-	[Space(5)]
-
 	[SerializeField] private PlayerReferences pRef;
 
-	public int GetExtraJumps() => extraJump;
+	private float experienceForceFieldBaseSize = 1f;
+	private ParticleSystemForceField experienceForceField;
 
+	private void Start()
+	{
+		if (experienceForceField == null)
+			experienceForceField = GetComponentInChildren<ParticleSystemForceField>();
+		experienceForceFieldBaseSize = experienceForceField.endRange;
+	}
 	protected override void ApplyValues()
     {
 		pRef.playerDamagable.SetHealthMultiplier();
+		experienceForceField.endRange = pRef.playerMultipliers.GetMulti(experienceForceFieldBaseSize, Multiplier.PickupRadius);
+
 		//Set pickup size inside the particle force field
 	}
 }

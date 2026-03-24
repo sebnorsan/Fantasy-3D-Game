@@ -162,7 +162,7 @@ public class Arrow : MonoBehaviour
 		}
 
 		// tell server if this arrow was big
-		pRef.bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint, shooterClientId, arrowEffects, pRef.playerMultipliers.GetKnockbackMulti(1));
+		pRef.bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint, shooterClientId, arrowEffects, pRef.playerMultipliers.GetMulti(1, Multiplier.Knockback));
 
 		// if no pierce
 	}

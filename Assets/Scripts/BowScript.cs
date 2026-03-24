@@ -55,11 +55,22 @@ public class BowScript : MonoBehaviour
 
 		AnimatorStateInfo bowStateInfo = anim.GetCurrentAnimatorStateInfo(0);
 
-		bool affectedByDrawSpeed = false;
-		if (bowStateInfo.IsName("bow_loadIn") || bowStateInfo.IsName("bow_loaded") || bowStateInfo.IsName("bow_shot"))
-			affectedByDrawSpeed = true;
+		//bool affectedByDrawSpeed = false;
+		//if (bowStateInfo.IsName("bow_loadIn") || bowStateInfo.IsName("bow_loaded") || bowStateInfo.IsName("bow_shot"))
+		//	affectedByDrawSpeed = true;
 
-		anim.speed = affectedByDrawSpeed ? pRef.playerMultipliers.GetAttackSpeedMulti(pRef.bowScript.arrowDrawSpeed) : 1f;
+		//anim.speed = affectedByDrawSpeed ? pRef.playerMultipliers.GetMulti(pRef.bowScript.arrowDrawSpeed, Multiplier.AtkSpeed) : 1f;
+
+
+		float atkSpd = pRef.bowScript.arrowDrawSpeed;
+
+		atkSpd = pRef.playerMultipliers.GetMulti(pRef.bowScript.arrowDrawSpeed, Multiplier.AtkSpeed);
+		if (pRef.playerController.IsStationary())
+		{
+			atkSpd = pRef.playerMultipliers.GetMulti(atkSpd, Multiplier.StationaryAttackSpeed);
+		}
+
+		anim.speed = atkSpd;
 	}
 
 	private void LoadBow()
@@ -90,6 +101,8 @@ public class BowScript : MonoBehaviour
 		pRef.arrowParticles.UnApplyArrowEffects();
 	}
 
+	
+
 	private void ResetShot() => canShoot = true;
 
 	// Call this from your animation event at the moment the arrow should fire
@@ -100,25 +113,66 @@ public class BowScript : MonoBehaviour
 		// Aim direction from the owner's camera
 		Vector3 shootDir = pRef.playerCam.transform.forward;
 
-		float dmgToUse = pRef.playerMultipliers.GetDamageMulti(arrowDamage);
+		float dmgToUse = pRef.playerMultipliers.GetMulti(arrowDamage, Multiplier.Damage);
+		float prjSpdToUse = pRef.playerMultipliers.GetMulti(arrowSpeed, Multiplier.ProjectileSpeed);
+		float prjSizeToUse = pRef.playerMultipliers.GetMulti(arrowSize, Multiplier.ProjectileSize);
 
-		SpawnArrow(arrowFired, arrowTransform.position, arrowTransform.rotation, shootDir, dmgToUse, pRef.playerMultipliers.GetProjectileSpeedMulti(arrowSpeed), pRef.playerMultipliers.GetProjectileSizeMulti(arrowSize));
+		CheckForArrowEffectsToApply();
+
+		SpawnArrow(arrowFired, arrowTransform.position, arrowTransform.rotation, shootDir, dmgToUse, prjSpdToUse, prjSizeToUse);
 	}
-	private void SpawnArrow(
-	GameObject go,
-	Vector3 pos,
-	Quaternion rot,
-	Vector3 shootDir,
-	float dmg,
-	float spd,
-	float size)
+	private void CheckForArrowEffectsToApply()
+	{
+		var chancesHit = pRef.playerMultipliers.RollAllChances();
+
+		foreach (var hit in chancesHit)
+		{
+			switch (hit)
+			{
+				case Chance.HealingOrbChance:
+					break;
+				case Chance.ReflectionChance:
+					break;
+				case Chance.EnemyFreezeOnThawChance:
+					break;
+				case Chance.DoubleProjectileChance:
+					break;
+				case Chance.BurnChance:
+					break;
+				case Chance.CritChance:
+					pRef.bowEffects.SetBowEffect(ArrowEffect.Critical, true);
+					break;
+				case Chance.LightningKillSummonNewChance:
+					break;
+				case Chance.LightningChance:
+					break;
+				case Chance.FreezeChance:
+					break;
+				case Chance.CritPointChance:
+					break;
+				case Chance.DodgeChance:
+					break;
+				default:
+					break;
+			}
+		}
+	}
+	private void SpawnArrow(GameObject go, Vector3 pos, Quaternion rot, Vector3 shootDir, float dmg, float spd, float size)
 	{
 		ulong shooterId = NetworkManager.Singleton.LocalClientId;
 
 		var arrowObj = Instantiate(go, pos, rot);
 		var arrow = arrowObj.GetComponent<Arrow>();
 
-		if (pRef.bowEffects.GetBigHit())
+		if (pRef.playerController.IsStationary())
+		{
+			dmg = pRef.playerMultipliers.GetMulti(dmg, Multiplier.StationaryDamage);
+		}
+		if (pRef.bowEffects.GetBowEffect(ArrowEffect.Critical))
+		{
+			dmg = pRef.playerMultipliers.GetMulti(dmg, Multiplier.CritDamage);
+		}
+		if (pRef.bowEffects.GetBowEffect(ArrowEffect.BigHit))
 		{
 			dmg *= 5;
 		}

@@ -79,7 +79,7 @@ public class PvPPowerup : NetworkBehaviour
 		switch (upType)
 		{
 			case PowerUpType.Damage:
-				p.bowEffects.SetBigHit(true);
+				p.bowEffects.SetBowEffect(ArrowEffect.BigHit, true);
 				break;
 		}
 	}

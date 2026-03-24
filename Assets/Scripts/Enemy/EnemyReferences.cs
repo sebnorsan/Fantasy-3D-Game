@@ -11,6 +11,7 @@ public class EnemyReferences : MonoBehaviour
 	public EnemyLevelling enemyLevel;
 	public EnemyGraphics enemyGraphics;
 	public ExperienceEmitter experienceEmitter;
+	public EnemyElementalAffection enemyElemental;
 	//---Set during runtime---
 	[HideInInspector] public EnemyTarget enemyTarget = null;
 	[HideInInspector] public PlayerDamagable playerTarget = null;

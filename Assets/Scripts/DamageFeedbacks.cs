@@ -46,6 +46,8 @@ public class DamageFeedback : MonoBehaviour
 				{
 					case ArrowEffect.BigHit:
 						return bigHitParticle;
+					case ArrowEffect.Critical:
+						return bigHitParticle;
 					default:
 						break;
 				}
