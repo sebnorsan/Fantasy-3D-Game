@@ -297,7 +297,7 @@ public enum FlatMultiplier
 	HealthMax,
 	HealthRegenTime,
 	HealthRegenAmount,
-	FreezeDuration,
+	FreezeTime,
 	LightningChainCount,
 
 	//Frenzy for x amount of seconds after taking damage

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Transforms;
 using UnityEngine;
 
 [Serializable]
@@ -172,7 +173,18 @@ public abstract class AbstractMultipliers : MonoBehaviour
 		SetMultiplierListValue(type, finalValue);
 		ApplyValues();
 	}
+	public void ApplyMultiplierMultiplied(Multiplier type, float multiplication = 1f, float division = 1f)
+	{
+		float value = GetMultiplierPercent(type);
 
+		value *= multiplication;
+		value /= division;
+		value = Mathf.Max(1f, value);
+
+		multipliers[type] = value;
+		SetMultiplierListValue(type, value);
+		ApplyValues();
+	}
 	public void AddMultiplier(Multiplier type, float percent)
 	{
 		multipliers[type] = Mathf.Max(1f, GetMultiplierPercent(type) + percent);

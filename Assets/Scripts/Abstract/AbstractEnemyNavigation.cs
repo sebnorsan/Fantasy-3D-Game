@@ -100,13 +100,26 @@ public abstract class AbstractEnemyNavigation : NetworkBehaviour
 	}
 	public void SetSpeedMultiplier()
 	{
+		SpeedMultiplierServerRpc(eRef.enemyMultipliers.GetMulti(speed, Multiplier.Speed));
+	}
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+	private void SpeedMultiplierServerRpc(float speed)
+	{
+		SpeedMultiplierClientRpc(speed);
+
+		originalSpeed = speed;
+		agent.speed = originalSpeed;
+	}
+	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
+	private void SpeedMultiplierClientRpc(float speed)
+	{
 		if (currKnockbackCoroutine != null)
 		{
 			Invoke(nameof(SetSpeedMultiplier), .25f);
 			return;
 		}
 
-		originalSpeed = eRef.enemyMultipliers.GetMulti(speed, Multiplier.Speed);
+		originalSpeed = speed;
 		agent.speed = originalSpeed;
 	}
 	protected virtual void InitializeEnemy()

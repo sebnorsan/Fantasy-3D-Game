@@ -32,8 +32,7 @@ public class EnemyElementalAffection : NetworkBehaviour
 		if (fireDamageTick != null)
 			StopCoroutine(fireDamageTick);
 		fireDamageTick = StartCoroutine(DoDamageTick(
-			ElementPfxToPlay.Fire, 
-			ArrowEffect.Fire, 
+			ElementPfxToPlay.Fire,  
 			pRef.playerMultipliers.GetMulti(pRef.playerPermanents.GetFlatMultiplier(FlatMultiplier.BurnDamage), Multiplier.BurnDamage), 
 			1,
 			pRef.playerMultipliers.GetMulti(pRef.playerPermanents.GetFlatMultiplier(FlatMultiplier.BurnTime), Multiplier.BurnTime), shooterClientId));
@@ -42,6 +41,47 @@ public class EnemyElementalAffection : NetworkBehaviour
 	#endregion
 
 	#region Ice
+
+	private Coroutine iceSlowTick;
+	private float originalSpeed;
+	private void SetIce(ulong shooterClientId, PlayerReferences pRef)
+	{
+		if (iceSlowTick != null)
+		{
+			eRef.enemyMultipliers.ApplyMultiplierMultiplied(Multiplier.Speed, multiplication: 3);
+			StopCoroutine(iceSlowTick);
+		}
+		iceSlowTick = StartCoroutine(IceSlowTick(
+			ElementPfxToPlay.Ice,
+			pRef.playerPermanents.GetFlatMultiplier(FlatMultiplier.FreezeTime),
+			shooterClientId,
+			pRef));
+	}
+
+	private IEnumerator IceSlowTick(ElementPfxToPlay pfxToPlay, float freezeTime, ulong shooterClientId, PlayerReferences pRef)
+	{
+		DoPfx(pfxToPlay, true);
+
+		eRef.enemyMultipliers.ApplyMultiplierMultiplied(Multiplier.Speed, division: 3);
+
+		//float timer = 0f;
+
+		//while (timer < freezeTime)
+		//{
+		//	timer += Time.deltaTime;
+		//}
+
+		yield return new WaitForSeconds(freezeTime);
+
+		eRef.enemyMultipliers.ApplyMultiplierMultiplied(Multiplier.Speed, multiplication: 3);
+
+		DoPfx(pfxToPlay, false);
+
+		iceSlowTick = null;
+
+		if (pRef.playerMultipliers.RollChance(Chance.EnemyFreezeOnThawChance))
+			SetIce(shooterClientId, pRef);
+	}
 
 	#endregion
 
@@ -80,6 +120,8 @@ public class EnemyElementalAffection : NetworkBehaviour
 
 		if (pRef.playerMultipliers.RollChance(Chance.BurnChance))
 			SetFire(shooterClientId, pRef);
+		if (pRef.playerMultipliers.RollChance(Chance.FreezeChance))
+			SetIce(shooterClientId, pRef);
 	}
 
 	private void DoPfx(ElementPfxToPlay pfxEnum, bool play)
@@ -125,7 +167,7 @@ public class EnemyElementalAffection : NetworkBehaviour
 			pfx.Stop();
 	}
 
-	private IEnumerator DoDamageTick(ElementPfxToPlay pfxToPlay, ArrowEffect effect, float damage, float timeBetweenDamage, float affectedTime, ulong shooterClientId)
+	private IEnumerator DoDamageTick(ElementPfxToPlay pfxToPlay, float damage, float timeBetweenDamage, float affectedTime, ulong shooterClientId)
 	{
 		DoPfx(pfxToPlay, true);
 

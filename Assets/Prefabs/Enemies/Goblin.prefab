@@ -1085,6 +1085,10 @@ MonoBehaviour:
     value: 100
   - type: 27
     value: 100
+  - type: 28
+    value: 100
+  - type: 29
+    value: 100
   chanceList:
   - type: 0
     value: 0
