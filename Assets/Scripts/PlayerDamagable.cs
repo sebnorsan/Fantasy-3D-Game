@@ -204,9 +204,9 @@ public class PlayerDamagable : AbstractDamagable
 
 	#endregion
 	#region Dying
-	protected override void DieServer()
+	protected override void DieServer(bool skipServerDeathFx = true)
 	{
-		base.DieServer();
+		base.DieServer(skipServerDeathFx);
 
 		SetDeadStateClientRpc();
 		SpawnDeathCamClientRpc(lastHitByClientId);

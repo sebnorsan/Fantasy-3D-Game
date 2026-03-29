@@ -92,21 +92,21 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 		PlayDeathPfx();
 	}
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	protected virtual void DieParticlesClientRpc()
+	protected virtual void DieParticlesClientRpc(bool skipServerDeathFx)
 	{
 		PlayDeathPfx();
 	}
-	protected void BroadcastDamageEffects(Vector3 hitPoint, ArrowEffect[] arrowEffects)
-	{
-		DamageEffectsClientRpc(hitPoint, lastHitByClientId, arrowEffects);
-	}
+	//protected void BroadcastDamageEffects(Vector3 hitPoint, ArrowEffect[] arrowEffects)
+	//{
+	//	DamageEffectsClientRpc(hitPoint, lastHitByClientId, arrowEffects);
+	//}
 	protected abstract void PlayDeathPfx();
 
 	// default: skip shooter to prevent double VFX when doing prediction
 	protected virtual bool SkipClientEffectsForShooter => true;
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void DamageEffectsClientRpc(Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
+	private void DamageEffectsClientRpc(Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects, bool skipShooterEffects)
 	{
 		ApplyCurrentEffects(arrowEffects);
 
@@ -114,7 +114,7 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 			NetworkManager.Singleton != null &&
 			NetworkManager.Singleton.LocalClientId == shooterClientId;
 
-		if (!(isShooter && SkipClientEffectsForShooter))
+		if (!(isShooter && skipShooterEffects))
 			DamageEffects(hitPoint);
 
 		OnDamageEffectsClient(hitPoint, shooterClientId, isShooter);
@@ -138,6 +138,11 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 	// IDamagable must still be implemented by the real types
 	public virtual void TakeDamage(float amount, Vector3 hitPoint, ArrowEffect[] arrowEffects, float knockbackMultiplier)
 	{
+		TakeDamage(amount, hitPoint, arrowEffects, knockbackMultiplier, true);
+	}
+
+	public virtual void TakeDamage(float amount, Vector3 hitPoint, ArrowEffect[] arrowEffects, float knockbackMultiplier, bool skipShooterEffects)
+	{
 		if (!NetworkManager.Singleton.IsServer) return;
 
 		currentHealth = DamageSet(amount);
@@ -145,8 +150,8 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 
 		ApplyCurrentEffects(arrowEffects);
 		HandleKnockback(hitPoint, knockbackMultiplier);
-		DamageEffectsClientRpc(hitPoint, lastHitByClientId, arrowEffects);
-		CheckForDeath();
+		DamageEffectsClientRpc(hitPoint, lastHitByClientId, arrowEffects, skipShooterEffects);
+		CheckForDeath(skipShooterEffects);
 	}
 	public virtual void Heal(float amount)
 	{
@@ -163,14 +168,14 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 	{
 		CheckForDeath();
 	}
-	private void CheckForDeath()
+	private void CheckForDeath(bool skipServerDeathFx = true)
 	{
 		if (currentHealth <= 0)
-			DieServer();
+			DieServer(skipServerDeathFx);
 	}
-	protected virtual void DieServer()
+	protected virtual void DieServer(bool skipServerDeathFx = true)
 	{
-		DieParticlesClientRpc();
+		DieParticlesClientRpc(skipServerDeathFx);
 	}
 	protected void AddKillForPlayer()
 	{

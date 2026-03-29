@@ -15,21 +15,26 @@ public class BowEffects : NetworkBehaviour
 			NetworkVariableReadPermission.Everyone,
 			NetworkVariableWritePermission.Owner);
 
+	[SerializeField] private ArrowEffect[] effectsToReset;
+
+	private void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Alpha4))
+			SetBowEffect(ArrowEffect.Fire, true);
+	}
+
 	public void UpdateEffects()
 	{
 		pRef.arrowParticles.UnApplyArrowEffects();
 
 		// WARNING:
 		// This fully removes all active effects.
-		ResetEffects();
+		ResetEffects(effectsToReset);
 	}
 
-	private void ResetEffects()
+	private void ResetEffects(ArrowEffect[] effectsToRemove)
 	{
 		EnsureList();
-
-		// Copy the list first, because SetBowEffect(false) removes from it
-		List<ArrowEffect> effectsToRemove = new List<ArrowEffect>(activeArrowEffects.Value);
 
 		foreach (ArrowEffect effect in effectsToRemove)
 		{
@@ -102,5 +107,9 @@ public class BowEffects : NetworkBehaviour
 public enum ArrowEffect
 {
 	BigHit,
-	Critical
+	Critical,
+
+	Fire,
+	Ice,
+	Lightning
 }

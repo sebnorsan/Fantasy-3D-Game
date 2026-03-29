@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Steamworks.Data;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -108,8 +109,18 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 	// NEW: called from AbstractDamagable like in your PlayerDamagable
 	protected override void OnDamageEffectsClient(Vector3 hitPoint, ulong shooterClientId, bool isShooter)
 	{
+		ulong clientId = shooterClientId;
+
+		GameObject playerObj = null;
+
+		if (NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client))
+		{
+			playerObj = client.PlayerObject.gameObject;
+		}
+
 		if (isShooter)
 			ShowHealthBarLocal(showHealthBarSeconds);
+		eRef.enemyElemental.ApplyElements(currentAppliedEffects, shooterClientId, playerObj?.GetComponent<PlayerReferences>());
 	}
 
 	public void SetHealthMultiplier()
@@ -165,6 +176,8 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 
 	protected override void HandleKnockback(Vector3 hitPoint, float knockbackMultiplier)
 	{
+		if (hitPoint == Vector3.zero) return;
+
 		eRef.enemyNavigation.DoKnockback(hitPoint, knockbackMultiplier);
 	}
 
@@ -185,9 +198,9 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 			healthBarCanvasGroup.alpha = 0f;
 	}
 
-	protected override void DieServer()
+	protected override void DieServer(bool skipServerDeathFx = true)
 	{
-		base.DieServer();
+		base.DieServer(skipServerDeathFx);
 
 		DieClientRpc(lastHitByClientId);
 		StopAllCoroutines();
@@ -202,12 +215,14 @@ public abstract class AbstractEnemyDamagable : AbstractDamagable
 	}
 
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	protected override void DieParticlesClientRpc()
+	protected override void DieParticlesClientRpc(bool skipServerDeathFx)
 	{
+		Debug.Log("skipping death fx " + skipServerDeathFx);
+
 		bool isShooter = NetworkManager.Singleton != null &&
 						 NetworkManager.Singleton.LocalClientId == lastHitByClientId;
 
-		if (!isShooter)
+		if (!isShooter || !skipServerDeathFx)
 			PlayDeathPfx();
 	}
 

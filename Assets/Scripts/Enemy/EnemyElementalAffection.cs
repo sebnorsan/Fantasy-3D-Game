@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Net.NetworkInformation;
 using Unity.Netcode;
 using UnityEngine;
@@ -25,7 +26,18 @@ public class EnemyElementalAffection : NetworkBehaviour
 
 	#region Fire
 
-
+	private Coroutine fireDamageTick;
+	private void SetFire(ulong shooterClientId, PlayerReferences pRef)
+	{
+		if (fireDamageTick != null)
+			StopCoroutine(fireDamageTick);
+		fireDamageTick = StartCoroutine(DoDamageTick(
+			ElementPfxToPlay.Fire, 
+			ArrowEffect.Fire, 
+			pRef.playerMultipliers.GetMulti(pRef.playerPermanents.GetFlatMultiplier(FlatMultiplier.BurnDamage), Multiplier.BurnDamage), 
+			1,
+			pRef.playerMultipliers.GetMulti(pRef.playerPermanents.GetFlatMultiplier(FlatMultiplier.BurnTime), Multiplier.BurnTime), shooterClientId));
+	}
 
 	#endregion
 
@@ -39,27 +51,104 @@ public class EnemyElementalAffection : NetworkBehaviour
 
 	#region Helpers
 
-	public void PlayPfx()
+	public void ApplyElements(ArrowEffect[] arrowEffects, ulong shooterClientId, PlayerReferences pRef)
 	{
-		PlayPfxServerRpc();
-		PlayPfxAction();
+		if (arrowEffects == null) return;
+
+		foreach (var effect in arrowEffects)
+		{
+			switch (effect)
+			{
+				case ArrowEffect.BigHit:
+					break;
+				case ArrowEffect.Critical:
+					break;
+				case ArrowEffect.Fire:
+					//if (pRef.playerMultipliers.RollChance(Chance.BurnChance))
+					//	SetFire(shooterClientId, pRef);
+					break;
+				case ArrowEffect.Ice:
+					break;
+				case ArrowEffect.Lightning:
+					break;
+				default:
+					break;
+			}
+		}
+
+		//Chances
+
+		if (pRef.playerMultipliers.RollChance(Chance.BurnChance))
+			SetFire(shooterClientId, pRef);
 	}
+
+	private void DoPfx(ElementPfxToPlay pfxEnum, bool play)
+	{
+		ulong predictorClientId = NetworkManager.Singleton.LocalClientId;
+
+		PlayPfxServerRpc(pfxEnum, play, predictorClientId);
+		PlayPfxAction(pfxEnum, play);
+	}
+
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-	private void PlayPfxServerRpc()
+	private void PlayPfxServerRpc(ElementPfxToPlay pfxEnum, bool play, ulong predictorClientId)
 	{
-		PlayPfxClientRpc();
+		PlayPfxClientRpc(pfxEnum, play, predictorClientId);
 	}
+
 	[Rpc(SendTo.ClientsAndHost, InvokePermission = RpcInvokePermission.Server)]
-	private void PlayPfxClientRpc()
+	private void PlayPfxClientRpc(ElementPfxToPlay pfxEnum, bool play, ulong predictorClientId)
 	{
-		if (IsOwner) return;
+		if (NetworkManager.Singleton.LocalClientId == predictorClientId) return;
 
-		PlayPfxAction();
+		PlayPfxAction(pfxEnum, play);
 	}
-	private void PlayPfxAction()
+	private void PlayPfxAction(ElementPfxToPlay pfxEnum, bool play)
 	{
+		ParticleSystem pfx = null;
 
+		switch (pfxEnum)
+		{
+			case ElementPfxToPlay.Fire:
+				pfx = firePfx;
+				break;
+			case ElementPfxToPlay.Ice:
+				pfx = icePfx;
+				break;
+			default:
+				return;
+		}
+
+		if (play)
+			pfx.Play();
+		else
+			pfx.Stop();
 	}
 
+	private IEnumerator DoDamageTick(ElementPfxToPlay pfxToPlay, ArrowEffect effect, float damage, float timeBetweenDamage, float affectedTime, ulong shooterClientId)
+	{
+		DoPfx(pfxToPlay, true);
+
+		float timer = 0f;
+
+		while (timer < affectedTime)
+		{
+			yield return new WaitForSeconds(timeBetweenDamage);
+
+			timer += timeBetweenDamage;
+			if (timer > affectedTime) yield break;
+
+			DoDamageServerRpc(damage, shooterClientId);
+		}
+
+		DoPfx(pfxToPlay, false);
+	}
+
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+	private void DoDamageServerRpc(float damage, ulong shooterClientId)
+	{
+		eRef.enemyDamagable.SetLastHitBy(shooterClientId);
+		eRef.enemyDamagable.TakeDamage(damage, Vector3.zero, null, 0, false);
+	}
 	#endregion
 }

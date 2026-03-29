@@ -248,6 +248,8 @@ public enum Multiplier
 	CritDamage,
 
 	PickupRadius,
+	BurnDamage,
+	BurnTime,
 	LightningDamage,
 	LightningRange,
 	ExplosionDamage,
