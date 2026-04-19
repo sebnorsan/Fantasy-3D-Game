@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.Entities;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,6 +23,10 @@ public class PlayerDamagable : AbstractDamagable
 	[Space(15)]
 	[Header("Knockback")]
 	[SerializeField] private float knockbackStrength = 10f;
+
+	[Header("Enemy Pushback On Hit")]
+	[SerializeField] private float enemyPushbackRange = 4f;
+	[SerializeField] private float enemyPushbackMultiplier = 1f;
 
 	private float displayedHealth;
 
@@ -143,10 +148,41 @@ public class PlayerDamagable : AbstractDamagable
 	{
 		Vector3 dir = (transform.position - hitPoint);
 		dir.y = 0f;
+
 		if (dir.sqrMagnitude > 0.001f)
 		{
 			dir.Normalize();
 			ApplyKnockbackOwnerRpc(dir * (knockbackStrength * knockbackMultiplier));
+		}
+
+		if (IsServer)
+			KnockbackNearbyEnemies();
+	}
+	private void KnockbackNearbyEnemies()
+	{
+		float rangeToUse = pRef.playerMultipliers.GetMulti(enemyPushbackRange, Multiplier.PushbackDistance);
+		float dmgToDeal = pRef.playerPermanents.GetFlatMultiplier(FlatMultiplier.EnemyPushbackDamage);
+		float pushbackToUse = pRef.playerMultipliers.GetMulti(enemyPushbackMultiplier, Multiplier.PushbackKnockback);
+
+		float rangeSqr = rangeToUse * rangeToUse;
+
+		foreach (var enemy in AbstractEnemy.All)
+		{
+			if (enemy == null) continue;
+			if (!enemy.isActiveAndEnabled) continue;
+
+			EnemyReferences enemyRef = enemy.GetComponent<EnemyReferences>();
+			if (enemyRef == null || enemyRef.enemyNavigation == null) continue;
+
+			Vector3 dir = enemy.transform.position - transform.position;
+			dir.y = 0f;
+
+			if (dir.sqrMagnitude > rangeSqr) continue;
+
+			if (dmgToDeal > 0)
+				enemyRef.enemyDamagable.TakeDamage(dmgToDeal, transform.position, null, pushbackToUse);
+			else
+				enemyRef.enemyNavigation.DoKnockback(transform.position, pushbackToUse);
 		}
 	}
 	protected override float DamageSet(float amount)

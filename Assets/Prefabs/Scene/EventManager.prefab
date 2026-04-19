@@ -131,7 +131,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 152406263
+  GlobalObjectIdHash: 962177354
   InScenePlacedSourceGlobalObjectIdHash: 152406263
   DeferredDespawnTick: 0
   Ownership: 1
@@ -178,6 +178,7 @@ MonoBehaviour:
   netGameObjects:
   - {fileID: 5024009746357069194, guid: 924af94442fdddd469b8f564bf1f980b, type: 3}
   - {fileID: 1198354084343624968, guid: 5ff6c8ea440d71848af2836b4cc299f7, type: 3}
+  - {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
 --- !u!114 &4891067815844761176
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,6 +191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b684a094493ca884baa265da99924631, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  changeStateKey: 0
 --- !u!114 &7396626512906889687
 MonoBehaviour:
   m_ObjectHideFlags: 0

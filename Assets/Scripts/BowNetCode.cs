@@ -1,11 +1,13 @@
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Identifiers;
+using UnityEngine.Rendering;
 
 public class BowNetCode : NetworkBehaviour
 {
 	[SerializeField] private PlayerReferences pRef;
 	[SerializeField] private GameObject arrowPrefab;
+	[SerializeField] private GameObject explosionPrefab;
 
 	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
 	public void SpawnArrowVisualServerRpc(string identifier, Vector3 pos, Quaternion rot, Vector3 dir, float dmg, float spd, float size, ulong shooterClientId, ArrowEffect[] arrowEffects)
@@ -31,6 +33,26 @@ public class BowNetCode : NetworkBehaviour
 		{
 			dmg.SetLastHitBy(shooterClientId);
 			dmg.TakeDamage(amount, hitPoint, arrowEffects, knockbackMultiplier);
+
+			if (arrowEffects.Contains(ArrowEffect.Explosion))
+				SpawnExplosion(dmg.transform.position, shooterClientId);
+
+			if (shooterClientId != ulong.MaxValue && NetworkManager.Singleton.ConnectedClients.TryGetValue(shooterClientId, out var playerCc))
+			{
+				var playerRef = playerCc.PlayerObject.GetComponent<PlayerReferences>();
+				playerRef.playerDamagable.HealFromClientRpc(playerRef.playerPermanents.GetFlatMultiplier(FlatMultiplier.LifeStealFlatAmount));
+				if (arrowEffects.Contains(ArrowEffect.Critical))
+					playerRef.playerDamagable.HealFromClientRpc(playerRef.playerPermanents.GetFlatMultiplier(FlatMultiplier.CritLifeStealAmount));
+				//make a server get a client multiplier
+			}
 		}
+	}
+
+	private void SpawnExplosion(Vector3 position, ulong shooterClientId)
+	{
+		GameObject expObj = Instantiate(explosionPrefab, position, explosionPrefab.transform.rotation);
+		expObj.GetComponent<NetworkObject>().Spawn();
+
+		expObj.GetComponent<Explosion>().InitializeFromServer(shooterClientId);
 	}
 }

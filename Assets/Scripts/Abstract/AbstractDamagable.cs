@@ -67,25 +67,27 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 	{
 		currentAppliedEffects = arrowEffects;
 	}
-	
-	public virtual void LocalPredictedDamage(float amount, Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
+
+	public virtual bool LocalPredictedDamage(float amount, Vector3 hitPoint, ulong shooterClientId, ArrowEffect[] arrowEffects)
 	{
-		if (!IsClient) return;
-		if (NetworkManager.Singleton.LocalClientId != shooterClientId) return;
-		if (locallyPredictedDead) return;
+		if (!IsClient) return false;
+		if (NetworkManager.Singleton.LocalClientId != shooterClientId) return false;
+		if (locallyPredictedDead) return false;
 
 		// instant local VFX
 		ApplyCurrentEffects(arrowEffects);
 		DamageEffects(hitPoint, true);
 
 		float newHealth = Mathf.Max(0, currentHealth - amount);
+		bool predictedKill = newHealth <= 0f;
 
-		if (newHealth == 0)
+		if (!IsServer)
+			currentHealth = newHealth;
+
+		if (predictedKill)
 			LocalPredictedDie();
 
-		if (IsServer) return;
-		
-		currentHealth = newHealth;
+		return predictedKill;
 	}
 	protected virtual void LocalPredictedDie()
 	{
@@ -152,6 +154,11 @@ public abstract class AbstractDamagable : NetworkBehaviour, IDamagable
 		HandleKnockback(hitPoint, knockbackMultiplier);
 		DamageEffectsClientRpc(hitPoint, lastHitByClientId, arrowEffects, skipShooterEffects);
 		CheckForDeath(skipShooterEffects);
+	}
+	[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+	public void HealFromClientRpc(float amount)
+	{
+		Heal(amount);
 	}
 	public virtual void Heal(float amount)
 	{

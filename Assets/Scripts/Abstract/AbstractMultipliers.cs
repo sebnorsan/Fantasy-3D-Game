@@ -277,7 +277,10 @@ public enum Multiplier
 	AfterKillSpeed,
 	HealingOrbAmount,
 	ElementalDamage,
-	EntitySize
+	EntitySize,
+	
+	PushbackKnockback,
+	PushbackDistance
 }
 public enum Chance
 {

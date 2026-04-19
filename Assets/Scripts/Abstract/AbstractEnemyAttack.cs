@@ -7,14 +7,15 @@ public abstract class AbstractEnemyAttack : NetworkBehaviour
 	[SerializeField] private EnemyReferences eRef;
 
 	[Space(5)]
-
 	[SerializeField] private float damageToPlayer = 1;
 	[SerializeField] private float damageToTarget = 1;
 	[SerializeField] private float attackDelay = 3;
-
+	[SerializeField] private float playerAttackRange = 1.5f;
 	[SerializeField] private float attackTurnSpeed = 10f;
 
 	private Coroutine attackCoroutine;
+
+	public float PlayerAttackRange => playerAttackRange;
 
 	public void AE_AttackTarget()
 	{
@@ -22,15 +23,11 @@ public abstract class AbstractEnemyAttack : NetworkBehaviour
 
 		if (eRef.playerTarget != null)
 			eRef.playerTarget.TakeDamage(damageToPlayer, transform.position, null, 1);
+
 		if (eRef.enemyTarget != null)
 			eRef.enemyTarget.TakeDamage(eRef.enemyMultipliers.GetMulti(damageToTarget, Multiplier.Damage));
 	}
-	/// <summary>
-	/// These are called from the EnemyTarget script itself,
-	/// when an enemy enters its trigger, it starts attacking
-	/// and when an enemy leaves its trigger, it stops.
-	/// </summary>
-	//------------------------
+
 	public void StartAttack()
 	{
 		if (!NetworkManager.Singleton.IsServer) return;
@@ -46,22 +43,17 @@ public abstract class AbstractEnemyAttack : NetworkBehaviour
 		if (attackCoroutine != null)
 		{
 			StopCoroutine(attackCoroutine);
-			attackCoroutine = null; // <-- important
+			attackCoroutine = null;
 		}
-		eRef.enemyAnimator.A_SetWalk(true); // optional: so they resume moving
+
+		eRef.enemyAnimator.A_SetWalk(true);
 	}
 
-	//------------------------
 	protected virtual IEnumerator AttackNumerator()
 	{
 		eRef.enemyAnimator.A_SetWalk(false);
-		float elapsed = 0f;
-		float delay = eRef.enemyMultipliers.ApplyInverseMultiplier(attackDelay, eRef.enemyMultipliers.GetMultiplierPercent(Multiplier.AtkSpeed));
 
-		if (eRef.playerTarget != null)
-			eRef.enemyAnimator.A_Attack();
-
-		while (elapsed < delay)
+		while (true)
 		{
 			if (GetTargetTransform() == null)
 			{
@@ -70,19 +62,64 @@ public abstract class AbstractEnemyAttack : NetworkBehaviour
 				yield break;
 			}
 
-			elapsed += Time.deltaTime;
-			RotateTowardsTarget();
-			yield return null;
+			float delay = eRef.enemyMultipliers.ApplyInverseMultiplier(
+				attackDelay,
+				eRef.enemyMultipliers.GetMultiplierPercent(Multiplier.AtkSpeed)
+			);
+
+			// PLAYER TARGET = direct damage, no animation
+			if (eRef.playerTarget != null)
+			{
+				float sqr = (eRef.playerTarget.transform.position - transform.position).sqrMagnitude;
+				if (sqr <= playerAttackRange * playerAttackRange)
+					eRef.playerTarget.TakeDamage(damageToPlayer, transform.position, null, 1);
+
+				float elapsed = 0;
+
+				while (elapsed < delay)
+				{
+					if (GetTargetTransform() == null || eRef.playerTarget == null)
+					{
+						attackCoroutine = null;
+						eRef.enemyAnimator.A_SetWalk(true);
+						yield break;
+					}
+
+					elapsed += Time.deltaTime;
+					yield return null;
+				}
+
+				continue;
+			}
+
+			// CRYSTAL / NORMAL TARGET = keep animation attack
+			eRef.enemyAnimator.A_Attack();
+
+			float animElapsed = 0f;
+			while (animElapsed < delay)
+			{
+				if (GetTargetTransform() == null)
+				{
+					attackCoroutine = null;
+					eRef.enemyAnimator.A_SetWalk(true);
+					yield break;
+				}
+
+				animElapsed += Time.deltaTime;
+				RotateTowardsTarget();
+				yield return null;
+			}
 		}
-		eRef.enemyAnimator.A_Attack();
-		attackCoroutine = StartCoroutine(AttackNumerator());
 	}
+
 	private void RotateTowardsTarget()
 	{
-		if (eRef.enemyTarget == null) return;
+		Transform target = GetTargetTransform();
+		if (target == null) return;
 
-		Vector3 dir = GetTargetTransform().position - transform.position;
+		Vector3 dir = target.position - transform.position;
 		dir.y = 0f;
+
 		if (dir.sqrMagnitude < 0.0001f) return;
 
 		Quaternion lookRot = Quaternion.LookRotation(dir);
@@ -92,13 +129,13 @@ public abstract class AbstractEnemyAttack : NetworkBehaviour
 			Time.deltaTime * attackTurnSpeed
 		);
 	}
+
 	private Transform GetTargetTransform()
 	{
-		if (eRef.playerTarget != null) 
+		if (eRef.playerTarget != null)
 			return eRef.playerTarget.transform;
-		if (eRef.enemyTarget != null) 
+		if (eRef.enemyTarget != null)
 			return eRef.enemyTarget.transform;
 		return null;
 	}
-
 }

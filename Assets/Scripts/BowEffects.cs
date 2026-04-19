@@ -111,5 +111,6 @@ public enum ArrowEffect
 
 	Fire,
 	Ice,
-	Lightning
+	Lightning,
+	Explosion
 }

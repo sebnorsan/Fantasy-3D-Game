@@ -314,7 +314,9 @@ public enum FlatMultiplier
 	SlowZoneRange,
 	FrostBiteDamage,
 	ExpOnDodgeAmount,
-	ForceFieldAmount
+	ForceFieldAmount,
+
+	EnemyPushbackDamage
 }
 public enum PermanentUpgrades
 {

@@ -23671,6 +23671,8 @@ MonoBehaviour:
   sliderLerpSpeed: 10
   localHealthSlider: {fileID: 180058822542579069}
   knockbackStrength: 10
+  enemyPushbackRange: 6
+  enemyPushbackMultiplier: 1
 --- !u!114 &994555372891957732
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23828,8 +23830,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  pRef: {fileID: 0}
+  pRef: {fileID: 930708363686757887}
   arrowPrefab: {fileID: 5657210549004271310, guid: d6446b95a8d411843a8b5b5ce19c79f3, type: 3}
+  explosionPrefab: {fileID: 417761080263594737, guid: 7800b8f6b712bfe49bd663eeb3ebe1e4, type: 3}
 --- !u!114 &-4300034968420110970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24103,6 +24106,14 @@ MonoBehaviour:
     value: 100
   - type: 27
     value: 100
+  - type: 28
+    value: 100
+  - type: 29
+    value: 100
+  - type: 30
+    value: 100
+  - type: 31
+    value: 100
   chanceList:
   - type: 0
     value: 0
@@ -24189,6 +24200,8 @@ MonoBehaviour:
   - type: 22
     value: 0
   - type: 23
+    value: 0
+  - type: 24
     value: 0
   activePermanents: 
   activeSynergyComponents: 

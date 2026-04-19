@@ -43,12 +43,12 @@ public class EnemyElementalAffection : NetworkBehaviour
 	#region Ice
 
 	private Coroutine iceSlowTick;
-	private float originalSpeed;
+	private float iceMultiplier = 3;
 	private void SetIce(ulong shooterClientId, PlayerReferences pRef)
 	{
 		if (iceSlowTick != null)
 		{
-			eRef.enemyMultipliers.ApplyMultiplierMultiplied(Multiplier.Speed, multiplication: 3);
+			eRef.enemyMultipliers.ApplyMultiplierMultiplied(Multiplier.Speed, multiplication: iceMultiplier);
 			StopCoroutine(iceSlowTick);
 		}
 		iceSlowTick = StartCoroutine(IceSlowTick(
@@ -62,7 +62,7 @@ public class EnemyElementalAffection : NetworkBehaviour
 	{
 		DoPfx(pfxToPlay, true);
 
-		eRef.enemyMultipliers.ApplyMultiplierMultiplied(Multiplier.Speed, division: 3);
+		eRef.enemyMultipliers.ApplyMultiplierMultiplied(Multiplier.Speed, division: iceMultiplier);
 
 		//float timer = 0f;
 
@@ -73,7 +73,7 @@ public class EnemyElementalAffection : NetworkBehaviour
 
 		yield return new WaitForSeconds(freezeTime);
 
-		eRef.enemyMultipliers.ApplyMultiplierMultiplied(Multiplier.Speed, multiplication: 3);
+		eRef.enemyMultipliers.ApplyMultiplierMultiplied(Multiplier.Speed, multiplication: iceMultiplier);
 
 		DoPfx(pfxToPlay, false);
 

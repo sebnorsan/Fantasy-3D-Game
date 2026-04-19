@@ -12,7 +12,9 @@ public class Arrow : MonoBehaviour
 
 	[Header("Damage & Effects")]
 	public float arrowDamage = 1;
-	public ArrowEffect[] arrowEffects;
+	public List<ArrowEffect> arrowEffects = new List<ArrowEffect>();
+
+	public GameObject explosionPrefab;
 
 	[Header("Flight Settings")]
 	public float initialSpeed = 30f;
@@ -53,9 +55,14 @@ public class Arrow : MonoBehaviour
 	{
 		pRef = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerReferences>();
 
-		arrowEffects = arrowFx;
+		arrowEffects.Clear();
 
-		ApplyEffects(arrowEffects);
+		if (arrowFx != null)
+			foreach (var fx in arrowFx)
+				arrowEffects.Add(fx);
+		//arrowEffects = arrowFx;
+
+		ApplyEffects(arrowEffects.ToArray());
 
 		this.isAuthority = isAuthority;
 
@@ -156,14 +163,38 @@ public class Arrow : MonoBehaviour
 
 		clientsHit.Add(targetNetId);
 
+		bool predictedKill = false;
+
 		if (go.TryGetComponent<AbstractDamagable>(out var enemy))
 		{
-			enemy.LocalPredictedDamage(arrowDamage, hitPoint, shooterClientId, arrowEffects);
+			predictedKill = enemy.LocalPredictedDamage(arrowDamage, hitPoint, shooterClientId, arrowEffects.ToArray());
 		}
 
-		// tell server if this arrow was big
-		pRef.bowNetCode.HitServerRpc(targetNetId, arrowDamage, hitPoint, shooterClientId, arrowEffects, pRef.playerMultipliers.GetMulti(1, Multiplier.Knockback));
+		if (predictedKill && pRef.playerPermanents.IsPermanentActive(PermanentUpgrades.BoomArrows))
+		{
+			arrowEffects.Add(ArrowEffect.Explosion);
+			//SpawnLocalExplosion();
+		}
 
-		// if no pierce
+		pRef.bowNetCode.HitServerRpc(
+			targetNetId,
+			arrowDamage,
+			hitPoint,
+			shooterClientId,
+			arrowEffects.ToArray(),
+			pRef.playerMultipliers.GetMulti(1, Multiplier.Knockback)
+		);
 	}
+	//private void SpawnLocalExplosion()
+	//{
+	//	if (explosionPrefab == null) return;
+
+	//	GameObject expObj = Instantiate(explosionPrefab, transform.position, explosionPrefab.transform.rotation);
+
+	//	if (expObj.TryGetComponent(out Explosion exp))
+	//	{
+	//		float radius = pRef.playerMultipliers.GetMulti(1f, Multiplier.ExplosionRadius);
+	//		exp.PlayLocalVisuals(radius);
+	//	}
+	//}
 }
